@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/common/widgets/ui.dart';
+import 'features/auth/pages/login.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
 
-      home: const ComponentShowcaseScreen(),
+      home: LoginPage(),
     );
   }
 }
