@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import '../widgets/button.dart';
+import '../widgets/textfield.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -9,14 +11,39 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Register Page')),
 
-      body: Center(
-        child: Padding(
+      body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              AppLogo(),
+              const SizedBox(height: 24),
+              AuthTextField(
+                hint: 'Nickname',
+                controller: TextEditingController(),
+                obscure: false,
+              ),
+              const SizedBox(height: 16),
+              AuthTextField(
+                hint: 'Email',
+                controller: TextEditingController(),
+                obscure: false,
+              ),
+              const SizedBox(height: 16),
+              AuthTextField(
+                hint: 'Password',
+                controller: TextEditingController(),
+                obscure: true,
+              ),
+              const SizedBox(height: 16),
+              AuthTextField(
+                hint: 'Confirm Password',
+                controller: TextEditingController(),
+                obscure: true,
+              ),
+              const SizedBox(height: 16),
               AuthButton(
-                label: 'Register',
+                label: 'Registrati',
                 textColor: Colors.white,
                 onPressed: () {},
               ),
@@ -32,7 +59,7 @@ class RegisterPage extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        
       ),
     );
   }
