@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/ui.dart';
+import 'package:greenlinkapp/features/auth/pages/login.dart';
+import 'package:greenlinkapp/features/auth/pages/register.dart';
 
 final router = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const RootScreenPlaceholder(),
+      builder: (context, state) => const LoginPage(),
     ),
 
     GoRoute(
       path: '/ui',
       builder: (context, state) => const ComponentShowcaseScreen(),
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterPage(),
+    ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
     ),
   ],
 );

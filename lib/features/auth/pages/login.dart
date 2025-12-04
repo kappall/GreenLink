@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import '../widgets/button.dart';
 import '../widgets/textfield.dart';
+import 'package:greenlinkapp/router.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -38,7 +39,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 16),
               GestureDetector(
                 onTap: () {
-                  // Navigate to registration page
+                  router.push('/register');
                 },
                 child:Text(
                 'Non hai un account? Registrati cliccando qui.',
