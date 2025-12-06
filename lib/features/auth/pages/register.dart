@@ -77,7 +77,7 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                     ),
                     const SizedBox(height: 16),
                     AuthTextField(
-                      hint: 'Confirm Password',
+                      hint: 'Conferma Password',
                       controller: _confirmPasswordController,
                       obscure: true,
                     ),
@@ -89,54 +89,53 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                       ),
                       const SizedBox(height: 16),
                     ],
-                    FilledButton(
-                      onPressed: authState.isLoading
-                          ? null
-                          : () {
-                              final email = _emailController.text.trim();
-                              final emailRegex = RegExp(
-                                r'^[\w\.-]+@[\w\.-]+\.\w+$',
-                              );
-
-                              if (!emailRegex.hasMatch(email)) {
-                                setState(() {
-                                  errorMessage = 'Email non valida';
-                                });
-                                return;
-                              }
-                              if (_passwordController.text.trim() !=
-                                  _confirmPasswordController.text.trim()) {
-                                setState(() {
-                                  errorMessage = 'Le password non coincidono';
-                                });
-                                return;
-                              }
-                              print(_nicknameController.text);
-                              print(_emailController.text.trim());
-                              print(_passwordController.text.trim());
-                              print(_confirmPasswordController.text.trim());
-                              _nicknameController.clear();
-                              _emailController.clear();
-                              _passwordController.clear();
-                              _confirmPasswordController.clear();
-                              ref
-                                  .read(authProvider.notifier)
-                                  .register(
-                                    _nicknameController.text.trim(),
-                                    _emailController.text.trim(),
-                                    _passwordController.text.trim(),
-                                  );
-                            },
-                      child: authState.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text("Registrati"),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: authState.isLoading
+                            ? null
+                            : () {
+                                final email = _emailController.text.trim();
+                                final emailRegex = RegExp(
+                                  r'^[\w\.-]+@[\w\.-]+\.\w+$',
+                                );
+                      
+                                if (!emailRegex.hasMatch(email)) {
+                                  setState(() {
+                                    errorMessage = 'Email non valida';
+                                  });
+                                  return;
+                                }
+                                if (_passwordController.text.trim() !=
+                                    _confirmPasswordController.text.trim()) {
+                                  setState(() {
+                                    errorMessage = 'Le password non coincidono';
+                                  });
+                                  return;
+                                }
+                                _nicknameController.clear();
+                                _emailController.clear();
+                                _passwordController.clear();
+                                _confirmPasswordController.clear();
+                                ref
+                                    .read(authProvider.notifier)
+                                    .register(
+                                      _nicknameController.text.trim(),
+                                      _emailController.text.trim(),
+                                      _passwordController.text.trim(),
+                                    );
+                              },
+                        child: authState.isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text("Registrati"),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextButton(
