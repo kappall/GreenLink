@@ -1,117 +1,27 @@
 import 'package:flutter/material.dart';
-import 'core/common/widgets/ui.dart';
-import 'features/auth/pages/login.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/router.dart';
 import 'theme/app_theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'GreenLink',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
 
-      home: LoginPage(),
-    );
-  }
-}
-
-class ComponentShowcaseScreen extends StatelessWidget {
-  const ComponentShowcaseScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('GreenLink UI Kit')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16,
-          children: [
-            const Text(
-              "Buttons",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Wrap(
-              spacing: 8,
-              children: [
-                FilledButton(onPressed: () {}, child: const Text("Primary")),
-                OutlinedButton(onPressed: () {}, child: const Text("Outline")),
-                TextButton(onPressed: () {}, child: const Text("Ghost")),
-              ],
-            ),
-
-            const Divider(),
-            const Text("Badges", style: TextStyle(fontWeight: FontWeight.bold)),
-            const Wrap(
-              spacing: 8,
-              children: [
-                UiBadge(
-                  label: "Pulizia",
-                  color: Colors.blue,
-                  icon: Icons.delete_outline,
-                ),
-                UiBadge(
-                  label: "Emergenza",
-                  color: Colors.red,
-                  icon: Icons.warning_amber,
-                ),
-                UiBadge(
-                  label: "Posti esauriti",
-                  isOutline: true,
-                  color: Colors.red,
-                ),
-              ],
-            ),
-
-            const Divider(),
-            const Text("Alert", style: TextStyle(fontWeight: FontWeight.bold)),
-            const UiAlert(
-              title: "Attenzione",
-              description:
-                  "Stai navigando in modalità anonima. Registrati per pubblicare.",
-              icon: Icons.info_outline,
-            ),
-
-            const Divider(),
-            const Text("Card", style: TextStyle(fontWeight: FontWeight.bold)),
-            UiCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Titolo della Card",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Questo è il contenuto della card, simile a quella di Shadcn UI.",
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.check),
-                      label: const Text("Azione"),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: const UiBottomNavigation(currentIndex: 0),
+      routerConfig: router,
     );
   }
 }
