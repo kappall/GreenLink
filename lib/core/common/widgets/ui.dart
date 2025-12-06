@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// 1. BADGE (Equivalente al Badge di Shadcn)
 class UiBadge extends StatelessWidget {
   final String label;
   final IconData? icon;
