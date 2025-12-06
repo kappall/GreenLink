@@ -4,25 +4,36 @@ import 'package:greenlinkapp/core/common/widgets/ui.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
 
+CustomTransitionPage noAnimationPage(Widget child) {
+  return CustomTransitionPage(
+    transitionsBuilder: (_, __, ___, child) => child, 
+    transitionDuration: Duration.zero,
+    reverseTransitionDuration: Duration.zero,
+    child: child,
+  );
+}
+
 final router = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const LoginPage(),
+      pageBuilder: (context, state) => noAnimationPage(const LoginPage()),
     ),
 
     GoRoute(
       path: '/ui',
-      builder: (context, state) => const ComponentShowcaseScreen(),
+      pageBuilder: (context, state) =>
+          noAnimationPage(const ComponentShowcaseScreen()),
     ),
     GoRoute(
       path: '/register',
-      builder: (context, state) => const RegisterPage(),
+      pageBuilder: (context, state) => noAnimationPage(const RegisterPage()),
     ),
+
     GoRoute(
       path: '/login',
-      builder: (context, state) => const LoginPage(),
+      pageBuilder: (context, state) => noAnimationPage(const LoginPage()),
     ),
   ],
 );
