@@ -31,7 +31,7 @@ class AuthNotifier extends Notifier<AuthState> {
     await Future.delayed(
       const Duration(milliseconds: 1000),
     ); // TODO: qua chiamata a repository, per Tommaso
-    state = AuthState(user: null, isLoading: false);
+    state = AuthState(user: User(), isLoading: false);
   }
 
   void loginAnonymous() {
