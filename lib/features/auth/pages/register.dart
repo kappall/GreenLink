@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/core/common/widgets/ui.dart';
-import 'package:greenlinkapp/core/providers/auth_provider.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import '../widgets/textfield.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -20,7 +20,6 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  String errorMessage = '';
 
   @override
   void dispose() {
@@ -36,11 +35,14 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
     final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (previous, next) {
-      if (next.error != null && !next.isLoading) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.error!)));
-      }
+      next.whenOrNull(
+        error: (error, _) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.toString())),
+          );
+        },
+      );
     });
     return Scaffold(
       body: Center(
@@ -81,48 +83,19 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                       controller: _confirmPasswordController,
                       obscure: true,
                     ),
-                    const SizedBox(height: 16),
-                    if (errorMessage.isNotEmpty) ...[
-                      Text(
-                        errorMessage,
-                        style: const TextStyle(color: Colors.red, fontSize: 14),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
                         onPressed: authState.isLoading
                             ? null
                             : () {
-                                final email = _emailController.text.trim();
-                                final emailRegex = RegExp(
-                                  r'^[\w\.-]+@[\w\.-]+\.\w+$',
-                                );
-                      
-                                if (!emailRegex.hasMatch(email)) {
-                                  setState(() {
-                                    errorMessage = 'Email non valida';
-                                  });
-                                  return;
-                                }
-                                if (_passwordController.text.trim() !=
-                                    _confirmPasswordController.text.trim()) {
-                                  setState(() {
-                                    errorMessage = 'Le password non coincidono';
-                                  });
-                                  return;
-                                }
-                                _nicknameController.clear();
-                                _emailController.clear();
-                                _passwordController.clear();
-                                _confirmPasswordController.clear();
                                 ref
                                     .read(authProvider.notifier)
                                     .register(
-                                      _nicknameController.text.trim(),
-                                      _emailController.text.trim(),
-                                      _passwordController.text.trim(),
+                                      _nicknameController.text,
+                                      _emailController.text,
+                                      _passwordController.text,
+                                      _confirmPasswordController.text,
                                     );
                               },
                         child: authState.isLoading

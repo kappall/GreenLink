@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/logo.dart';
-import 'package:greenlinkapp/core/providers/auth_provider.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/core/common/widgets/ui.dart';
 import 'package:greenlinkapp/features/auth/widgets/textfield.dart';
 
@@ -29,11 +29,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (previous, next) {
-      if (next.error != null && !next.isLoading) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.error!)));
-      }
+      next.whenOrNull(
+        error: (error, _) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.toString())),
+          );
+        },
+      );
     });
 
     return Scaffold(
