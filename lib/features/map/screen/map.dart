@@ -53,16 +53,20 @@ class _MapScreenState extends State<MapScreen> {
               child: Semantics(
                 label: "Ricentra la mappa sulla posizione iniziale",
                 button: true,
-                child: FloatingActionButton.large(
-                  heroTag: "recenter",
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer,
-                  foregroundColor: Theme.of(context).colorScheme.primary,
-                  onPressed: () {
-                    _mapController.move(_initialCenter, 12.0);
-                  },
-                  child: const Icon(Icons.my_location),
+                child: SizedBox(
+                  width: 60.0,
+                  height: 60.0,
+                  child: FloatingActionButton(
+                    heroTag: "recenter",
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer,
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                    onPressed: () {
+                      _mapController.move(_initialCenter, 12.0);
+                    },
+                    child: const Icon(Icons.my_location, size: 30),
+                  ),
                 ),
               ),
             ),
