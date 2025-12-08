@@ -1,13 +1,288 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class ProfileScreen extends StatelessWidget {
+import '../../../data/tmp.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../widgets/post_card.dart';
+import '../widgets/volounteer_card.dart';
+
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profilo Utente')),
-      body: const Center(child: Text('Dettagli Profilo Utente')),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Gestione stati AsyncValue (Loading / Error / Data)
+    return authState.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (error, stackTrace) =>
+          Scaffold(body: Center(child: Text("Errore: $error"))),
+      data: (data) {
+        final user = data.user;
+
+        // 1. CASO UTENTE ANONIMO O NON LOGGATO
+        // Restituisce uno Scaffold semplice con invito al login
+        if (user == null || user.id == 'anonymous') {
+          return Scaffold(
+            appBar: AppBar(title: const Text("Profilo"), centerTitle: true),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.account_circle_outlined,
+                    size: 80,
+                    color: colorScheme.outline,
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    "Non hai un account",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text("Accedi per visualizzare il tuo profilo completo"),
+                  const SizedBox(height: 32),
+                  FilledButton(
+                    onPressed: () {
+                      ref.read(authProvider.notifier).logout();
+                    },
+                    child: const Text("Accedi"),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // 2. CASO UTENTE AUTENTICATO
+        // Restituisce la UI complessa con NestedScrollView e TabBar
+        return Scaffold(
+          body: DefaultTabController(
+            length: 2,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    expandedHeight: 340.0,
+                    floating: false,
+                    pinned: true,
+                    backgroundColor: colorScheme.primary,
+                    iconTheme: const IconThemeData(color: Colors.white),
+                    title: const Text(
+                      "Profilo",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.settings, color: Colors.white),
+                        onPressed: () => context.push('/settings'),
+                      ),
+                    ],
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              colorScheme.primary,
+                              const Color(0xFF0D9488),
+                            ],
+                          ),
+                        ),
+                        child: SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircleAvatar(
+                                  radius: 40,
+                                  backgroundColor: Colors.white,
+                                  child: CircleAvatar(
+                                    radius: 38,
+                                    backgroundColor:
+                                        colorScheme.primaryContainer,
+                                    child: Text(
+                                      (user.displayName ?? "U")[0]
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 32,
+                                        color: colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+
+                                Text(
+                                  user.displayName ?? "Utente",
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  user.email ?? "",
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Ruolo Badge (Placeholder)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Partner", // Logica ruolo dinamica qui
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    _buildStatItem(
+                                      "Post",
+                                      mockPosts.length.toString(),
+                                    ),
+                                    _buildStatItem(
+                                      "Eventi",
+                                      mockEvents.length.toString(),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SliverPersistentHeader(
+                    delegate: _SliverAppBarDelegate(
+                      TabBar(
+                        labelColor: colorScheme.primary,
+                        unselectedLabelColor: Colors.grey,
+                        indicatorColor: colorScheme.primary,
+                        tabs: const [
+                          Tab(text: "I miei Post"),
+                          Tab(text: "I miei Eventi"),
+                        ],
+                      ),
+                    ),
+                    pinned: true,
+                  ),
+                ];
+              },
+              body: TabBarView(
+                children: [
+                  mockPosts.isEmpty
+                      ? const Center(child: Text("Nessun post pubblicato"))
+                      : ListView.separated(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: mockPosts.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (context, index) => PostCard(
+                            post: mockPosts[index],
+                            onTap: () => context.go(
+                              '/post-details',
+                              extra: mockPosts[index],
+                            ),
+                          ),
+                        ),
+
+                  mockEvents.isEmpty
+                      ? const Center(child: Text("Nessun evento partecipato"))
+                      : ListView.separated(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: mockEvents.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (context, index) => VolunteerCard(
+                            event: mockEvents[index],
+                            onRemove: () {},
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.8),
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }
