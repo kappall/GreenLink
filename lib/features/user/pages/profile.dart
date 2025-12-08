@@ -15,7 +15,6 @@ class ProfileScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Gestione stati AsyncValue (Loading / Error / Data)
     return authState.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -24,8 +23,6 @@ class ProfileScreen extends ConsumerWidget {
       data: (data) {
         final user = data.user;
 
-        // 1. CASO UTENTE ANONIMO O NON LOGGATO
-        // Restituisce uno Scaffold semplice con invito al login
         if (user == null || user.id == 'anonymous') {
           return Scaffold(
             appBar: AppBar(title: const Text("Profilo"), centerTitle: true),
@@ -58,8 +55,6 @@ class ProfileScreen extends ConsumerWidget {
           );
         }
 
-        // 2. CASO UTENTE AUTENTICATO
-        // Restituisce la UI complessa con NestedScrollView e TabBar
         return Scaffold(
           body: DefaultTabController(
             length: 2,
@@ -136,7 +131,6 @@ class ProfileScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 8),
 
-                                // Ruolo Badge (Placeholder)
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
