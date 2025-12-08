@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/common/widgets/ui.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -13,11 +14,14 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _notificationsEnabled = false;
-  bool _darkModeEnabled = false;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final currentThemeMode = ref.watch(themeProvider);
+
+    final isDark = currentThemeMode == ThemeMode.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,9 +88,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   context,
                   title: "Tema Scuro",
                   trailing: Switch.adaptive(
-                    value: _darkModeEnabled,
-                    activeThumbColor: colorScheme.primary,
-                    onChanged: (val) => setState(() => _darkModeEnabled = val),
+                    value: isDark,
+                    activeColor: colorScheme.primary,
+                    onChanged: (val) {
+                      ref
+                          .read(themeProvider.notifier)
+                          .setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+                    },
                   ),
                 ),
                 const Divider(height: 1),
@@ -234,7 +242,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: titleColor ?? Colors.black87,
+                  color: titleColor ?? Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
