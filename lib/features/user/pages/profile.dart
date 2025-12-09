@@ -55,6 +55,17 @@ class ProfileScreen extends ConsumerWidget {
           );
         }
 
+        final displayName = (user.displayName?.isNotEmpty ?? false)
+            ? user.displayName!
+            : (user.email ?? "Utente");
+        final email = user.email ?? "Email non disponibile";
+        final avatarLetter = (displayName.isNotEmpty
+                ? displayName
+                : (user.email ?? "U"))
+            .characters
+            .first
+            .toUpperCase();
+
         return Scaffold(
           body: DefaultTabController(
             length: 2,
@@ -103,8 +114,7 @@ class ProfileScreen extends ConsumerWidget {
                                     backgroundColor:
                                         colorScheme.primaryContainer,
                                     child: Text(
-                                      (user.displayName ?? "U")[0]
-                                          .toUpperCase(),
+                                      avatarLetter,
                                       style: TextStyle(
                                         fontSize: 32,
                                         color: colorScheme.primary,
@@ -115,7 +125,7 @@ class ProfileScreen extends ConsumerWidget {
                                 const SizedBox(height: 16),
 
                                 Text(
-                                  user.displayName ?? "Utente",
+                                  displayName,
                                   style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -123,7 +133,7 @@ class ProfileScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  user.email ?? "",
+                                  email,
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.9),
                                     fontSize: 14,

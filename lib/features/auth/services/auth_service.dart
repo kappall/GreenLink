@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
-  Future<String> login({
+  Future<AuthResult> login({
     required String email,
     required String password,
   }) async {
@@ -26,7 +27,7 @@ class AuthService {
     return _handleAuthResponse(response, 'login');
   }
 
-  Future<String> register({
+  Future<AuthResult> register({
     required String username,
     required String email,
     required String password,
@@ -49,16 +50,22 @@ class AuthService {
     return _handleAuthResponse(response, 'registrazione');
   }
 
-  String _handleAuthResponse(http.Response response, String action) {
+  AuthResult _handleAuthResponse(http.Response response, String action) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final data = _safeDecode(response.body);
       final token = data['token'] as String?;
+      UserModel? user;
+
+      final userJson = data['user'];
+      if (userJson is Map<String, dynamic>) {
+        user = UserModel.fromJson(userJson);
+      }
 
       if (token == null || token.isEmpty) {
         throw Exception('Token non presente nella risposta di $action.');
       }
 
-      return token;
+      return AuthResult(token: token, user: user);
     }
 
     final data = _safeDecode(response.body);
@@ -73,4 +80,14 @@ class AuthService {
       return <String, dynamic>{};
     }
   }
+}
+
+class AuthResult {
+  final String token;
+  final UserModel? user;
+
+  const AuthResult({
+    required this.token,
+    this.user,
+  });
 }
