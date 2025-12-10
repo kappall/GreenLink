@@ -55,7 +55,7 @@ class PostCard extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        // azione onPressed
+                        // Segnala il post
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),

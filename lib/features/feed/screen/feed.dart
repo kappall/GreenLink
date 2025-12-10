@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
@@ -77,7 +78,8 @@ class FeedScreen extends StatelessWidget {
             PostCard(
               post: p,
               onTap: () {
-                print('Post di ${p.authorName} selezionato, ID: ${p.id}');
+                // Navigo in PostInfoScreen con i dettagli del post selezionato
+                context.push('/post-info', extra: p);
               },
             ),
         ],
