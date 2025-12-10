@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 
@@ -18,9 +19,39 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(post.authorName, style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text(post.authorRole),
-            Text(post.timeAgo),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 26, // diametro = radius * 2
+                  backgroundColor: Colors.grey[200],
+                  child: Text(
+                    post.authorName.isNotEmpty ? post.authorName[0] : '',
+                    style: const TextStyle(fontSize: 24, color: Colors.black54),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        post.authorName,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(post.authorRole),
+                      Text(post.timeAgo),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                UiBadge(
+                  label: post.eventType,
+                  color: Colors.blue,
+                  isOutline: false,
+                ),
+              ],
+            ),
 
             const SizedBox(height: 12),
 
@@ -35,13 +66,23 @@ class PostCard extends StatelessWidget {
             ],
 
             const SizedBox(height: 12),
-            Text(post.location),
+            Row(
+              children: [
+                Icon(Icons.location_on, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(post.location),
+              ],
+            ),
 
             const SizedBox(height: 12),
             Row(
               children: [
-                Text('${post.upvotes} UpVotes'),
+                Icon( Icons.trending_up, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text('${post.upvotes} Upvotes'),
                 const SizedBox(width: 16),
+                Icon(Icons.comment, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
                 Text('${post.comments} Commenti'),
               ],
             ),

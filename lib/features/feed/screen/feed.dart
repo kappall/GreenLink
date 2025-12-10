@@ -13,6 +13,7 @@ class FeedScreen extends StatelessWidget {
         id: 1,
         authorName: 'Giulia Rossi',
         authorRole: 'Volontaria',
+        eventType: "Alluvione",
         timeAgo: '2h fa',
         text:
             'Ciao community! Sabato organizziamo una pulizia del parco insieme. Ci troviamo alle 9:30 vicino all\'ingresso principale, portate guanti e buona energia!',
@@ -24,29 +25,31 @@ class FeedScreen extends StatelessWidget {
       ),
       Post(
         id: 2,
-        authorName: 'Giulia Rossi',
-        authorRole: 'Volontaria',
-        timeAgo: '2h fa',
+        authorName: 'Luca Bianchi',
+        authorRole: 'Soccorritore',
+        eventType: "Emergenza Idrica",
+        timeAgo: '1h fa',
         text:
-            'Ciao community! Sabato organizziamo una pulizia del parco insieme. Ci troviamo alle 9:30 vicino all\'ingresso principale, portate guanti e buona energia!',
+            'Emergenza idrica in corso nella zona nord della città. Stiamo distribuendo bottiglie d\'acqua presso il centro comunitario. Venite a prenderle se ne avete bisogno!',
         imageUrl:
             'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
-        location: 'Parco Sempione, Milano',
-        upvotes: 42,
-        comments: 12,
+        location: 'Centro Comunitario, Zona Nord',
+        upvotes: 30,
+        comments: 5,
       ),
       Post(
         id: 3,
-        authorName: 'Giulia Rossi',
-        authorRole: 'Volontaria',
-        timeAgo: '2h fa',
+        authorName: 'Sara Verdi',
+        authorRole: 'Cittadina',
+        eventType: "Acquazzone",
+        timeAgo: '30m fa',
         text:
-            'Ciao community! Sabato organizziamo una pulizia del parco insieme. Ci troviamo alle 9:30 vicino all\'ingresso principale, portate guanti e buona energia!',
+            'Ho notato che molte persone stanno avendo difficoltà a trovare cibo nelle vicinanze. Ho creato una lista di punti di distribuzione alimentare nella nostra area. Contattatemi per maggiori dettagli!',
         imageUrl:
             'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
-        location: 'Parco Sempione, Milano',
-        upvotes: 42,
-        comments: 12,
+        location: 'Via Roma, Centro Città',
+        upvotes: 25,
+        comments: 8,
       ),
     ];
 
@@ -70,9 +73,10 @@ class FeedScreen extends StatelessWidget {
             ],
           ),
 
-
           for (final p in posts)
-            PostCard(post: p, onTap: () {
+            PostCard(
+              post: p,
+              onTap: () {
                 print('Post di ${p.authorName} selezionato, ID: ${p.id}');
               },
             ),

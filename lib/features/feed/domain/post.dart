@@ -2,6 +2,7 @@ class Post {
   final int id;
   final String authorName;
   final String authorRole;
+  final String eventType;
   final String timeAgo;
   final String text;
   final String? imageUrl;
@@ -13,6 +14,7 @@ class Post {
     required this.id,
     required this.authorName,
     required this.authorRole,
+    required this.eventType,
     required this.timeAgo,
     required this.text,
     this.imageUrl,
