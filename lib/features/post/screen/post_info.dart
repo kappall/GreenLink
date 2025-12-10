@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
 
+import 'package:greenlinkapp/features/feed/domain/post.dart';
+import 'package:flutter/material.dart';
 class PostInfoScreen extends StatelessWidget {
   final Post post;
 

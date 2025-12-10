@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/feed/screen/feed.dart';
 import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
-import 'package:greenlinkapp/features/post/screen/post-info.dart';
+import 'package:greenlinkapp/features/post/screen/post_info.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/user-profile/screen/profile.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
