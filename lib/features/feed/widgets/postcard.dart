@@ -45,10 +45,28 @@ class PostCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                UiBadge(
-                  label: post.eventType,
-                  color: Colors.blue,
-                  isOutline: false,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    UiBadge(
+                      label: post.eventType,
+                      icon: Icons.warning_amber_rounded,
+                      color: Colors.blue,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // azione onPressed
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.flag_outlined,
+                          color: Colors.grey[700],
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -77,7 +95,7 @@ class PostCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon( Icons.trending_up, size: 16, color: Colors.grey),
+                Icon(Icons.trending_up, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text('${post.upvotes} Upvotes'),
                 const SizedBox(width: 16),
