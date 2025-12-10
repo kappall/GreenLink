@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/core/common/widgets/ui.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
 import 'package:greenlinkapp/core/providers/auth_provider.dart';
@@ -9,6 +8,7 @@ import 'package:greenlinkapp/features/feed/screen/feed.dart';
 import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
 import 'package:greenlinkapp/features/user-profile/screen/profile.dart';
+import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
 import 'package:greenlinkapp/features/volunteering/screen/volunteer.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
@@ -102,6 +102,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/login',
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => noAnimationPage(const LoginPage()),
+      ),
+      GoRoute(
+        path: '/ui-demo',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const UiShowcaseScreen(),
       ),
     ],
   );
