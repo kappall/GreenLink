@@ -110,7 +110,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final post = state.extra as Post;
-          return PostInfoScreen(post: post);
+          return PostInfoScreen(p: post);
         },
       ),
       

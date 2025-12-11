@@ -7,7 +7,7 @@ class Post {
   final String text;
   final String? imageUrl;
   final String location;
-  final int upvotes;
+  int upvotes;
   final int comments;
 
   Post({

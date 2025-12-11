@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
 
-class FeedScreen extends StatelessWidget {
+class FeedScreen extends ConsumerWidget {
   const FeedScreen({super.key});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loggedIn = true;
     final List<Post> posts = [
       //hardcoded sample posts
       Post(
@@ -65,23 +69,31 @@ class FeedScreen extends StatelessWidget {
                 "Bacheca Emergenze",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
+              if (loggedIn)
               ButtonWidget(
-                label: '+ Nuovo Post',
+                label: 'Nuovo Post',
                 onPressed: () {
                   print('Crea Nuovo Post premuto');
                 },
+                icon: const Icon(Icons.add, color: Colors.white),
               ),
             ],
           ),
 
           for (final p in posts)
-            PostCard(
-              post: p,
-              onTap: () {
-                // Navigo in PostInfoScreen con i dettagli del post selezionato
-                context.push('/post-info', extra: p);
-              },
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: UiCard(
+              child: PostCard(
+                post: p,
+                onTap: () {
+                  // Navigo in PostInfoScreen con i dettagli del post selezionato
+                  context.push('/post-info', extra: p);
+                },
+              ),
+              onTap: () => context.push('/post-info', extra: p),
             ),
+          ),
         ],
       ),
     );
