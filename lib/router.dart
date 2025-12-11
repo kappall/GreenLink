@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
-import 'package:greenlinkapp/core/providers/auth_provider.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/feed/screen/feed.dart';
 import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
 import 'package:greenlinkapp/features/post/screen/post_info.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
-import 'package:greenlinkapp/features/user-profile/screen/profile.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
+import 'package:greenlinkapp/features/user/pages/profile.dart';
 import 'package:greenlinkapp/features/volunteering/screen/volunteer.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
@@ -23,12 +24,10 @@ CustomTransitionPage noAnimationPage(Widget child) {
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _sectionNavigatorKey = GlobalKey<NavigatorState>();
-
 final routerProvider = Provider<GoRouter>((ref) {
   final routerListenable = ValueNotifier<bool>(true);
 
-  ref.listen<AuthState>(authProvider, (previous, next) {
+  ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
     routerListenable.value = !routerListenable.value;
   });
 
@@ -44,7 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = ref.read(authProvider);
 
-      final isLoggedIn = authState.isAuthenticated;
+      final isLoggedIn = authState.asData?.value.isAuthenticated ?? false;
       final isLoggingIn = state.uri.path == '/login';
       final isRegistering = state.uri.path == '/register';
 
