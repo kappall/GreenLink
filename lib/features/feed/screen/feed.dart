@@ -26,7 +26,7 @@ class FeedScreen extends ConsumerWidget {
             'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
         location: 'Parco Sempione, Milano',
         upvotes: 42,
-        comments: 12,
+        comments: ['Partecipo!', 'Ottima iniziativa!'],
       ),
       Post(
         id: 2,
@@ -40,7 +40,7 @@ class FeedScreen extends ConsumerWidget {
             'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
         location: 'Centro Comunitario, Zona Nord',
         upvotes: 30,
-        comments: 5,
+        comments: ['Servono altre bottiglie?', 'Grazie per l\'aiuto'],
       ),
       Post(
         id: 3,
@@ -54,7 +54,7 @@ class FeedScreen extends ConsumerWidget {
             'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
         location: 'Via Roma, Centro Città',
         upvotes: 25,
-        comments: 8,
+        comments: ['Posso aiutare con la distribuzione', 'Grazie per la lista', 'Ci sono punti per diete speciali?'],
       ),
     ];
 

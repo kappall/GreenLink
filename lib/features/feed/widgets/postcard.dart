@@ -106,7 +106,7 @@ class PostCard extends StatelessWidget {
             if (showCommentsCount) ...[
               Icon(Icons.comment, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text('${post.comments} Commenti'),
+              Text('${post.comments.length} Commenti'),
             ],
           ],
         ),

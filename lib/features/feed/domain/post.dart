@@ -8,7 +8,7 @@ class Post {
   final String? imageUrl;
   final String location;
   int upvotes;
-  final int comments;
+  final List<String> comments;
 
   Post({
     required this.id,
