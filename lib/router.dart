@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/features/admin/screens/reports_screen.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/feed/screen/feed.dart';
-import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
+import 'package:greenlinkapp/features/main-wrapper/screen/main_wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
 import 'package:greenlinkapp/features/volunteering/screen/volunteer.dart';
 
+import 'features/admin/screens/admin_dashboard.dart';
+import 'features/admin/screens/admin_wrapper.dart';
 import 'features/settings/screens/settings_screen.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
@@ -98,6 +101,41 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/volunteer',
                 builder: (context, state) => const VolunteerScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return AdminWrapper(
+            navigationShell: navigationShell,
+          ); // Wrapper Admin
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin',
+                builder: (context, state) => const AdminDashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/reports',
+                builder: (context, state) => const ReportsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/users',
+                builder: (context, state) =>
+                    const Center(child: Text("Gestione Utenti")),
               ),
             ],
           ),
