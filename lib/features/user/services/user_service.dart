@@ -68,10 +68,4 @@ class UserService {
     }
   }
 
-  String _maskToken(String token) {
-    if (token.length <= 10) return '***';
-    final start = token.substring(0, 6);
-    final end = token.substring(token.length - 4);
-    return '$start...$end';
-  }
 }

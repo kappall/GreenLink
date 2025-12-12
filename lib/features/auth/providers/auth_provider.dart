@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
+import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/auth/services/auth_service.dart';
 import 'package:greenlinkapp/features/auth/utils/auth_validators.dart';
 import 'package:greenlinkapp/features/user/services/user_service.dart';
@@ -34,9 +35,12 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         token: authResult.token,
       );
 
+      final derivedRole = deriveRoleFromToken(authResult.token);
+
       return AuthState(
         user: user,
         token: authResult.token,
+        derivedRole: derivedRole,
       );
     });
   }
@@ -49,6 +53,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
           email: '',
           username: 'Ospite',
         ),
+        derivedRole: AuthRole.unknown,
       ),
     );
   }
@@ -84,23 +89,18 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         token: authResult.token,
       );
 
+      final derivedRole = deriveRoleFromToken(authResult.token);
+
       return AuthState(
         user: user,
         token: authResult.token,
+        derivedRole: derivedRole,
       );
     });
   }
 
   void logout() {
     state = AsyncData(AuthState.unauthenticated());
-  }
-
-  String _maskToken(String? token) {
-    if (token == null || token.isEmpty) return 'null';
-    if (token.length <= 10) return '***';
-    final start = token.substring(0, 6);
-    final end = token.substring(token.length - 4);
-    return '$start...$end';
   }
 
   Future<void> deleteAccount() async {
