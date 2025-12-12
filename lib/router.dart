@@ -12,7 +12,7 @@ import 'package:greenlinkapp/features/post/screen/post_info.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
-import 'package:greenlinkapp/features/volunteering/screen/volunteer.dart';
+import 'package:greenlinkapp/features/volunteering/screen/volunteerfeed.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
