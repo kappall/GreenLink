@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 
 import '../../../data/tmp.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -13,6 +14,9 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+    final role = ref.watch(
+      authProvider.select((auth) => auth.value?.role ?? AuthRole.unknown),
+    );
     final colorScheme = Theme.of(context).colorScheme;
 
     return authState.when(
@@ -54,6 +58,16 @@ class ProfileScreen extends ConsumerWidget {
             ),
           );
         }
+
+        final displayName = (user.username?.trim().isNotEmpty ?? false)
+            ? user.username!.trim()
+            : (user.email.trim().isNotEmpty ? user.email.trim() : "Utente");
+        final email =
+            user.email.trim().isNotEmpty ? user.email.trim() : "Email non disponibile";
+        final avatarLetter = (displayName.isNotEmpty ? displayName : email)
+            .characters
+            .first
+            .toUpperCase();
 
         return Scaffold(
           body: DefaultTabController(
@@ -103,8 +117,7 @@ class ProfileScreen extends ConsumerWidget {
                                     backgroundColor:
                                         colorScheme.primaryContainer,
                                     child: Text(
-                                      (user.displayName ?? "U")[0]
-                                          .toUpperCase(),
+                                      avatarLetter,
                                       style: TextStyle(
                                         fontSize: 32,
                                         color: colorScheme.primary,
@@ -115,7 +128,7 @@ class ProfileScreen extends ConsumerWidget {
                                 const SizedBox(height: 16),
 
                                 Text(
-                                  user.displayName ?? "Utente",
+                                  displayName,
                                   style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -123,7 +136,7 @@ class ProfileScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  user.email ?? "",
+                                  email,
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.9),
                                     fontSize: 14,
@@ -145,9 +158,9 @@ class ProfileScreen extends ConsumerWidget {
                                       ),
                                     ),
                                   ),
-                                  child: const Text(
-                                    "Partner", // Logica ruolo dinamica qui
-                                    style: TextStyle(color: Colors.white),
+                                  child: Text(
+                                    roleLabel(role),
+                                    style: const TextStyle(color: Colors.white),
                                   ),
                                 ),
 

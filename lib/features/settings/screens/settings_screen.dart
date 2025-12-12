@@ -15,6 +15,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _notificationsEnabled = false;
+  bool _isDeletingAccount = false;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +138,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   titleColor: colorScheme.error,
                   icon: Icons.delete_outline,
                   iconColor: colorScheme.error,
-                  onTap: () => _showDeleteAccountDialog(context, ref),
+                  onTap: _isDeletingAccount
+                      ? null
+                      : () => _showDeleteAccountDialog(context, ref),
                 ),
               ],
             ),
@@ -299,31 +302,54 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Sei sicuro?"),
         content: const Text(
           "Questa azione è irreversibile. Tutti i tuoi dati verranno eliminati permanentemente.",
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text("Annulla"),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            onPressed: () {
-              Navigator.pop(context);
-              ref
-                  .read(authProvider.notifier)
-                  .logout(); //TODO: usare api cancellazione account
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Account eliminato")),
-              );
-            },
+            onPressed: _isDeletingAccount
+                ? null
+                : () async {
+                    if (_isDeletingAccount) return;
+                    setState(() => _isDeletingAccount = true);
+                    Navigator.pop(dialogContext);
+
+                    try {
+                      await ref.read(authProvider.notifier).deleteAccount();
+                      if (!mounted) return;
+                      scaffoldMessenger.showSnackBar(
+                        const SnackBar(
+                          content: Text("Account eliminato con successo"),
+                        ),
+                      );
+                    } catch (error) {
+                      if (!mounted) return;
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Errore durante l'eliminazione dell'account: $error",
+                          ),
+                        ),
+                      );
+                    } finally {
+                      if (mounted) {
+                        setState(() => _isDeletingAccount = false);
+                      }
+                    }
+                  },
             child: const Text("Elimina"),
           ),
         ],
