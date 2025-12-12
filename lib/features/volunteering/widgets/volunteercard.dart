@@ -17,9 +17,13 @@ class VolunteerCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              volunteer.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Text(
+                volunteer.title,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
 
             UiBadge(
@@ -33,24 +37,30 @@ class VolunteerCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 13, // diametro = radius * 2
-                  backgroundColor: Colors.grey[200],
-                  child: Text(
-                    volunteer.owner.isNotEmpty ? volunteer.owner[0] : '',
-                    style: const TextStyle(fontSize: 16, color: Colors.black54),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 13, // diametro = radius * 2
+                    backgroundColor: Colors.grey[200],
+                    child: Text(
+                      volunteer.owner.isNotEmpty ? volunteer.owner[0] : '',
+                      style: const TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                Text(
-                  volunteer.owner,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
+                  Flexible(
+                    child: Text(
+                      volunteer.owner,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
             ),
             InkWell(
               onTap: () {

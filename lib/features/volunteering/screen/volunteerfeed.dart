@@ -14,8 +14,8 @@ class VolunteerScreen extends StatelessWidget {
       //hardcoded sample volunteers
       Volunteer(
         id: 1,
-        owner: 'Associazione GreenHelp',
-        title: 'Raccolta Rifiuti',
+        owner: 'Associazione GreenHelpdsafgsdgrdsgdegrhgrafrseg',
+        title: 'Raccolta RifiuRaccolta RifiuRaccolta RifiuRaccolta RifiuRaccolta Rifiuti',
         eventType: "Inquinamento",
         description:
             'Unisciti al gruppo per ripulire il lungomare dai rifiuti accumulati dopo la mareggiata.',
@@ -64,9 +64,13 @@ class VolunteerScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Bacheca Volontariato",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  "Bacheca Volontariato",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               if (isPartner)
                 ButtonWidget(

@@ -16,14 +16,14 @@ class RegisterPage extends ConsumerStatefulWidget {
 }
 
 class _RegisterPage extends ConsumerState<RegisterPage> {
-  final _nicknameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    _nicknameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose(); // pulisco la memoria
@@ -61,8 +61,8 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                 child: Column(
                   children: [
                     AuthTextField(
-                      hint: 'Nickname',
-                      controller: _nicknameController,
+                      hint: 'Username',
+                      controller: _usernameController,
                       obscure: false,
                     ),
                     const SizedBox(height: 16),
@@ -83,6 +83,7 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                       controller: _confirmPasswordController,
                       obscure: true,
                     ),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
@@ -92,7 +93,7 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                                 ref
                                     .read(authProvider.notifier)
                                     .register(
-                                      _nicknameController.text,
+                                      _usernameController.text,
                                       _emailController.text,
                                       _passwordController.text,
                                       _confirmPasswordController.text,
