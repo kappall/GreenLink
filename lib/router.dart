@@ -43,14 +43,27 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authProvider);
 
       final isLoggedIn = authState.asData?.value.isAuthenticated ?? false;
+      final isAdmin = authState.asData?.value.isAdmin ?? false;
+
       final isLoggingIn = state.uri.path == '/login';
       final isRegistering = state.uri.path == '/register';
+      final isAdminRoute = state.uri.path.startsWith('/admin');
 
       if (authState.isLoading) return null;
 
       if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
 
-      if (isLoggedIn && (isLoggingIn || isRegistering)) return '/home';
+      if (isLoggedIn && (isLoggingIn || isRegistering)) {
+        return isAdmin ? '/admin' : '/home';
+      }
+
+      if (isLoggedIn && !isAdmin && isAdminRoute) {
+        return '/home';
+      }
+
+      if (isLoggedIn && isAdmin && !isAdminRoute) {
+        return '/admin';
+      }
 
       return null;
     },

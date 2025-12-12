@@ -37,8 +37,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       final UserModel user;
       if (derivedRole!=AuthRole.admin){
        user = await _userService.fetchCurrentUser(
-        token: authResult.token,
-        userId: authResult.userId
+        token: authResult.token
       ); }
       else{
         user = UserModel(id: authResult.userId, email: authResult.email);
@@ -94,8 +93,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       );
 
       final user = await _userService.fetchCurrentUser(
-        token: authResult.token,
-        userId: authResult.userId
+        token: authResult.token
       );
 
       final derivedRole = deriveRoleFromToken(authResult.token);

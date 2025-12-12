@@ -16,6 +16,9 @@ abstract class AuthState with _$AuthState {
   }) = _AuthState;
 
   bool get isAuthenticated => user != null || token != null;
+  bool get isAdmin => derivedRole == AuthRole.admin;
+  bool get isPartner => derivedRole == AuthRole.partner;
+  bool get isUser => derivedRole == AuthRole.user;
 
   AuthRole get role => derivedRole ?? AuthRole.unknown;
 
