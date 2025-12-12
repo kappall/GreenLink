@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
@@ -31,11 +32,18 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         password: trimmedPassword,
       );
 
-      final user = await _userService.fetchCurrentUser(
-        token: authResult.token,
-      );
-
       final derivedRole = deriveRoleFromToken(authResult.token);
+
+      final UserModel user;
+      if (derivedRole!=AuthRole.admin){
+       user = await _userService.fetchCurrentUser(
+        token: authResult.token,
+        userId: authResult.userId
+      ); }
+      else{
+        user = UserModel(id: authResult.userId, email: authResult.email);
+      }
+
 
       return AuthState(
         user: user,
@@ -87,10 +95,10 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
 
       final user = await _userService.fetchCurrentUser(
         token: authResult.token,
+        userId: authResult.userId
       );
 
       final derivedRole = deriveRoleFromToken(authResult.token);
-
       return AuthState(
         user: user,
         token: authResult.token,

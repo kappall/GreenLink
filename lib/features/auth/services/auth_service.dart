@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
@@ -54,18 +54,15 @@ class AuthService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final data = _safeDecode(response.body);
       final token = data['token'] as String?;
-      UserModel? user;
-
-      final userJson = data['user'];
-      if (userJson is Map<String, dynamic>) {
-        user = UserModel.fromJson(userJson);
-      }
 
       if (token == null || token.isEmpty) {
         throw Exception('Token non presente nella risposta di $action.');
       }
+      final decoded = JwtDecoder.decode(token);
+      final userId = decoded['id'];
+      final email = decoded['email'];
 
-      return AuthResult(token: token, user: user);
+      return AuthResult(token: token, userId: userId, email: email);
     }
 
     final data = _safeDecode(response.body);
@@ -84,10 +81,12 @@ class AuthService {
 
 class AuthResult {
   final String token;
-  final UserModel? user;
+  final int userId;
+  final String email;
 
   const AuthResult({
     required this.token,
-    this.user,
+    required this.userId,
+    required this.email
   });
 }
