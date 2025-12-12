@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/common/widgets/ui.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
+import 'change_password.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -46,7 +47,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   context,
                   title: "Cambia Password",
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  onTap: () => _showChangePasswordDialog(context),
+                  onTap: () {
+                    // Navigate to the new screen instead of showing a dialog
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ChangePasswordScreen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -89,7 +97,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: "Tema Scuro",
                   trailing: Switch.adaptive(
                     value: isDark,
-                    activeColor: colorScheme.primary,
                     onChanged: (val) {
                       ref
                           .read(themeProvider.notifier)
@@ -97,33 +104,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     },
                   ),
                 ),
-                const Divider(height: 1),
-                _buildSettingsItem(
-                  context,
-                  title: "Lingua",
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Italiano",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: Colors.grey,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  onTap: () {},
-                ),
               ],
             ),
 
             const SizedBox(height: 16),
 
-            // --- SEZIONE PRIVACY ---
             _buildSection(
               context,
               title: "Privacy e Sicurezza",
@@ -253,8 +238,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
-  // --- DIALOGS ---
 
   void _showChangePasswordDialog(BuildContext context) {
     showDialog(
