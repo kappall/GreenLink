@@ -242,49 +242,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _showChangePasswordDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Cambia Password"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(labelText: "Password Attuale"),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(labelText: "Nuova Password"),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(labelText: "Conferma Nuova Password"),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Annulla"),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Password cambiata con successo")),
-              );
-            },
-            child: const Text("Salva"),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showTextDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
