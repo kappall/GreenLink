@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
-import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 
 class FeedScreen extends ConsumerWidget {
@@ -86,10 +85,6 @@ class FeedScreen extends ConsumerWidget {
             child: UiCard(
               child: PostCard(
                 post: p,
-                onTap: () {
-                  // Navigo in PostInfoScreen con i dettagli del post selezionato
-                  context.push('/post-info', extra: p);
-                },
               ),
               onTap: () => context.push('/post-info', extra: p),
             ),

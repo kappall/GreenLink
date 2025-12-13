@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:greenlinkapp/features/volunteering/domain/volunteer.dart';
-import 'package:greenlinkapp/features/volunteering/widgets/volunteercard.dart';
+import 'package:greenlinkapp/features/volunteering/domain/event.dart';
+import 'package:greenlinkapp/features/volunteering/widgets/volunteeringcard.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/volunteering/widgets/button.dart';
+import 'package:go_router/go_router.dart';
 
-class VolunteerScreen extends StatelessWidget {
-  const VolunteerScreen({super.key});
+
+class VolunteeringScreen extends StatelessWidget {
+  const VolunteeringScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isPartner = true;
-    final List<Volunteer> volunteers = [
-      //hardcoded sample volunteers
-      Volunteer(
+    final List<Event> events = [
+      //hardcoded sample events
+      Event(
         id: 1,
         owner: 'Associazione GreenHelpdsafgsdgrdsgdegrhgrafrseg',
         title: 'Raccolta RifiuRaccolta RifiuRaccolta RifiuRaccolta RifiuRaccolta Rifiuti',
@@ -27,7 +29,7 @@ class VolunteerScreen extends StatelessWidget {
         participantsCurrent: 18,
       ),
 
-      Volunteer(
+      Event(
         id: 2,
         owner: 'Protezione Civile Torino',
         title: 'Supporto Nevicate',
@@ -42,7 +44,7 @@ class VolunteerScreen extends StatelessWidget {
         participantsCurrent: 12,
       ),
 
-      Volunteer(
+      Event(
         id: 3,
         owner: 'Gruppo Ambientale Veneto',
         title: 'Ripristino Sentieri Boschi',
@@ -83,15 +85,13 @@ class VolunteerScreen extends StatelessWidget {
             ],
           ),
 
-          for (final v in volunteers)
+          for (final e in events)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: UiCard(
-                child: VolunteerCard(
-                  volunteer: v,
-                  onTap: () {
-                    // Navigo in PostInfoScreen con i dettagli del post selezionato
-                  },
+                child: EventCard(
+                  event: e,
+                  onTap: () => context.push('/event-info', extra: e),
                 ),
               ),
             ),

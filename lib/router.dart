@@ -5,14 +5,16 @@ import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/event/screen/event_info.dart';
 import 'package:greenlinkapp/features/feed/screen/feed.dart';
 import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
 import 'package:greenlinkapp/features/post/screen/post_info.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
+import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
-import 'package:greenlinkapp/features/volunteering/screen/volunteerfeed.dart';
+import 'package:greenlinkapp/features/volunteering/screen/volunteeringfeed.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
@@ -80,8 +82,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/volunteer',
-                builder: (context, state) => const VolunteerScreen(),
+                path: '/volunteering',
+                builder: (context, state) => const VolunteeringScreen(),
               ),
             ],
           ),
@@ -111,6 +113,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final post = state.extra as Post;
           return PostInfoScreen(p: post);
+        },
+      ),
+
+      GoRoute(
+        path: '/event-info',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final event = state.extra as Event;
+          return EventInfoScreen(e: event);
         },
       ),
       

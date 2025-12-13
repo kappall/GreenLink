@@ -1,4 +1,4 @@
-class Volunteer {
+class Event {
   final int id;
   final String owner;
   final String title;
@@ -11,7 +11,7 @@ class Volunteer {
   final int participantsMax;
   final int participantsCurrent;
 
-  Volunteer({
+  Event({
     required this.id,
     required this.owner,
     required this.title,

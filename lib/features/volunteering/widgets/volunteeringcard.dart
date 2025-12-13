@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
-import 'package:greenlinkapp/features/volunteering/domain/volunteer.dart';
+import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 
-class VolunteerCard extends StatelessWidget {
-  final Volunteer volunteer;
+class EventCard extends StatelessWidget {
+  final Event event;
   final VoidCallback? onTap;
 
-  const VolunteerCard({super.key, required this.volunteer, this.onTap});
-
+  const EventCard({super.key, required this.event, this.onTap});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -19,7 +18,7 @@ class VolunteerCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                volunteer.title,
+                event.title,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -27,7 +26,7 @@ class VolunteerCard extends StatelessWidget {
             ),
 
             UiBadge(
-              label: volunteer.eventType,
+              label: event  .eventType,
               icon: Icons.warning_amber_rounded,
               color: Colors.blue,
             ),
@@ -45,7 +44,7 @@ class VolunteerCard extends StatelessWidget {
                     radius: 13, // diametro = radius * 2
                     backgroundColor: Colors.grey[200],
                     child: Text(
-                      volunteer.owner.isNotEmpty ? volunteer.owner[0] : '',
+                      event.owner.isNotEmpty ? event.owner[0] : '',
                       style: const TextStyle(fontSize: 16, color: Colors.black54),
                     ),
                   ),
@@ -53,7 +52,7 @@ class VolunteerCard extends StatelessWidget {
 
                   Flexible(
                     child: Text(
-                      volunteer.owner,
+                      event.owner,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -80,14 +79,14 @@ class VolunteerCard extends StatelessWidget {
 
         const SizedBox(height: 12),
 
-        Text(volunteer.description),
+        Text(event.description),
 
         const SizedBox(height: 12),
         Row(
           children: [
             Icon(Icons.location_on, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
-            Text(volunteer.location),
+            Text(event.location),
           ],
         ),
         const SizedBox(height: 12),
@@ -96,7 +95,7 @@ class VolunteerCard extends StatelessWidget {
             Icon(Icons.group, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
-              '${volunteer.participantsCurrent} / ${volunteer.participantsMax} Partecipanti',
+              '${event.participantsCurrent} / ${event.participantsMax} Partecipanti',
             ),
           ],
         ),
@@ -106,7 +105,7 @@ class VolunteerCard extends StatelessWidget {
             Icon(Icons.calendar_month, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
-              '${volunteer.date} | ${volunteer.startTime} - ${volunteer.endTime}',
+              '${event.date} | ${event.startTime} - ${event.endTime}',
             ),
           ],
         ),
