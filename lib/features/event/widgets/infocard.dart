@@ -18,7 +18,7 @@ class InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Colors.grey[100],
+      color: Colors.grey[200],
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

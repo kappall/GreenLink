@@ -90,7 +90,11 @@ class EventCard extends StatelessWidget {
 
         SizedBox(height: 12),
 
-        Text(event.description),
+        Text(
+          event.description,
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+        ),
 
         SizedBox(height: 12),
         Row(

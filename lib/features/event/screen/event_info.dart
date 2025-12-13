@@ -107,29 +107,6 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
 
             const Divider(height: 1),
 
-            const SizedBox(height: 24),
-
-            // Description Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Descrizione',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.e.description,
-                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
-                  ),
-                ],
-              ),
-            ),
-
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Row(
@@ -187,6 +164,27 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
 
             const SizedBox(height: 24),
 
+            // Description Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Descrizione',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.e.description,
+                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
             // Location with directions button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
