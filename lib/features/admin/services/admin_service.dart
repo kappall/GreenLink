@@ -155,27 +155,6 @@ class AdminService {
     }
   }
 
-  Future<void> updateUserRole(int userId, AuthRole newRole) async {
-    try {
-      final response = await http.put(
-        Uri.parse('$_baseUrl/user/$userId'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: {'role': newRole.toString().toLowerCase()},
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-          'Fallimento nella modifica del ruolo: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      throw Exception('Errore di connessione: $e');
-    }
-  }
-
   Future<void> blockUser(int userId) async {
     try {
       final response = await http.delete(
