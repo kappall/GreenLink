@@ -53,7 +53,11 @@ class FeedScreen extends ConsumerWidget {
             'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
         location: 'Via Roma, Centro Città',
         upvotes: 25,
-        comments: ['Posso aiutare con la distribuzione', 'Grazie per la lista', 'Ci sono punti per diete speciali?'],
+        comments: [
+          'Posso aiutare con la distribuzione',
+          'Grazie per la lista',
+          'Ci sono punti per diete speciali?',
+        ],
       ),
     ];
 
@@ -69,26 +73,24 @@ class FeedScreen extends ConsumerWidget {
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               if (loggedIn)
-              ButtonWidget(
-                label: 'Nuovo Post',
-                onPressed: () {
-                  print('Crea Nuovo Post premuto');
-                },
-                icon: const Icon(Icons.add, color: Colors.white),
-              ),
+                ButtonWidget(
+                  label: 'Nuovo Post',
+                  onPressed: () {
+                    print('Crea Nuovo Post premuto');
+                  },
+                  icon: const Icon(Icons.add, color: Colors.white),
+                ),
             ],
           ),
 
           for (final p in posts)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: UiCard(
-              child: PostCard(
-                post: p,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: UiCard(
+                child: PostCard(post: p),
+                onTap: () => context.push('/post-info', extra: p),
               ),
-              onTap: () => context.push('/post-info', extra: p),
             ),
-          ),
         ],
       ),
     );

@@ -6,7 +6,12 @@ class EventCard extends StatelessWidget {
   final Event event;
   final VoidCallback? onTap;
 
-  const EventCard({super.key, required this.event, this.onTap});
+  const EventCard({
+    super.key,
+    required this.event,
+    this.onTap,
+
+  });
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -19,20 +24,23 @@ class EventCard extends StatelessWidget {
             Expanded(
               child: Text(
                 event.title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
             ),
 
             UiBadge(
-              label: event  .eventType,
+              label: event.eventType,
               icon: Icons.warning_amber_rounded,
               color: Colors.blue,
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -45,7 +53,10 @@ class EventCard extends StatelessWidget {
                     backgroundColor: Colors.grey[200],
                     child: Text(
                       event.owner.isNotEmpty ? event.owner[0] : '',
-                      style: const TextStyle(fontSize: 16, color: Colors.black54),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -77,11 +88,11 @@ class EventCard extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
 
         Text(event.description),
 
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Row(
           children: [
             Icon(Icons.location_on, size: 16, color: Colors.grey),
@@ -89,7 +100,7 @@ class EventCard extends StatelessWidget {
             Text(event.location),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Row(
           children: [
             Icon(Icons.group, size: 16, color: Colors.grey),
@@ -99,24 +110,22 @@ class EventCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Row(
           children: [
             Icon(Icons.calendar_month, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
-            Text(
-              '${event.date} | ${event.startTime} - ${event.endTime}',
-            ),
+            Text('${event.date} | ${event.startTime} - ${event.endTime}'),
           ],
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: onTap,
-            child: const Text('Partecipa'),
+        SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: onTap,
+              child: const Text('Partecipa'),
+            ),
           ),
-        ),
       ],
     );
   }

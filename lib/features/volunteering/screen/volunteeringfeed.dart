@@ -5,7 +5,6 @@ import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/volunteering/widgets/button.dart';
 import 'package:go_router/go_router.dart';
 
-
 class VolunteeringScreen extends StatelessWidget {
   const VolunteeringScreen({super.key});
 
@@ -16,8 +15,9 @@ class VolunteeringScreen extends StatelessWidget {
       //hardcoded sample events
       Event(
         id: 1,
-        owner: 'Associazione GreenHelpdsafgsdgrdsgdegrhgrafrseg',
-        title: 'Raccolta RifiuRaccolta RifiuRaccolta RifiuRaccolta RifiuRaccolta Rifiuti',
+        owner: 'Associazione GreenHelp',
+        title:
+            'Raccolta Rifiuti',
         eventType: "Inquinamento",
         description:
             'Unisciti al gruppo per ripulire il lungomare dai rifiuti accumulati dopo la mareggiata.',
@@ -59,8 +59,7 @@ class VolunteeringScreen extends StatelessWidget {
         participantsCurrent: 9,
       ),
     ];
-    return Scaffold(
-      body: ListView(
+    return ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Row(
@@ -96,7 +95,7 @@ class VolunteeringScreen extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
+      );
+    
   }
 }

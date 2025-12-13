@@ -124,7 +124,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return EventInfoScreen(e: event);
         },
       ),
-      
+
       GoRoute(
         path: '/ui-demo',
         parentNavigatorKey: _rootNavigatorKey,
