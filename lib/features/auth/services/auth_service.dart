@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
-  Future<String> login({
+  Future<AuthResult> login({
     required String email,
     required String password,
   }) async {
@@ -26,7 +27,7 @@ class AuthService {
     return _handleAuthResponse(response, 'login');
   }
 
-  Future<String> register({
+  Future<AuthResult> register({
     required String username,
     required String email,
     required String password,
@@ -49,7 +50,7 @@ class AuthService {
     return _handleAuthResponse(response, 'registrazione');
   }
 
-  String _handleAuthResponse(http.Response response, String action) {
+  AuthResult _handleAuthResponse(http.Response response, String action) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final data = _safeDecode(response.body);
       final token = data['token'] as String?;
@@ -57,8 +58,11 @@ class AuthService {
       if (token == null || token.isEmpty) {
         throw Exception('Token non presente nella risposta di $action.');
       }
+      final decoded = JwtDecoder.decode(token);
+      final userId = decoded['id'];
+      final email = decoded['email'];
 
-      return token;
+      return AuthResult(token: token, userId: userId, email: email);
     }
 
     final data = _safeDecode(response.body);
@@ -73,4 +77,16 @@ class AuthService {
       return <String, dynamic>{};
     }
   }
+}
+
+class AuthResult {
+  final String token;
+  final int userId;
+  final String email;
+
+  const AuthResult({
+    required this.token,
+    required this.userId,
+    required this.email
+  });
 }

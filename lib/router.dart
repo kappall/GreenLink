@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/feed/screen/feed.dart';
 import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
@@ -13,6 +13,8 @@ import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
 import 'package:greenlinkapp/features/volunteering/screen/volunteer.dart';
+
+import 'features/settings/screens/settings_screen.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
@@ -44,14 +46,27 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authProvider);
 
       final isLoggedIn = authState.asData?.value.isAuthenticated ?? false;
+      final isAdmin = authState.asData?.value.isAdmin ?? false;
+
       final isLoggingIn = state.uri.path == '/login';
       final isRegistering = state.uri.path == '/register';
+      final isAdminRoute = state.uri.path.startsWith('/admin');
 
       if (authState.isLoading) return null;
 
       if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
 
-      if (isLoggedIn && (isLoggingIn || isRegistering)) return '/home';
+      if (isLoggedIn && (isLoggingIn || isRegistering)) {
+        return isAdmin ? '/admin' : '/home';
+      }
+
+      if (isLoggedIn && !isAdmin && isAdminRoute) {
+        return '/home';
+      }
+
+      if (isLoggedIn && isAdmin && !isAdminRoute) {
+        return '/admin';
+      }
 
       return null;
     },
@@ -63,6 +78,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(
             routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => const FeedScreen(),
+              ),
               GoRoute(
                 path: '/home',
                 builder: (context, state) => const FeedScreen(),
@@ -93,6 +112,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ProfileScreen(),
       ),
+      GoRoute(
+        path: '/settings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+
       GoRoute(
         path: '/register',
         parentNavigatorKey: _rootNavigatorKey,
