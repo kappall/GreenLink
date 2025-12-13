@@ -1,7 +1,8 @@
 //temporaneo, da usare gli stessi del feed
 import 'package:flutter/material.dart';
 
-import '../../../core/common/widgets/ui.dart';
+import '../../../core/common/widgets/badge.dart';
+import '../../../core/common/widgets/card.dart';
 import '../../../data/tmp.dart';
 
 class PostCard extends StatelessWidget {

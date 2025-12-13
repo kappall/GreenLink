@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../core/common/widgets/ui.dart';
+import '../../../core/common/widgets/badge.dart';
+import '../../../core/common/widgets/card.dart';
 import '../../../data/tmp.dart';
 
 class VolunteerCard extends StatelessWidget {

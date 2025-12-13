@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/common/widgets/ui.dart';
+import '../../../core/common/widgets/card.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'change_password.dart';
