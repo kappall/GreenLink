@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/features/admin/models/user.dart';
 import 'package:greenlinkapp/features/admin/screens/reports_screen.dart';
+import 'package:greenlinkapp/features/admin/screens/user_detail.dart';
 import 'package:greenlinkapp/features/admin/screens/users_screen.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
@@ -43,9 +45,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: true,
     initialLocation: '/home',
-
     refreshListenable: routerListenable,
-
     redirect: (context, state) {
       final authState = ref.read(authProvider);
 
@@ -110,7 +110,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return AdminWrapper(
@@ -139,12 +138,21 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/admin/users',
                 builder: (context, state) => const UsersScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':userId',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final user = state.extra as User;
+                      return UserDetailScreen(user: user);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
-
       GoRoute(
         path: '/profile',
         parentNavigatorKey: _rootNavigatorKey,
@@ -155,13 +163,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const SettingsScreen(),
       ),
-
       GoRoute(
         path: '/register',
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => noAnimationPage(const RegisterPage()),
       ),
-
       GoRoute(
         path: '/login',
         parentNavigatorKey: _rootNavigatorKey,
