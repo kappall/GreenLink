@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/admin/screens/reports_screen.dart';
+import 'package:greenlinkapp/features/admin/screens/users_screen.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
@@ -137,8 +138,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/admin/users',
-                builder: (context, state) =>
-                    const Center(child: Text("Gestione Utenti")),
+                builder: (context, state) => const UsersScreen(),
               ),
             ],
           ),
