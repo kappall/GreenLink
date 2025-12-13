@@ -9,11 +9,11 @@ import 'package:greenlinkapp/features/feed/screen/feed.dart';
 import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
 import 'package:greenlinkapp/features/post/screen/post_info.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
 import 'package:greenlinkapp/features/volunteering/screen/volunteer.dart';
 
+import 'features/post/models/post_model.dart';
 import 'features/settings/screens/settings_screen.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
@@ -134,11 +134,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/post-info',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
-          final post = state.extra as Post;
+          final post = state.extra as PostModel;
           return PostInfoScreen(p: post);
         },
       ),
-      
+
       GoRoute(
         path: '/ui-demo',
         parentNavigatorKey: _rootNavigatorKey,

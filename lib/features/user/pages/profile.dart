@@ -150,7 +150,9 @@ class ProfileScreen extends ConsumerWidget {
                                     Text(
                                       email,
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.9,
+                                        ),
                                         fontSize: 14,
                                       ),
                                     ),
@@ -161,10 +163,14 @@ class ProfileScreen extends ConsumerWidget {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.2,
+                                        ),
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
-                                          color: Colors.white.withOpacity(0.3),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.3,
+                                          ),
                                         ),
                                       ),
                                       child: Text(
@@ -238,8 +244,8 @@ class ProfileScreen extends ConsumerWidget {
                                     const SizedBox(height: 16),
                                 itemBuilder: (context, index) => PostCard(
                                   post: posts[index],
-                                  onTap: () => context.go(
-                                    '/post-details',
+                                  onTap: () => context.push(
+                                    '/post-info',
                                     extra: posts[index],
                                   ),
                                 ),
@@ -293,7 +299,10 @@ class ProfileScreen extends ConsumerWidget {
         ),
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12),
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.8),
+            fontSize: 12,
+          ),
         ),
       ],
     );
