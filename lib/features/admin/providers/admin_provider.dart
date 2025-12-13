@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:greenlinkapp/features/admin/models/user.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../models/report.dart';
@@ -23,10 +23,13 @@ final reportsListProvider = FutureProvider.autoDispose<List<Report>>((
   return repository.getReports();
 });
 
-final usersListProvider = FutureProvider.autoDispose<List<UserModel>>((
-  ref,
-) async {
+final usersListProvider = FutureProvider.autoDispose<List<User>>((ref) async {
   final repository = ref.watch(adminServiceProvider);
 
-  return repository.getUsers();
+  final results = await Future.wait([
+    repository.getUsers(),
+    repository.getPartners(),
+  ]);
+
+  return results.expand((userList) => userList).toList();
 });
