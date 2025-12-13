@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 
 import '../models/user.dart';
@@ -22,26 +23,6 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
     super.dispose();
   }
 
-  void _updateUserRole(User user, AuthRole newRole) async {
-    Navigator.pop(context);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Aggiornamento ruolo di ${user.displayName}...")),
-    );
-
-    await ref.read(adminServiceProvider).updateUserRole(user.id, newRole);
-
-    ref.invalidate(usersListProvider);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Ruolo aggiornato a ${newRole.name}"),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
   void _blockUser(User user) async {
     Navigator.pop(context);
 
@@ -61,7 +42,6 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
   @override
   Widget build(BuildContext context) {
     final usersAsync = ref.watch(usersListProvider);
-    final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -163,14 +143,6 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
               ),
               const Divider(height: 1),
               ListTile(
-                leading: const Icon(Icons.shield_outlined),
-                title: const Text("Cambia Ruolo"),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showRolePickerSheet(context, user);
-                },
-              ),
-              ListTile(
                 leading: Icon(
                   Icons.block,
                   color: user.isBlocked ? Colors.green : Colors.red,
@@ -188,79 +160,9 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                 leading: const Icon(Icons.info_outline),
                 title: const Text("Vedi dettagli completi"),
                 onTap: () {
-                  // TODO: Navigazione a pagina dettagli
+                  context.go('/admin/users/${user.id}', extra: user);
                 },
               ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showRolePickerSheet(BuildContext context, User user) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  "Assegna nuovo ruolo a ${user.displayName}",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const Divider(height: 1),
-              ...[AuthRole.partner, AuthRole.user].map((role) {
-                final isCurrentRole = user.role == role;
-                return InkWell(
-                  onTap: isCurrentRole
-                      ? null
-                      : () => _updateUserRole(user, role),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          isCurrentRole
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_off,
-                          color: isCurrentRole
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.grey,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            role.toString().split('.').last.toUpperCase(),
-                            style: TextStyle(
-                              fontWeight: isCurrentRole
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                        if (isCurrentRole)
-                          Icon(
-                            Icons.check,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-              const SizedBox(height: 16),
             ],
           ),
         );
