@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 
-import '../../../data/tmp.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../widgets/post_card.dart';
 import '../widgets/volounteer_card.dart';
@@ -20,6 +19,8 @@ class ProfileScreen extends ConsumerWidget {
     );
     final colorScheme = Theme.of(context).colorScheme;
     final currentUserAsync = ref.watch(currentUserProvider);
+    final userPostsAsync = AsyncData([]); //TODO:ref.watch(userPostsProvider);
+    final userEventsAsync = AsyncData([]); //TODO:ref.watch(userEventsProvider);
 
     return authState.when(
       loading: () =>
@@ -182,13 +183,25 @@ class ProfileScreen extends ConsumerWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        _buildStatItem(
-                                          "Post",
-                                          mockPosts.length.toString(),
+                                        userPostsAsync.when(
+                                          data: (posts) => _buildStatItem(
+                                            "Post",
+                                            posts.length.toString(),
+                                          ),
+                                          loading: () =>
+                                              _buildStatItem("Post", "-"),
+                                          error: (_, __) =>
+                                              _buildStatItem("Post", "!"),
                                         ),
-                                        _buildStatItem(
-                                          "Eventi",
-                                          mockEvents.length.toString(),
+                                        userEventsAsync.when(
+                                          data: (events) => _buildStatItem(
+                                            "Eventi",
+                                            events.length.toString(),
+                                          ),
+                                          loading: () =>
+                                              _buildStatItem("Eventi", "-"),
+                                          error: (_, __) =>
+                                              _buildStatItem("Eventi", "!"),
                                         ),
                                       ],
                                     ),
@@ -206,8 +219,8 @@ class ProfileScreen extends ConsumerWidget {
                             unselectedLabelColor: Colors.grey,
                             indicatorColor: colorScheme.primary,
                             tabs: const [
-                              Tab(text: "I miei Post"),
-                              Tab(text: "I miei Eventi"),
+                              Tab(text: "Post"),
+                              Tab(text: "Eventi"),
                             ],
                           ),
                         ),
@@ -217,35 +230,49 @@ class ProfileScreen extends ConsumerWidget {
                   },
                   body: TabBarView(
                     children: [
-                      mockPosts.isEmpty
-                          ? const Center(child: Text("Nessun post pubblicato"))
-                          : ListView.separated(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: mockPosts.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 16),
-                              itemBuilder: (context, index) => PostCard(
-                                post: mockPosts[index],
-                                onTap: () => context.go(
-                                  '/post-details',
-                                  extra: mockPosts[index],
+                      userPostsAsync.when(
+                        data: (posts) => posts.isEmpty
+                            ? const Center(
+                                child: Text("Nessun post pubblicato"),
+                              )
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: posts.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 16),
+                                itemBuilder: (context, index) => PostCard(
+                                  post: posts[index],
+                                  onTap: () => context.go(
+                                    '/post-details',
+                                    extra: posts[index],
+                                  ),
                                 ),
                               ),
-                            ),
-                      mockEvents.isEmpty
-                          ? const Center(
-                              child: Text("Nessun evento partecipato"),
-                            )
-                          : ListView.separated(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: mockEvents.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 16),
-                              itemBuilder: (context, index) => VolunteerCard(
-                                event: mockEvents[index],
-                                onRemove: () {},
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) =>
+                            Center(child: Text("Errore: $error")),
+                      ),
+                      userEventsAsync.when(
+                        data: (events) => events.isEmpty
+                            ? const Center(
+                                child: Text("Nessun evento partecipato"),
+                              )
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: events.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 16),
+                                itemBuilder: (context, index) => VolunteerCard(
+                                  event: events[index],
+                                  onRemove: () {},
+                                ),
                               ),
-                            ),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) =>
+                            Center(child: Text("Errore: $error")),
+                      ),
                     ],
                   ),
                 ),
