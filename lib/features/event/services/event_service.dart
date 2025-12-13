@@ -29,8 +29,12 @@ class EventService {
       throw Exception('Errore durante il recupero degli eventi: $message');
     }
 
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-    final dynamic rawList = decoded['events'] ?? decoded['data'] ?? decoded;
+    final decoded = jsonDecode(response.body);
+    final dynamic rawList = switch (decoded) {
+      final Map<String, dynamic> map => map['events'] ?? map['data'] ?? map,
+      final List<dynamic> list => list,
+      _ => decoded,
+    };
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /events: $rawList');
     }

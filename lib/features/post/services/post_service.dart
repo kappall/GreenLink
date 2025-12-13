@@ -29,8 +29,12 @@ class PostService {
       throw Exception('Errore durante il recupero dei post: $message');
     }
 
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-    final dynamic rawList = decoded['posts'] ?? decoded['data'] ?? decoded;
+    final decoded = jsonDecode(response.body);
+    final dynamic rawList = switch (decoded) {
+      final Map<String, dynamic> map => map['posts'] ?? map['data'] ?? map,
+      final List<dynamic> list => list,
+      _ => decoded,
+    };
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /posts: $rawList');
     }
