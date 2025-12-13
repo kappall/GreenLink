@@ -32,10 +32,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       );
 
       final derivedRole = deriveRoleFromToken(authResult.token);
-      final user = UserModel(
-        id: authResult.userId,
-        email: authResult.email,
-      );
+      final user = UserModel(id: authResult.userId, email: authResult.email);
 
       return AuthState(
         user: user,
@@ -82,10 +79,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       );
 
       final derivedRole = deriveRoleFromToken(authResult.token);
-      final user = UserModel(
-        id: authResult.userId,
-        email: authResult.email,
-      );
+      final user = UserModel(id: authResult.userId, email: authResult.email);
 
       return AuthState(
         user: user,
