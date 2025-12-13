@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:http/http.dart' as http;
 
 class UserService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
@@ -10,13 +10,9 @@ class UserService {
     required int userId,
     required String token,
   }) async {
-
     final response = await http.delete(
-      Uri.parse('$_baseUrl/user/${userId.toString()}'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      Uri.parse('$_baseUrl/user/$userId'),
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -26,30 +22,20 @@ class UserService {
     final data = _safeDecode(response.body);
     final message = data['message'] ?? response.body;
 
-    throw Exception(
-      "Errore durante l'eliminazione dell'account: $message",
-    );
+    throw Exception("Errore durante l'eliminazione dell'account: $message");
   }
 
-  Future<UserModel> fetchCurrentUser({
-    required String token,
-  }) async {
-
+  Future<UserModel> fetchCurrentUser({required String token}) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/user/me'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final data = _safeDecode(response.body);
       final rawUser = data['user'] ?? data;
       if (rawUser is! Map<String, dynamic>) {
-        throw Exception(
-          'Risposta inattesa da /user/me: ${response.body}',
-        );
+        throw Exception('Risposta inattesa da /user/me: ${response.body}');
       }
 
       return UserModel.fromJson(rawUser);
@@ -67,5 +53,4 @@ class UserService {
       return <String, dynamic>{};
     }
   }
-
 }

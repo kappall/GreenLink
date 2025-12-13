@@ -1,8 +1,10 @@
 import 'dart:convert';
 
-import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:flutter/foundation.dart';
+import 'package:greenlinkapp/features/admin/models/user.dart';
 import 'package:http/http.dart' as http;
 
+import '../../auth/utils/role_parser.dart';
 import '../models/report.dart';
 
 class AdminService {
@@ -41,7 +43,7 @@ class AdminService {
     }
   }
 
-  Future<List<UserModel>> getUsers() async {
+  Future<List<User>> getUsers() async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/users'),
@@ -53,18 +55,45 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-
-        final users = jsonList
-            .map(
-              (jsonItem) =>
-                  UserModel.fromJson(jsonItem as Map<String, dynamic>),
-            )
-            .toList();
+        final users = jsonList.map((jsonItem) {
+          final json = jsonItem as Map<String, dynamic>;
+          return User.fromJson(json, AuthRole.user);
+          ;
+        }).toList();
 
         return users;
       } else {
         throw Exception(
-          'Fallimento nel caricamento dei report: ${response.statusCode}',
+          'Fallimento nel caricamento degli user: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Errore di connessione: $e');
+    }
+  }
+
+  Future<List<User>> getPartners() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/partners'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        debugPrint(jsonList.toString());
+        final users = jsonList.map((jsonItem) {
+          final json = jsonItem as Map<String, dynamic>;
+          return User.fromJson(json, AuthRole.partner);
+        }).toList();
+
+        return users;
+      } else {
+        throw Exception(
+          'Fallimento nel caricamento dei partner: ${response.statusCode}',
         );
       }
     } catch (e) {
@@ -119,6 +148,47 @@ class AdminService {
       if (response.statusCode != 200) {
         throw Exception(
           'Fallimento nella rimozione del report: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Errore di connessione: $e');
+    }
+  }
+
+  Future<void> updateUserRole(int userId, AuthRole newRole) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$_baseUrl/user/$userId'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: {'role': newRole.toString().toLowerCase()},
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Fallimento nella modifica del ruolo: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Errore di connessione: $e');
+    }
+  }
+
+  Future<void> blockUser(int userId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/user/$userId'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Fallimento nella modifica del ruolo: ${response.statusCode}',
         );
       }
     } catch (e) {
