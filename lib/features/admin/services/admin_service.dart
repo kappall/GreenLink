@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:greenlinkapp/features/admin/models/user.dart';
 import 'package:http/http.dart' as http;
 
@@ -58,7 +57,6 @@ class AdminService {
         final users = jsonList.map((jsonItem) {
           final json = jsonItem as Map<String, dynamic>;
           return User.fromJson(json, AuthRole.user);
-          ;
         }).toList();
 
         return users;
@@ -84,7 +82,6 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        debugPrint(jsonList.toString());
         final users = jsonList.map((jsonItem) {
           final json = jsonItem as Map<String, dynamic>;
           return User.fromJson(json, AuthRole.partner);

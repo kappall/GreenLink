@@ -160,6 +160,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                 leading: const Icon(Icons.info_outline),
                 title: const Text("Vedi dettagli completi"),
                 onTap: () {
+                  ctx.pop();
                   context.go('/admin/users/${user.id}', extra: user);
                 },
               ),
