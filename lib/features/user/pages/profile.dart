@@ -27,7 +27,7 @@ class ProfileScreen extends ConsumerWidget {
       data: (data) {
         final user = data.user;
 
-        if (user == null || user.id == 'anonymous') {
+        if (user == null || user.id == -1) {
           return Scaffold(
             appBar: AppBar(title: const Text("Profilo"), centerTitle: true),
             body: Center(
@@ -62,8 +62,9 @@ class ProfileScreen extends ConsumerWidget {
         final displayName = (user.username?.trim().isNotEmpty ?? false)
             ? user.username!.trim()
             : (user.email.trim().isNotEmpty ? user.email.trim() : "Utente");
-        final email =
-            user.email.trim().isNotEmpty ? user.email.trim() : "Email non disponibile";
+        final email = user.email.trim().isNotEmpty
+            ? user.email.trim()
+            : "Email non disponibile";
         final avatarLetter = (displayName.isNotEmpty ? displayName : email)
             .characters
             .first

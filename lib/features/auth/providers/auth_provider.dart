@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
-import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/auth/services/auth_service.dart';
 import 'package:greenlinkapp/features/auth/utils/auth_validators.dart';
-import 'package:greenlinkapp/features/user/services/user_service.dart';
+import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:greenlinkapp/features/user/services/user_service.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthState> {
   final AuthService _authService = AuthService();
@@ -35,14 +34,11 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       final derivedRole = deriveRoleFromToken(authResult.token);
 
       final UserModel user;
-      if (derivedRole!=AuthRole.admin){
-       user = await _userService.fetchCurrentUser(
-        token: authResult.token
-      ); }
-      else{
+      if (derivedRole != AuthRole.admin) {
+        user = await _userService.fetchCurrentUser(token: authResult.token);
+      } else {
         user = UserModel(id: authResult.userId, email: authResult.email);
       }
-
 
       return AuthState(
         user: user,
@@ -55,11 +51,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   void loginAnonymous() {
     state = const AsyncData(
       AuthState(
-        user: UserModel(
-          id: -1,
-          email: '',
-          username: 'Ospite',
-        ),
+        user: UserModel(id: -1, email: '', username: 'Ospite'),
         derivedRole: AuthRole.unknown,
       ),
     );
@@ -92,9 +84,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         password: trimmedPassword,
       );
 
-      final user = await _userService.fetchCurrentUser(
-        token: authResult.token
-      );
+      final user = await _userService.fetchCurrentUser(token: authResult.token);
 
       final derivedRole = deriveRoleFromToken(authResult.token);
       return AuthState(
