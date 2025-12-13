@@ -6,7 +6,13 @@ import '../models/report.dart';
 import '../services/admin_service.dart';
 
 final adminServiceProvider = Provider<AdminService>((ref) {
-  return AdminService();
+  final authState = ref.watch(authProvider);
+  final token = authState.asData?.value.token;
+
+  if (token == null) {
+    throw Exception("Utente non autenticato");
+  }
+  return AdminService(token: token);
 });
 
 final reportsListProvider = FutureProvider.autoDispose<List<Report>>((
@@ -14,14 +20,7 @@ final reportsListProvider = FutureProvider.autoDispose<List<Report>>((
 ) async {
   final repository = ref.watch(adminServiceProvider);
 
-  final authState = ref.watch(authProvider);
-  final token = authState.asData?.value.token;
-
-  if (token == null) {
-    throw Exception("Utente non autenticato");
-  }
-
-  return repository.getReports(token: token);
+  return repository.getReports();
 });
 
 final usersListProvider = FutureProvider.autoDispose<List<UserModel>>((
@@ -29,12 +28,5 @@ final usersListProvider = FutureProvider.autoDispose<List<UserModel>>((
 ) async {
   final repository = ref.watch(adminServiceProvider);
 
-  final authState = ref.watch(authProvider);
-  final token = authState.asData?.value.token;
-
-  if (token == null) {
-    throw Exception("Utente non autenticato");
-  }
-
-  return repository.getUsers(token: token);
+  return repository.getUsers();
 });
