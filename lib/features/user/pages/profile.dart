@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
+import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 
 import '../../../data/tmp.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -18,226 +19,239 @@ class ProfileScreen extends ConsumerWidget {
       authProvider.select((auth) => auth.value?.role ?? AuthRole.unknown),
     );
     final colorScheme = Theme.of(context).colorScheme;
+    final currentUserAsync = ref.watch(currentUserProvider);
 
     return authState.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, stackTrace) =>
           Scaffold(body: Center(child: Text("Errore: $error"))),
-      data: (data) {
-        final user = data.user;
+      data: (authData) {
+        return currentUserAsync.when(
+          loading: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
+          error: (error, stackTrace) =>
+              Scaffold(body: Center(child: Text("Errore: $error"))),
+          data: (currentUser) {
+            final user = currentUser ?? authData.user;
 
-        if (user == null || user.id == 'anonymous') {
-          return Scaffold(
-            appBar: AppBar(title: const Text("Profilo"), centerTitle: true),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.account_circle_outlined,
-                    size: 80,
-                    color: colorScheme.outline,
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    "Non hai un account",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text("Accedi per visualizzare il tuo profilo completo"),
-                  const SizedBox(height: 32),
-                  FilledButton(
-                    onPressed: () {
-                      ref.read(authProvider.notifier).logout();
-                    },
-                    child: const Text("Accedi"),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        final displayName = (user.username?.trim().isNotEmpty ?? false)
-            ? user.username!.trim()
-            : (user.email.trim().isNotEmpty ? user.email.trim() : "Utente");
-        final email =
-            user.email.trim().isNotEmpty ? user.email.trim() : "Email non disponibile";
-        final avatarLetter = (displayName.isNotEmpty ? displayName : email)
-            .characters
-            .first
-            .toUpperCase();
-
-        return Scaffold(
-          body: DefaultTabController(
-            length: 2,
-            child: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) {
-                return [
-                  SliverAppBar(
-                    expandedHeight: 340.0,
-                    floating: false,
-                    pinned: true,
-                    backgroundColor: colorScheme.primary,
-                    iconTheme: const IconThemeData(color: Colors.white),
-                    title: const Text(
-                      "Profilo",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.settings, color: Colors.white),
-                        onPressed: () => context.push('/settings'),
+            if (user == null || user.id == 'anonymous') {
+              return Scaffold(
+                appBar: AppBar(title: const Text("Profilo"), centerTitle: true),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.account_circle_outlined,
+                        size: 80,
+                        color: colorScheme.outline,
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        "Non hai un account",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Accedi per visualizzare il tuo profilo completo",
+                      ),
+                      const SizedBox(height: 32),
+                      FilledButton(
+                        onPressed: () {
+                          ref.read(authProvider.notifier).logout();
+                        },
+                        child: const Text("Accedi"),
                       ),
                     ],
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              colorScheme.primary,
-                              const Color(0xFF0D9488),
-                            ],
-                          ),
+                  ),
+                ),
+              );
+            }
+
+            final displayName = user.username ?? user.email;
+            final email = user.email;
+            final avatarLetter = displayName.characters.first.toUpperCase();
+
+            return Scaffold(
+              body: DefaultTabController(
+                length: 2,
+                child: NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    return [
+                      SliverAppBar(
+                        expandedHeight: 340.0,
+                        floating: false,
+                        pinned: true,
+                        backgroundColor: colorScheme.primary,
+                        iconTheme: const IconThemeData(color: Colors.white),
+                        title: const Text(
+                          "Profilo",
+                          style: TextStyle(color: Colors.white),
                         ),
-                        child: SafeArea(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                  radius: 40,
-                                  backgroundColor: Colors.white,
-                                  child: CircleAvatar(
-                                    radius: 38,
-                                    backgroundColor:
-                                        colorScheme.primaryContainer,
-                                    child: Text(
-                                      avatarLetter,
-                                      style: TextStyle(
-                                        fontSize: 32,
-                                        color: colorScheme.primary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                Text(
-                                  displayName,
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                Text(
-                                  email,
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    roleLabel(role),
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ),
-
-                                const SizedBox(height: 20),
-
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                        actions: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.settings,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => context.push('/settings'),
+                          ),
+                        ],
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  colorScheme.primary,
+                                  const Color(0xFF0D9488),
+                                ],
+                              ),
+                            ),
+                            child: SafeArea(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    _buildStatItem(
-                                      "Post",
-                                      mockPosts.length.toString(),
+                                    CircleAvatar(
+                                      radius: 40,
+                                      backgroundColor: Colors.white,
+                                      child: CircleAvatar(
+                                        radius: 38,
+                                        backgroundColor:
+                                            colorScheme.primaryContainer,
+                                        child: Text(
+                                          avatarLetter,
+                                          style: TextStyle(
+                                            fontSize: 32,
+                                            color: colorScheme.primary,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    _buildStatItem(
-                                      "Eventi",
-                                      mockEvents.length.toString(),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      displayName,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      email,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.9,
+                                        ),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        roleLabel(role),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        _buildStatItem(
+                                          "Post",
+                                          mockPosts.length.toString(),
+                                        ),
+                                        _buildStatItem(
+                                          "Eventi",
+                                          mockEvents.length.toString(),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-
-                  SliverPersistentHeader(
-                    delegate: _SliverAppBarDelegate(
-                      TabBar(
-                        labelColor: colorScheme.primary,
-                        unselectedLabelColor: Colors.grey,
-                        indicatorColor: colorScheme.primary,
-                        tabs: const [
-                          Tab(text: "I miei Post"),
-                          Tab(text: "I miei Eventi"),
-                        ],
+                      SliverPersistentHeader(
+                        delegate: _SliverAppBarDelegate(
+                          TabBar(
+                            labelColor: colorScheme.primary,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: colorScheme.primary,
+                            tabs: const [
+                              Tab(text: "I miei Post"),
+                              Tab(text: "I miei Eventi"),
+                            ],
+                          ),
+                        ),
+                        pinned: true,
                       ),
-                    ),
-                    pinned: true,
-                  ),
-                ];
-              },
-              body: TabBarView(
-                children: [
-                  mockPosts.isEmpty
-                      ? const Center(child: Text("Nessun post pubblicato"))
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: mockPosts.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 16),
-                          itemBuilder: (context, index) => PostCard(
-                            post: mockPosts[index],
-                            onTap: () => context.go(
-                              '/post-details',
-                              extra: mockPosts[index],
+                    ];
+                  },
+                  body: TabBarView(
+                    children: [
+                      mockPosts.isEmpty
+                          ? const Center(child: Text("Nessun post pubblicato"))
+                          : ListView.separated(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: mockPosts.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 16),
+                              itemBuilder: (context, index) => PostCard(
+                                post: mockPosts[index],
+                                onTap: () => context.go(
+                                  '/post-details',
+                                  extra: mockPosts[index],
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-
-                  mockEvents.isEmpty
-                      ? const Center(child: Text("Nessun evento partecipato"))
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: mockEvents.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 16),
-                          itemBuilder: (context, index) => VolunteerCard(
-                            event: mockEvents[index],
-                            onRemove: () {},
-                          ),
-                        ),
-                ],
+                      mockEvents.isEmpty
+                          ? const Center(
+                              child: Text("Nessun evento partecipato"),
+                            )
+                          : ListView.separated(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: mockEvents.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 16),
+                              itemBuilder: (context, index) => VolunteerCard(
+                                event: mockEvents[index],
+                                onRemove: () {},
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

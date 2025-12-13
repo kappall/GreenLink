@@ -31,11 +31,14 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         password: trimmedPassword,
       );
 
-      final user = await _userService.fetchCurrentUser(
-        token: authResult.token,
-      );
-
       final derivedRole = deriveRoleFromToken(authResult.token);
+
+      UserModel? user;
+      if (derivedRole != AuthRole.admin) {
+        user = await _userService.fetchCurrentUser(
+          token: authResult.token,
+        );
+      }
 
       return AuthState(
         user: user,
@@ -97,6 +100,40 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         derivedRole: derivedRole,
       );
     });
+  }
+
+  Future<UserModel?> loadCurrentUser() async {
+    final authData = state.asData?.value;
+    final token = authData?.token;
+
+    if (token == null || token.isEmpty) return null;
+
+    final cachedUser = authData?.user;
+    if (cachedUser != null) return cachedUser;
+
+    final role = authData?.role ?? deriveRoleFromToken(token);
+    if (role == AuthRole.admin) return authData?.user;
+
+    final user = await _userService.fetchCurrentUser(token: token);
+
+    if (authData != null) {
+      state = AsyncData(
+        authData.copyWith(
+          user: user,
+          derivedRole: authData.derivedRole ?? role,
+        ),
+      );
+    } else {
+      state = AsyncData(
+        AuthState(
+          user: user,
+          token: token,
+          derivedRole: role,
+        ),
+      );
+    }
+
+    return user;
   }
 
   void logout() {
