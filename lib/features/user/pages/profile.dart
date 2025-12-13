@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
+import 'package:greenlinkapp/features/event/providers/event_provider.dart';
+import 'package:greenlinkapp/features/post/providers/post_provider.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 
 import '../../auth/providers/auth_provider.dart';
@@ -19,8 +21,8 @@ class ProfileScreen extends ConsumerWidget {
     );
     final colorScheme = Theme.of(context).colorScheme;
     final currentUserAsync = ref.watch(currentUserProvider);
-    final userPostsAsync = AsyncData([]); //TODO:ref.watch(userPostsProvider);
-    final userEventsAsync = AsyncData([]); //TODO:ref.watch(userEventsProvider);
+    final userPostsAsync = ref.watch(postsProvider);
+    final userEventsAsync = ref.watch(eventsProvider);
 
     return authState.when(
       loading: () =>
@@ -148,9 +150,7 @@ class ProfileScreen extends ConsumerWidget {
                                     Text(
                                       email,
                                       style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.9,
-                                        ),
+                                        color: Colors.white.withOpacity(0.9),
                                         fontSize: 14,
                                       ),
                                     ),
@@ -161,14 +161,10 @@ class ProfileScreen extends ConsumerWidget {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.2,
-                                        ),
+                                        color: Colors.white.withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.3,
-                                          ),
+                                          color: Colors.white.withOpacity(0.3),
                                         ),
                                       ),
                                       child: Text(
@@ -263,7 +259,7 @@ class ProfileScreen extends ConsumerWidget {
                                 itemCount: events.length,
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(height: 16),
-                                itemBuilder: (context, index) => VolunteerCard(
+                                itemBuilder: (context, index) => EventCard(
                                   event: events[index],
                                   onRemove: () {},
                                 ),
@@ -297,10 +293,7 @@ class ProfileScreen extends ConsumerWidget {
         ),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12),
         ),
       ],
     );

@@ -1,19 +1,22 @@
-//temporaneo, da usare gli stessi del feed
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:intl/intl.dart';
 
-import '../../../core/common/widgets/badge.dart';
 import '../../../core/common/widgets/card.dart';
-import '../../../data/tmp.dart';
 
-class VolunteerCard extends StatelessWidget {
-  final Event event;
+class EventCard extends ConsumerWidget {
+  final EventModel event;
   final VoidCallback? onRemove;
 
-  const VolunteerCard({super.key, required this.event, this.onRemove});
+  const EventCard({super.key, required this.event, this.onRemove});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final title = event.description.split('\n').first;
+    final date = DateFormat('dd MMM yyyy').format(event.startDate);
+    final time = DateFormat('HH:mm').format(event.startDate);
+
     return UiCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,14 +28,8 @@ class VolunteerCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    UiBadge(
-                      label: event.category.label,
-                      color: event.category.color,
-                      icon: event.category.icon,
-                    ),
-                    const SizedBox(height: 8),
                     Text(
-                      event.title,
+                      title,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -54,7 +51,7 @@ class VolunteerCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                event.organizer.name,
+                event.author?.displayName ?? 'Utente Sconosciuto',
                 style: TextStyle(color: Colors.grey[600], fontSize: 13),
               ),
             ],
@@ -64,12 +61,12 @@ class VolunteerCard extends StatelessWidget {
           // Info Grid
           Row(
             children: [
-              _buildInfoIcon(
-                Icons.calendar_today,
-                "${event.date}, ${event.time}",
-              ),
+              _buildInfoIcon(Icons.calendar_today, "$date, $time"),
               const SizedBox(width: 16),
-              _buildInfoIcon(Icons.location_on, event.location),
+              _buildInfoIcon(
+                Icons.location_on,
+                '${event.latitude}, ${event.longitude}',
+              ),
             ],
           ),
 

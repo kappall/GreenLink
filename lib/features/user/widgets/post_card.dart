@@ -1,12 +1,78 @@
 //temporaneo, da usare gli stessi del feed
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/post/models/post_model.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/badge.dart';
 import '../../../core/common/widgets/card.dart';
-import '../../../data/tmp.dart';
+import '../providers/user_provider.dart';
 
-class PostCard extends StatelessWidget {
-  final Post post;
+extension PostCategoryUI on PostCategory {
+  String get label {
+    switch (this) {
+      case PostCategory.flood:
+        return 'Alluvione';
+      case PostCategory.fire:
+        return 'Incendio';
+      case PostCategory.earthquake:
+        return 'Terremoto';
+      case PostCategory.pollution:
+        return 'Inquinamento';
+      case PostCategory.storm:
+        return 'Tempesta';
+      case PostCategory.hurricane:
+        return 'Uragano';
+      case PostCategory.other:
+        return 'Altro';
+      case PostCategory.unknown:
+        return 'Sconosciuto';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case PostCategory.flood:
+        return Icons.water_drop;
+      case PostCategory.fire:
+        return Icons.local_fire_department;
+      case PostCategory.earthquake:
+        return Icons.landslide;
+      case PostCategory.pollution:
+        return Icons.factory;
+      case PostCategory.storm:
+        return Icons.storm;
+      case PostCategory.hurricane:
+        return Icons.cyclone;
+      case PostCategory.other:
+      case PostCategory.unknown:
+        return Icons.question_mark;
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case PostCategory.flood:
+        return Colors.blue;
+      case PostCategory.fire:
+        return Colors.red;
+      case PostCategory.earthquake:
+        return Colors.brown;
+      case PostCategory.pollution:
+        return Colors.grey;
+      case PostCategory.storm:
+        return Colors.indigo;
+      case PostCategory.hurricane:
+        return Colors.purple;
+      case PostCategory.other:
+      case PostCategory.unknown:
+        return Colors.black;
+    }
+  }
+}
+
+class PostCard extends ConsumerWidget {
+  final PostModel post;
   final VoidCallback? onTap;
   final VoidCallback? onAmplify;
   final VoidCallback? onComment;
@@ -22,7 +88,15 @@ class PostCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isAmplified =
+        currentUser != null &&
+        post.votes.any((voter) => voter.id == currentUser.id);
+    final timestamp = post.createdAt != null
+        ? DateFormat('dd MMM yyyy, HH:mm').format(post.createdAt!.toLocal())
+        : '';
+
     return UiCard(
       onTap: onTap,
       padding: EdgeInsets.zero,
@@ -35,13 +109,12 @@ class PostCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        post.author.name,
+                        post.author?.displayName ?? 'Utente Sconosciuto',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -50,7 +123,7 @@ class PostCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        post.timestamp,
+                        timestamp,
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 12,
@@ -59,14 +132,13 @@ class PostCard extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     UiBadge(
-                      label: post.type.label,
-                      icon: post.type.icon,
-                      color: post.type.color,
+                      label: post.category.label,
+                      icon: post.category.icon,
+                      color: post.category.color,
                     ),
                     if (onReport != null)
                       SizedBox(
@@ -91,80 +163,14 @@ class PostCard extends StatelessWidget {
               ],
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              post.content,
+              post.description,
               style: const TextStyle(fontSize: 15, height: 1.4),
             ),
           ),
           const SizedBox(height: 12),
-
-          if (post.images != null && post.images!.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              height: 200,
-              width: double.infinity,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Stack(
-                  children: [
-                    PageView.builder(
-                      itemCount: post.images!.length,
-                      itemBuilder: (context, index) {
-                        return Image.network(
-                          post.images![index],
-                          fit: BoxFit.cover,
-                          loadingBuilder: (ctx, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: Colors.grey.shade100,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (ctx, error, stackTrace) => Container(
-                            color: Colors.grey.shade100,
-                            child: const Icon(
-                              Icons.broken_image,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-
-                    if (post.images!.length > 1)
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            "+ ${post.images!.length} foto",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -173,7 +179,7 @@ class PostCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    post.location,
+                    '${post.latitude}, ${post.longitude}',
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -182,10 +188,8 @@ class PostCard extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 12),
           const Divider(height: 1),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
@@ -196,40 +200,40 @@ class PostCard extends StatelessWidget {
                     icon: Icon(
                       Icons.trending_up,
                       size: 20,
-                      color: post.isAmplified
+                      color: isAmplified
                           ? const Color(0xFF059669)
                           : Colors.grey.shade600,
                     ),
                     label: Text(
-                      post.isAmplified
-                          ? "Amplificato (${post.amplifications})"
-                          : "Amplifica (${post.amplifications})",
+                      isAmplified
+                          ? 'Amplificato (${post.votes.length})'
+                          : 'Amplifica (${post.votes.length})',
                       style: TextStyle(
-                        color: post.isAmplified
+                        color: isAmplified
                             ? const Color(0xFF059669)
                             : Colors.grey.shade600,
-                        fontWeight: post.isAmplified
+                        fontWeight: isAmplified
                             ? FontWeight.w600
                             : FontWeight.normal,
                       ),
                     ),
                   ),
                 ),
-
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: onComment,
-                    icon: Icon(
-                      Icons.chat_bubble_outline,
-                      size: 18,
-                      color: Colors.grey.shade600,
-                    ),
-                    label: Text(
-                      "${post.commentsCount} Commenti",
-                      style: TextStyle(color: Colors.grey.shade600),
+                if (onComment != null)
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: onComment,
+                      icon: Icon(
+                        Icons.chat_bubble_outline,
+                        size: 18,
+                        color: Colors.grey.shade600,
+                      ),
+                      label: Text(
+                        'Commenti',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
