@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/report.dart';
+import '../providers/admin_provider.dart';
 import '../widgets/report_card.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -11,21 +13,13 @@ class ReportsScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportsScreenState extends ConsumerState<ReportsScreen> {
-  late List<dynamic> _posts;
-  late List<dynamic> _events;
-  late List<dynamic> _comments;
+  void _handleAction(Report report, bool isApprove) async {
+    await ref
+        .read(adminServiceProvider)
+        .moderateReport(report: report, approve: isApprove);
+    ref.invalidate(reportsListProvider);
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void _handleAction(String id, String type, bool isApprove) {
-    setState(() {
-      if (type == 'post') _posts.removeWhere((r) => r.id == id);
-      if (type == 'event') _events.removeWhere((r) => r.id == id);
-      if (type == 'comment') _comments.removeWhere((r) => r.id == id);
-    });
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -40,39 +34,57 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Column(
-        children: [
-          Container(
-            color: Colors.white,
-            child: const TabBar(
-              labelColor: Colors.indigo,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Colors.indigo,
-              tabs: [
-                Tab(text: "Post", icon: Icon(Icons.message_outlined)),
-                Tab(text: "Eventi", icon: Icon(Icons.calendar_today_outlined)),
-                Tab(text: "Commenti", icon: Icon(Icons.comment_outlined)),
-              ],
-            ),
-          ),
+    final reportsAsync = ref.watch(reportsListProvider);
 
-          Expanded(
-            child: TabBarView(
-              children: [
-                _buildReportList([], 'post'),
-                _buildReportList([], 'event'),
-                _buildReportList([], 'comment'),
-              ],
-            ),
+    return reportsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(child: Text('Error: $error')),
+      data: (reports) {
+        final posts = reports.where((r) => r.type == ReportType.post).toList();
+        final events = reports
+            .where((r) => r.type == ReportType.event)
+            .toList();
+        final comments = reports
+            .where((r) => r.type == ReportType.comment)
+            .toList();
+
+        return DefaultTabController(
+          length: 3,
+          child: Column(
+            children: [
+              Container(
+                color: Colors.white,
+                child: const TabBar(
+                  labelColor: Colors.indigo,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: Colors.indigo,
+                  tabs: [
+                    Tab(text: "Post", icon: Icon(Icons.message_outlined)),
+                    Tab(
+                      text: "Eventi",
+                      icon: Icon(Icons.calendar_today_outlined),
+                    ),
+                    Tab(text: "Commenti", icon: Icon(Icons.comment_outlined)),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _buildReportList(posts),
+                    _buildReportList(events),
+                    _buildReportList(comments),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildReportList(List<dynamic> reports, String type) {
+  Widget _buildReportList(List<Report> reports) {
     if (reports.isEmpty) {
       return Center(
         child: Column(
@@ -101,8 +113,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         final report = reports[index];
         return ReportCard(
           report: report,
-          onReject: () => _handleAction(report.id, type, false),
-          onApprove: () => _handleAction(report.id, type, true),
+          onReject: () => _handleAction(report, false),
+          onApprove: () => _handleAction(report, true),
         );
       },
     );
