@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/features/volunteering/domain/event.dart';
-import 'package:greenlinkapp/features/volunteering/widgets/volunteeringcard.dart';
+import 'package:greenlinkapp/features/volunteering/widgets/eventcard.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/volunteering/widgets/button.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +11,7 @@ class VolunteeringScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPartner = true;
+    final isPartner = true; // Simulazione del controllo del ruolo partner
     final List<Event> events = [
       //hardcoded sample events
       Event(
