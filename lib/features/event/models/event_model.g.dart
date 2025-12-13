@@ -7,9 +7,11 @@ part of 'event_model.dart';
 // **************************************************************************
 
 _EventModel _$EventModelFromJson(Map<String, dynamic> json) => _EventModel(
-  id: (json['id'] as num).toInt(),
+  id: (json['id'] as num?)?.toInt(),
   description: json['description'] as String,
-  createdAt: DateTime.parse(json['created_at'] as String),
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
   deletedAt: json['deleted_at'] == null
       ? null
       : DateTime.parse(json['deleted_at'] as String),
@@ -20,17 +22,19 @@ _EventModel _$EventModelFromJson(Map<String, dynamic> json) => _EventModel(
     json['event_type'],
     unknownValue: EventType.unknown,
   ),
-  author: EventUserModel.fromJson(json['author'] as Map<String, dynamic>),
+  author: json['author'] == null
+      ? null
+      : UserModel.fromJson(json['author'] as Map<String, dynamic>),
   votes:
       (json['votes'] as List<dynamic>?)
-          ?.map((e) => EventUserModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
-      const <EventUserModel>[],
+      const <UserModel>[],
   participants:
       (json['participants'] as List<dynamic>?)
-          ?.map((e) => EventUserModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
-      const <EventUserModel>[],
+      const <UserModel>[],
   maxParticipants: (json['max_participants'] as num).toInt(),
   startDate: DateTime.parse(json['start_date'] as String),
   endDate: DateTime.parse(json['end_date'] as String),
@@ -40,7 +44,7 @@ Map<String, dynamic> _$EventModelToJson(_EventModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
-      'created_at': instance.createdAt.toIso8601String(),
+      'created_at': instance.createdAt?.toIso8601String(),
       'deleted_at': instance.deletedAt?.toIso8601String(),
       'latitude': instance.latitude,
       'longitude': instance.longitude,
@@ -61,25 +65,3 @@ const _$EventTypeEnumMap = {
   EventType.other: 'other',
   EventType.unknown: 'unknown',
 };
-
-_EventUserModel _$EventUserModelFromJson(Map<String, dynamic> json) =>
-    _EventUserModel(
-      id: (json['id'] as num).toInt(),
-      email: json['email'] as String,
-      username: json['username'] as String?,
-      password: json['password'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      deletedAt: json['deleted_at'] == null
-          ? null
-          : DateTime.parse(json['deleted_at'] as String),
-    );
-
-Map<String, dynamic> _$EventUserModelToJson(_EventUserModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'email': instance.email,
-      'username': instance.username,
-      'password': instance.password,
-      'created_at': instance.createdAt.toIso8601String(),
-      'deleted_at': instance.deletedAt?.toIso8601String(),
-    };

@@ -7,20 +7,24 @@ part of 'post_model.dart';
 // **************************************************************************
 
 _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
-  id: (json['id'] as num).toInt(),
+  id: (json['id'] as num?)?.toInt(),
   description: json['description'] as String,
-  createdAt: DateTime.parse(json['created_at'] as String),
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
   deletedAt: json['deleted_at'] == null
       ? null
       : DateTime.parse(json['deleted_at'] as String),
   latitude: (json['latitude'] as num).toDouble(),
   longitude: (json['longitude'] as num).toDouble(),
-  author: PostUserModel.fromJson(json['author'] as Map<String, dynamic>),
+  author: json['author'] == null
+      ? null
+      : UserModel.fromJson(json['author'] as Map<String, dynamic>),
   votes:
       (json['votes'] as List<dynamic>?)
-          ?.map((e) => PostUserModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
-      const <PostUserModel>[],
+      const <UserModel>[],
   category: $enumDecode(
     _$PostCategoryEnumMap,
     json['category'],
@@ -32,7 +36,7 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
-      'created_at': instance.createdAt.toIso8601String(),
+      'created_at': instance.createdAt?.toIso8601String(),
       'deleted_at': instance.deletedAt?.toIso8601String(),
       'latitude': instance.latitude,
       'longitude': instance.longitude,
@@ -51,23 +55,3 @@ const _$PostCategoryEnumMap = {
   PostCategory.other: 'other',
   PostCategory.unknown: 'unknown',
 };
-
-_PostUserModel _$PostUserModelFromJson(Map<String, dynamic> json) =>
-    _PostUserModel(
-      id: (json['id'] as num).toInt(),
-      email: json['email'] as String,
-      password: json['password'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      deletedAt: json['deleted_at'] == null
-          ? null
-          : DateTime.parse(json['deleted_at'] as String),
-    );
-
-Map<String, dynamic> _$PostUserModelToJson(_PostUserModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'email': instance.email,
-      'password': instance.password,
-      'created_at': instance.createdAt.toIso8601String(),
-      'deleted_at': instance.deletedAt?.toIso8601String(),
-    };
