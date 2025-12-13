@@ -36,7 +36,7 @@ class UserService {
   }) async {
 
     final response = await http.get(
-      Uri.parse('$_baseUrl/user/me'),
+      Uri.parse('$_baseUrl/me'),
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer $token',
@@ -48,7 +48,7 @@ class UserService {
       final rawUser = data['user'] ?? data;
       if (rawUser is! Map<String, dynamic>) {
         throw Exception(
-          'Risposta inattesa da /user/me: ${response.body}',
+          'Risposta inattesa da /me: ${response.body}',
         );
       }
 

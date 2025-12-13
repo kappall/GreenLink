@@ -26,16 +26,16 @@ class ProfileScreen extends ConsumerWidget {
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, stackTrace) =>
           Scaffold(body: Center(child: Text("Errore: $error"))),
-      data: (authData) {
+      data: (_) {
         return currentUserAsync.when(
           loading: () =>
               const Scaffold(body: Center(child: CircularProgressIndicator())),
           error: (error, stackTrace) =>
               Scaffold(body: Center(child: Text("Errore: $error"))),
           data: (currentUser) {
-            final user = currentUser ?? authData.user;
+            final user = currentUser;
 
-            if (user == null || user.id == 'anonymous') {
+            if (user == null || user.id <= 0) {
               return Scaffold(
                 appBar: AppBar(title: const Text("Profilo"), centerTitle: true),
                 body: Center(
