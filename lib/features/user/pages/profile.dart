@@ -6,9 +6,9 @@ import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/post/providers/post_provider.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 
+import '../../../core/common/widgets/event_card.dart';
+import '../../../core/common/widgets/post_card.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../widgets/event_card.dart';
-import '../widgets/post_card.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});

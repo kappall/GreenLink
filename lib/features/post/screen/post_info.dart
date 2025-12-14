@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 
-import '../../user/widgets/post_card.dart';
+import '../../../core/common/widgets/post_card.dart';
 import '../models/post_model.dart';
 
 class PostInfoScreen extends StatefulWidget {

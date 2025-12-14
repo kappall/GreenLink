@@ -8,6 +8,8 @@ import 'package:greenlinkapp/features/post/models/post_model.dart';
 import 'package:greenlinkapp/features/post/providers/post_provider.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../core/providers/geocoding_provider.dart';
+
 extension PostCategoryUI on PostCategory {
   String get label {
     switch (this) {
@@ -288,9 +290,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ? (post.author?.displayName ?? 'Segnalazione')
         : event!.description.split('\n').first;
     final description = isPost ? post.description : event!.description;
-    final location = isPost
-        ? '${post.latitude.toStringAsFixed(4)}, ${post.longitude.toStringAsFixed(4)}'
-        : '${event!.latitude.toStringAsFixed(4)}, ${event.longitude.toStringAsFixed(4)}';
+
+    final geoKey = isPost
+        ? (lat: post.latitude, lng: post.longitude)
+        : (lat: event!.latitude, lng: event.longitude);
+    final location = ref.watch(placeNameProvider(geoKey)).value;
     final icon = isPost ? post.category.icon : event!.eventType.icon;
 
     showModalBottomSheet(
@@ -350,7 +354,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   children: [
                     Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 4),
-                    Text(location, style: TextStyle(color: Colors.grey[600])),
+                    Text(
+                      location ?? '',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),

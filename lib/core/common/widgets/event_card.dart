@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/common/widgets/card.dart';
+import 'card.dart';
 
 class EventCard extends ConsumerWidget {
   final EventModel event;
