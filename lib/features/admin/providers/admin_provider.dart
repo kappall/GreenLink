@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 import '../../auth/providers/auth_provider.dart';
@@ -61,4 +63,49 @@ final reportsCountProvider = Provider<int>((ref) {
     data: (reports) => reports.length,
     orElse: () => 0,
   );
+});
+
+final usersSearchQueryProvider = StateProvider<String>((_) => '');
+
+final userRoleFilterProvider = StateProvider<AuthRole?>((_) => null);
+
+final filteredUsersProvider = Provider<List<UserModel>>((ref) {
+  final usersAsync = ref.watch(usersListProvider);
+  final query = ref.watch(usersSearchQueryProvider).toLowerCase();
+  final selectedRole = ref.watch(userRoleFilterProvider);
+
+  return usersAsync.maybeWhen(
+    data: (users) {
+      var filteredUsers = users;
+
+      if (selectedRole != null) {
+        filteredUsers = filteredUsers
+            .where((user) => user.role == selectedRole)
+            .toList();
+      }
+
+      if (query.isEmpty) {
+        return filteredUsers;
+      }
+
+      return filteredUsers
+          .where(
+            (u) =>
+                u.displayName.toLowerCase().contains(query) ||
+                u.email.toLowerCase().contains(query),
+          )
+          .toList();
+    },
+    orElse: () => const [],
+  );
+});
+
+final activeFilteredUsersProvider = Provider<List<UserModel>>((ref) {
+  final users = ref.watch(filteredUsersProvider);
+  return users.where((user) => !user.isBlocked).toList();
+});
+
+final blockedFilteredUsersProvider = Provider<List<UserModel>>((ref) {
+  final users = ref.watch(filteredUsersProvider);
+  return users.where((user) => user.isBlocked).toList();
 });

@@ -25,7 +25,6 @@ final placeNameProvider = FutureProvider.family<String, GeoKey>((
 
     return [street, locality, country].where((s) => s.isNotEmpty).join(', ');
   } catch (e) {
-    print("Geocoding Error: $e");
     return "Errore Geocoding";
   }
 });
