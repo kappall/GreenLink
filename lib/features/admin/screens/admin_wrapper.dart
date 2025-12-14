@@ -18,19 +18,22 @@ class AdminWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "GreenLink",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () => ref.read(authProvider.notifier).logout(),
           ),
         ],
+        backgroundColor: colorScheme.primary,
+        foregroundColor: Colors.white,
       ),
       body: navigationShell,
       bottomNavigationBar: NavigationBar(

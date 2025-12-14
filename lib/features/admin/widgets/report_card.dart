@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:greenlinkapp/core/common/widgets/badge.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/admin/models/report.dart';
-
-import '../../../core/common/widgets/ui.dart';
 
 class ReportCard extends StatelessWidget {
   final Report report;
