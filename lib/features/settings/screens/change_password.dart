@@ -28,10 +28,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       setState(() => _isSaving = true);
       // TODO: aspetto che tom implementi controller
       Future.delayed(const Duration(seconds: 2), () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Password cambiata con successo")),
-        );
         if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Password cambiata con successo")),
+          );
           Navigator.of(context).pop();
         }
       });
