@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/volunteering/domain/event.dart';
+import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';  
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -74,7 +75,7 @@ class EventCard extends StatelessWidget {
             ),
             InkWell(
               onTap: () {
-                // Segnala il post
+                showReportDialog(context, item: event);
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),

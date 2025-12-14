@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
+import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
@@ -57,7 +58,10 @@ class PostCard extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    // Segnala il post
+                    showReportDialog(
+                      context,
+                      item: post,
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),

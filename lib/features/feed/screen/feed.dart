@@ -67,7 +67,7 @@ class FeedScreen extends ConsumerWidget {
         children: [
           TextField(
             decoration: InputDecoration(
-              hintText: 'Cerca eventi di volontariato...',
+              hintText: 'Cerca emergenze o luoghi...',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.grey[100],
