@@ -16,6 +16,7 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   deletedAt: json['deleted_at'] == null
       ? null
       : DateTime.parse(json['deleted_at'] as String),
+  role: $enumDecodeNullable(_$AuthRoleEnumMap, json['role']),
 );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
@@ -25,4 +26,12 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'username': instance.username,
       'created_at': instance.createdAt?.toIso8601String(),
       'deleted_at': instance.deletedAt?.toIso8601String(),
+      'role': _$AuthRoleEnumMap[instance.role],
     };
+
+const _$AuthRoleEnumMap = {
+  AuthRole.admin: 'admin',
+  AuthRole.partner: 'partner',
+  AuthRole.user: 'user',
+  AuthRole.unknown: 'unknown',
+};

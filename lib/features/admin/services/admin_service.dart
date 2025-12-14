@@ -1,9 +1,10 @@
 import 'dart:convert';
 
-import 'package:greenlinkapp/features/admin/models/user.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../../auth/utils/role_parser.dart';
+import '../../user/models/user_model.dart';
 import '../models/report.dart';
 
 class AdminService {
@@ -42,7 +43,7 @@ class AdminService {
     }
   }
 
-  Future<List<User>> getUsers() async {
+  Future<List<UserModel>> getUsers() async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/users'),
@@ -56,7 +57,9 @@ class AdminService {
         final List<dynamic> jsonList = json.decode(response.body);
         final users = jsonList.map((jsonItem) {
           final json = jsonItem as Map<String, dynamic>;
-          return User.fromJson(json, AuthRole.user);
+          json['role'] = AuthRole.user.name;
+          debugPrint(json.toString());
+          return UserModel.fromJson(json);
         }).toList();
 
         return users;
@@ -70,7 +73,7 @@ class AdminService {
     }
   }
 
-  Future<List<User>> getPartners() async {
+  Future<List<UserModel>> getPartners() async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/partners'),
@@ -84,7 +87,8 @@ class AdminService {
         final List<dynamic> jsonList = json.decode(response.body);
         final users = jsonList.map((jsonItem) {
           final json = jsonItem as Map<String, dynamic>;
-          return User.fromJson(json, AuthRole.partner);
+          json['role'] = AuthRole.partner.name;
+          return UserModel.fromJson(json);
         }).toList();
 
         return users;

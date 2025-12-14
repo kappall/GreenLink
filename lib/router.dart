@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/features/admin/models/user.dart';
 import 'package:greenlinkapp/features/admin/screens/reports_screen.dart';
 import 'package:greenlinkapp/features/admin/screens/user_detail.dart';
 import 'package:greenlinkapp/features/admin/screens/users_screen.dart';
@@ -14,6 +13,7 @@ import 'package:greenlinkapp/features/main-wrapper/screen/main_wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
 import 'package:greenlinkapp/features/post/screen/post_info.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
 import 'package:greenlinkapp/features/volunteering/screen/volunteer.dart';
 
@@ -143,7 +143,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: ':userId',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
-                      final user = state.extra as User;
+                      final user = state.extra as UserModel;
                       return UserDetailScreen(user: user);
                     },
                   ),

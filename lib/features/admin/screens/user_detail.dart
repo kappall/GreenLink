@@ -1,35 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
+import 'package:greenlinkapp/features/event/providers/event_provider.dart';
+import 'package:greenlinkapp/features/post/providers/post_provider.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:greenlinkapp/features/user/widgets/post_card.dart';
 
-import '../../../core/common/widgets/ui.dart';
-import '../models/user.dart';
 import '../providers/admin_provider.dart';
 
 class UserDetailScreen extends ConsumerWidget {
-  final User user;
+  final UserModel user;
 
   const UserDetailScreen({super.key, required this.user});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final userPosts = ref.watch(postsProvider);
+    final userEvents = ref.watch(eventsProvider);
+    final userComments = ref.watch(userCommentProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Dettagli Utente",
-          style: TextStyle(color: colorScheme.onPrimary),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
+        title: Text("Dettagli Utente", style: TextStyle(color: Colors.white)),
         backgroundColor: colorScheme.primary,
         actions: [
           IconButton(
-            icon: Icon(user.isBlocked ? Icons.lock_open : Icons.block),
-            color: user.isBlocked ? Colors.white : Colors.red,
+            icon: const Icon(Icons.block),
+            color: Colors.red,
             onPressed: () => _showBlockDialog(context, user, ref),
-          ),
-          IconButton(
-            icon: Icon(Icons.more_vert, color: colorScheme.onPrimary),
-            onPressed: () => _showManagementOptions(context, user, ref),
           ),
         ],
       ),
@@ -39,26 +44,89 @@ class UserDetailScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildUserInfoCard(context, user),
-            const SizedBox(height: 20),
 
+            const SizedBox(height: 20),
             Text(
-              "Metriche Attività",
+              "Metriche Attività ",
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
-            _buildStatsGrid(user),
+            _buildStatsGrid(
+              user,
+              userPosts.asData?.value
+                      .where((p) => p.author?.id == user.id)
+                      .length ??
+                  0,
+              userEvents.asData?.value
+                      .where((e) => e.author?.id == user.id)
+                      .length ??
+                  0,
+              userComments.where((c) => c.userId == user.id).length,
+            ),
             const SizedBox(height: 20),
             Text(
-              "Contenuti Pubblicati",
+              "Contenuti Pubblicati ",
               style: Theme.of(context).textTheme.titleLarge,
             ),
+            const SizedBox(height: 12),
+            userPosts.when(
+              data: (posts) {
+                final postsByUser = posts
+                    .where((p) => p.author?.id == user.id)
+                    .toList();
+                if (postsByUser.isEmpty) {
+                  return const Text("Nessun post pubblicato. ");
+                }
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: postsByUser.length,
+                  itemBuilder: (context, index) =>
+                      PostCard(post: postsByUser[index]),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Text("Errore: $e "),
+            ),
+            if (user.role == AuthRole.partner) ...[
+              const SizedBox(height: 20),
+              Text(
+                "Eventi Creati ",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              userEvents.when(
+                data: (events) {
+                  final eventsByUser = events
+                      .where((e) => e.author?.id == user.id)
+                      .toList();
+                  if (eventsByUser.isEmpty) {
+                    return const Text("Nessun evento creato. ");
+                  }
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: eventsByUser.length,
+                    itemBuilder: (context, index) =>
+                        Text(eventsByUser[index].description),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Text("Errore: $e "),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserInfoCard(BuildContext context, User user) {
+  Widget _buildUserInfoCard(BuildContext context, UserModel user) {
+    final colorScheme = Theme.of(context).colorScheme;
     return UiCard(
       child: SizedBox(
         width: double.infinity,
@@ -81,22 +149,30 @@ class UserDetailScreen extends ConsumerWidget {
             ),
             Text(user.email, style: TextStyle(color: Colors.grey[600])),
             const SizedBox(height: 8),
-            UiBadge(
-              label: user.role.name.toUpperCase(),
-              color: Colors.blueGrey,
-            ),
-            if (user.isBlocked)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: UiBadge(label: "BLOCCATO", color: Colors.red),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: colorScheme.primary),
               ),
+              child: Text(
+                roleLabel(user.role ?? AuthRole.unknown),
+                style: TextStyle(color: colorScheme.onPrimary),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatsGrid(User user) {
+  Widget _buildStatsGrid(
+    UserModel user,
+    int postCount,
+    int eventCount,
+    int commentCount,
+  ) {
     return GridView.count(
       shrinkWrap: true,
       crossAxisCount: 2,
@@ -105,75 +181,55 @@ class UserDetailScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 2.5,
       children: [
-        _StatItem(label: "Post Totali", value: '0', color: Colors.green),
-        _StatItem(label: "Eventi Partecipati", value: '0', color: Colors.green),
         _StatItem(
-          label: "Segnalazioni Ricevute",
-          value: '0',
+          label: "Post Totali ",
+          value: postCount.toString(),
+          color: Colors.green,
+        ),
+        _StatItem(
+          label: "Eventi Creati ",
+          value: eventCount.toString(),
+          color: Colors.blue,
+        ),
+        _StatItem(
+          label: "Commenti ",
+          value: commentCount.toString(),
           color: Colors.orange,
         ),
         _StatItem(
-          label: "Data Iscrizione",
-          value:
-              "${user.createdAt.day}/${user.createdAt.month}/${user.createdAt.year}",
+          label: "Data Iscrizione ",
+          value: user.createdAt != null
+              ? "${user.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year} "
+              : "N/A ",
           color: Colors.blueGrey,
         ),
       ],
     );
   }
 
-  void _showBlockDialog(BuildContext context, User user, WidgetRef ref) {
+  void _showBlockDialog(BuildContext context, UserModel user, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(user.isBlocked ? "Sbloccare Utente?" : "Bloccare Utente?"),
-        content: Text(
-          user.isBlocked
-              ? "L'utente potrà di nuovo accedere e pubblicare."
-              : "Questo utente perderà l'accesso all'app e non potrà creare contenuti.",
+        title: const Text("Bloccare Utente? "),
+        content: const Text(
+          "Questo utente perderà l'accesso all'app e non potrà creare contenuti. ",
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Annulla"),
+            child: const Text("Annulla "),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: user.isBlocked ? Colors.green : Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(ctx);
               ref.read(adminServiceProvider).blockUser(user.id);
               ref.invalidate(usersListProvider);
             },
-            child: Text(user.isBlocked ? "Sblocca" : "Blocca"),
+            child: const Text("Blocca "),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showManagementOptions(BuildContext context, User user, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.delete_forever, color: Colors.red),
-              title: const Text(
-                "Elimina Account",
-                style: TextStyle(color: Colors.red),
-              ),
-              onTap: () {
-                Navigator.pop(ctx);
-                ref.read(adminServiceProvider).blockUser(user.id);
-                ref.invalidate(usersListProvider);
-              },
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -183,13 +239,11 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-
   const _StatItem({
     required this.label,
     required this.value,
     required this.color,
   });
-
   @override
   Widget build(BuildContext context) {
     return UiCard(

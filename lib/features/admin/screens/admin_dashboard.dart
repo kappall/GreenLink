@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/features/admin/providers/admin_provider.dart';
 
-import '../../../core/common/widgets/ui.dart';
-
-class AdminDashboardScreen extends StatelessWidget {
+class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final reportsCount = ref.watch(reportsCountProvider);
+    final usersCount = ref.watch(usersCountProvider);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -24,7 +28,7 @@ class AdminDashboardScreen extends StatelessWidget {
                 child: _buildStatCard(
                   context,
                   "Segnalazioni",
-                  "0",
+                  reportsCount.toString(),
                   Colors.orange,
                   Icons.warning,
                 ),
@@ -34,52 +38,15 @@ class AdminDashboardScreen extends StatelessWidget {
                 child: _buildStatCard(
                   context,
                   "Utenti",
-                  "0",
+                  usersCount.toString(),
                   Colors.blue,
                   Icons.people,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          _buildStatCard(
-            context,
-            "Utenti Bloccati",
-            "0",
-            Colors.red,
-            Icons.block,
-          ),
 
           const SizedBox(height: 24),
-
-          const Text(
-            "Azioni Rapide",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-
-          UiCard(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.message, color: Colors.indigo),
-                  title: const Text("Revisiona ultimi post"),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(
-                    Icons.calendar_today,
-                    color: Colors.indigo,
-                  ),
-                  title: const Text("Approva eventi in attesa"),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

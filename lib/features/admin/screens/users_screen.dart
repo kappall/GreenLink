@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 
-import '../models/user.dart';
 import '../providers/admin_provider.dart';
 
 class UsersScreen extends ConsumerStatefulWidget {
@@ -23,7 +23,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
     super.dispose();
   }
 
-  void _blockUser(User user) async {
+  void _blockUser(UserModel user) async {
     Navigator.pop(context);
 
     await ref.read(adminServiceProvider).blockUser(user.id);
@@ -124,7 +124,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
     );
   }
 
-  void _showUserOptions(BuildContext context, User user) {
+  void _showUserOptions(BuildContext context, UserModel user) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -173,7 +173,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
 }
 
 class _UserCard extends StatelessWidget {
-  final User user;
+  final UserModel user;
   final VoidCallback onOptionsTap;
 
   const _UserCard({required this.user, required this.onOptionsTap});
