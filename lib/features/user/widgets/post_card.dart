@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/badge.dart';
 import '../../../core/common/widgets/card.dart';
+import '../../../core/providers/geocoding_provider.dart';
 import '../providers/user_provider.dart';
 
 extension PostCategoryUI on PostCategory {
@@ -96,6 +97,8 @@ class PostCard extends ConsumerWidget {
     final timestamp = post.createdAt != null
         ? DateFormat('dd MMM yyyy, HH:mm').format(post.createdAt!.toLocal())
         : '';
+    final geoKey = (lat: post.latitude, lng: post.longitude);
+    final location = ref.watch(placeNameProvider(geoKey)).value;
 
     return UiCard(
       onTap: onTap,
@@ -135,11 +138,13 @@ class PostCard extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    UiBadge(
-                      label: post.category.label,
-                      icon: post.category.icon,
-                      color: post.category.color,
-                    ),
+                    if (post.category != PostCategory.other &&
+                        post.category != PostCategory.unknown)
+                      UiBadge(
+                        label: post.category.label,
+                        icon: post.category.icon,
+                        color: post.category.color,
+                      ),
                     if (onReport != null)
                       SizedBox(
                         height: 24,
@@ -179,7 +184,7 @@ class PostCard extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    '${post.latitude}, ${post.longitude}',
+                    location ?? '',
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

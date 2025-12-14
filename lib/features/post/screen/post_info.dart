@@ -18,7 +18,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.p.category.toString())),
+      appBar: AppBar(title: Text("Segnalazione")),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -41,7 +41,6 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
                 ],
               ),
 
-              // comments section
               const SizedBox(height: 8),
               TextField(
                 controller: TextEditingController(),
@@ -74,7 +73,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          radius: 22, // diametro = radius * 2
+                          radius: 22,
                           backgroundColor: Colors.grey[200],
                           child: Text(
                             'U', // primo carattere del nome utente che verrà preso dal backend
