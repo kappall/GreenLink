@@ -26,8 +26,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
             children: [
               PostCard(
                 post: widget.p,
-                showCommentsCount: false,
-                showUpvotesCount: false,
+                insidePost: true,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,

@@ -5,7 +5,7 @@ class Post {
   final String eventType;
   final String timeAgo;
   final String text;
-  final String? imageUrl;
+  final List<String> imageUrl;
   final String location;
   int upvotes;
   final List<String> comments;
@@ -17,7 +17,7 @@ class Post {
     required this.eventType,
     required this.timeAgo,
     required this.text,
-    this.imageUrl,
+    required this.imageUrl,
     required this.location,
     required this.upvotes,
     required this.comments,

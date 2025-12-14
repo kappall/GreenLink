@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
+import 'package:greenlinkapp/features/feed/widgets/imagesview.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
   final VoidCallback? onTap;
-  final bool showUpvotesCount;
-  final bool showCommentsCount;
+  final bool insidePost;
 
   const PostCard({
     super.key,
     required this.post,
     this.onTap,
-    this.showUpvotesCount = true,
-    this.showCommentsCount = true,
+    this.insidePost = false,
+    
   });
 
   @override
@@ -58,10 +58,7 @@ class PostCard extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    showReportDialog(
-                      context,
-                      item: post,
-                    );
+                    showReportDialog(context, item: post);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -81,12 +78,9 @@ class PostCard extends StatelessWidget {
 
         Text(post.text),
 
-        if (post.imageUrl != null) ...[
+        if (post.imageUrl.isNotEmpty) ...[
           const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(post.imageUrl!),
-          ),
+          ImagesView(imageUrl: post.imageUrl, insidePost: insidePost),
         ],
 
         const SizedBox(height: 12),
@@ -101,13 +95,11 @@ class PostCard extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            if (showUpvotesCount) ...[
+            if (!insidePost) ...[
               Icon(Icons.trending_up, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
               Text('${post.upvotes} Upvotes'),
               const SizedBox(width: 16),
-            ],
-            if (showCommentsCount) ...[
               Icon(Icons.comment, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
               Text('${post.comments.length} Commenti'),

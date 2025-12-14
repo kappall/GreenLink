@@ -21,8 +21,10 @@ class FeedScreen extends ConsumerWidget {
         timeAgo: '2h fa',
         text:
             'Ciao community! Sabato organizziamo una pulizia del parco insieme. Ci troviamo alle 9:30 vicino all\'ingresso principale, portate guanti e buona energia!',
-        imageUrl:
-            'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
+        imageUrl: [
+          'https://www.repstatic.it/content/localirep/img/rep-milano/2023/09/25/083218547-1dc2a908-3fd6-4860-a333-a7ddc6bd792f.jpg?webp',
+          'https://mountaingenius.org/wp-content/uploads/2023/08/tempesta-milano-.jpg.webp',
+        ],
         location: 'Parco Sempione, Milano',
         upvotes: 42,
         comments: ['Partecipo!', 'Ottima iniziativa!'],
@@ -35,8 +37,11 @@ class FeedScreen extends ConsumerWidget {
         timeAgo: '1h fa',
         text:
             'Emergenza idrica in corso nella zona nord della città. Stiamo distribuendo bottiglie d\'acqua presso il centro comunitario. Venite a prenderle se ne avete bisogno!',
-        imageUrl:
-            'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
+        imageUrl: [
+          'https://oltrelalinea.news/wp-content/uploads/2024/04/Foto-Dubai-e-scossa-dal-caos-delle-inondazioni-mentre-piogge.jpg',
+          'https://immagini.alvolante.it/sites/default/files/styles/anteprima_lunghezza_640/public/dasapere_galleria/2014/02/auto-acqua_2.jpg',
+          'https://immagini.alvolante.it/sites/default/files/styles/editor_1_colonna/public/dasapere_galleria/2014/02/auto-acqua_4.jpg'
+        ],
         location: 'Centro Comunitario, Zona Nord',
         upvotes: 30,
         comments: ['Servono altre bottiglie?', 'Grazie per l\'aiuto'],
@@ -49,8 +54,9 @@ class FeedScreen extends ConsumerWidget {
         timeAgo: '30m fa',
         text:
             'Ho notato che molte persone stanno avendo difficoltà a trovare cibo nelle vicinanze. Ho creato una lista di punti di distribuzione alimentare nella nostra area. Contattatemi per maggiori dettagli!',
-        imageUrl:
-            'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
+        imageUrl: [
+          'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
+        ],
         location: 'Via Roma, Centro Città',
         upvotes: 25,
         comments: [
