@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/core/common/widgets/post_card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/post/providers/post_provider.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
-import 'package:greenlinkapp/features/user/widgets/post_card.dart';
 
 import '../providers/admin_provider.dart';
 

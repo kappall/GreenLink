@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/core/common/widgets/post_card.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../../post/providers/post_provider.dart';
-import '../../user/widgets/post_card.dart';
 
 class FeedScreen extends ConsumerWidget {
   const FeedScreen({super.key});
