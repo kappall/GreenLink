@@ -9,6 +9,7 @@ class ReportCard extends StatelessWidget {
   final VoidCallback onApprove;
 
   const ReportCard({
+    super.key,
     required this.report,
     required this.onReject,
     required this.onApprove,

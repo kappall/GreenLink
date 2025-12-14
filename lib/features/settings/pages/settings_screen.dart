@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/core/providers/theme_provider.dart';
 
-import '../../../core/common/widgets/card.dart';
-import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'change_password.dart';
 

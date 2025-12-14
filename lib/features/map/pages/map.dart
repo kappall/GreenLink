@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/post/models/post_model.dart';
 import 'package:greenlinkapp/features/post/providers/post_provider.dart';
 import 'package:latlong2/latlong.dart';
-
-import '../../../core/providers/geocoding_provider.dart';
 
 extension PostCategoryUI on PostCategory {
   String get label {
