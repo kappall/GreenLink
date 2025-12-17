@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
-import 'package:greenlinkapp/features/post/models/post_model.dart';
-import 'package:greenlinkapp/features/post/services/post_service.dart';
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
+import 'package:greenlinkapp/features/feed/services/post_service.dart';
 
 class PostsNotifier extends AsyncNotifier<List<PostModel>> {
   final PostService _postService = PostService();
