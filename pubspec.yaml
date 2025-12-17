@@ -15,6 +15,11 @@ dependencies:
   flutter_riverpod: ^3.0.3
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  jwt_decoder: ^2.0.1
+  intl: ^0.20.2
+  geocoding: ^4.0.0
 
 dev_dependencies:
   flutter_test:

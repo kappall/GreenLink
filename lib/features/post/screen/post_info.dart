@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
-import 'package:flutter/material.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
+import '../models/post_model.dart';
+
 
 class PostInfoScreen extends StatefulWidget {
   final Post p;
@@ -17,7 +19,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.p.eventType)),
+      appBar: AppBar(title: Text("Segnalazione")),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -34,21 +36,15 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
                   ButtonWidget(
                     label: "${widget.p.upvotes}",
                     onPressed: () {
-                      setState(() {
-                        widget.p.upvotes++;
-                      });
+                      setState(() {});
                     },
                     icon: const Icon(Icons.arrow_upward, color: Colors.white),
                   ),
                   const SizedBox(width: 16),
-                  Text(
-                    "(${widget.p.comments.length}) Commenti",
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  Text("0 Commenti", style: const TextStyle(fontSize: 16)),
                 ],
               ),
 
-              // comments section
               const SizedBox(height: 8),
               TextField(
                 controller: TextEditingController(),
@@ -69,7 +65,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
 
               const SizedBox(height: 16),
 
-              for (final comment in widget.p.comments) ...[
+              for (final comment in ["ciao", "bielo"]) ...[
                 SizedBox(
                   width: double.infinity,
                   child: UiCard(
@@ -81,7 +77,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          radius: 22, // diametro = radius * 2
+                          radius: 22,
                           backgroundColor: Colors.grey[200],
                           child: Text(
                             'U', // primo carattere del nome utente che verrà preso dal backend

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/features/admin/screens/reports_screen.dart';
+import 'package:greenlinkapp/features/admin/screens/user_detail.dart';
+import 'package:greenlinkapp/features/admin/screens/users_screen.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
@@ -7,14 +11,20 @@ import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/event/screen/event_info.dart';
 import 'package:greenlinkapp/features/feed/screen/feed.dart';
-import 'package:greenlinkapp/features/main-wrapper/screen/main-wrapper.dart';
+import 'package:greenlinkapp/features/main-wrapper/screen/main_wrapper.dart';
 import 'package:greenlinkapp/features/map/screen/map.dart';
 import 'package:greenlinkapp/features/post/screen/post_info.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
 import 'package:greenlinkapp/features/volunteering/screen/volunteeringfeed.dart';
+
+import 'features/admin/screens/admin_dashboard.dart';
+import 'features/admin/screens/admin_wrapper.dart';
+import 'features/post/models/post_model.dart';
+import 'features/settings/screens/settings_screen.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
@@ -39,21 +49,32 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: true,
     initialLocation: '/home',
-
     refreshListenable: routerListenable,
-
     redirect: (context, state) {
       final authState = ref.read(authProvider);
 
       final isLoggedIn = authState.asData?.value.isAuthenticated ?? false;
+      final isAdmin = authState.asData?.value.isAdmin ?? false;
+
       final isLoggingIn = state.uri.path == '/login';
       final isRegistering = state.uri.path == '/register';
+      final isAdminRoute = state.uri.path.startsWith('/admin');
 
       if (authState.isLoading) return null;
 
       if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
 
-      if (isLoggedIn && (isLoggingIn || isRegistering)) return '/home';
+      if (isLoggedIn && (isLoggingIn || isRegistering)) {
+        return isAdmin ? '/admin' : '/home';
+      }
+
+      if (isLoggedIn && !isAdmin && isAdminRoute) {
+        return '/home';
+      }
+
+      if (isLoggedIn && isAdmin && !isAdminRoute) {
+        return '/admin';
+      }
 
       return null;
     },
@@ -65,6 +86,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(
             routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => const FeedScreen(),
+              ),
               GoRoute(
                 path: '/home',
                 builder: (context, state) => const FeedScreen(),
@@ -89,18 +114,64 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return AdminWrapper(
+            navigationShell: navigationShell,
+          ); // Wrapper Admin
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin',
+                builder: (context, state) => const AdminDashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/reports',
+                builder: (context, state) => const ReportsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/users',
+                builder: (context, state) => const UsersScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':userId',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final user = state.extra as UserModel;
+                      return UserDetailScreen(user: user);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
       GoRoute(
         path: '/profile',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
+        path: '/settings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
         path: '/register',
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => noAnimationPage(const RegisterPage()),
       ),
-
       GoRoute(
         path: '/login',
         parentNavigatorKey: _rootNavigatorKey,
