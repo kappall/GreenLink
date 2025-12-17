@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
+import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/widgets/detailrow.dart';
 import 'package:greenlinkapp/features/event/widgets/infocard.dart';
-import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 
 class EventInfoPage extends StatefulWidget {
-  final Event e;
+  final EventModel e;
 
   const EventInfoPage({super.key, required this.e});
 
@@ -22,7 +23,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.e.eventType)),
+      appBar: AppBar(title: Text(widget.e.eventType.name)),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +39,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          widget.e.title,
+                          widget.e.TITOLO,
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -46,7 +47,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                       ),
                       const SizedBox(width: 8),
                       UiBadge(
-                        label: widget.e.eventType,
+                        label: widget.e.eventType.name,
                         icon: Icons.eco,
                         color: colorScheme.primary,
                       ),
@@ -59,9 +60,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                         radius: 20,
                         backgroundColor: colorScheme.primaryContainer,
                         child: Text(
-                          widget.e.owner.isNotEmpty
-                              ? widget.e.owner[0].toUpperCase()
-                              : '?',
+                          widget.e.author!.displayName[0].toUpperCase(),
                           style: TextStyle(
                             fontSize: 18,
                             color: colorScheme.onPrimaryContainer,
@@ -81,7 +80,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                               ),
                             ),
                             Text(
-                              widget.e.owner,
+                              widget.e.author!.displayName,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -116,7 +115,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                       icon: Icons.group,
                       title: 'Partecipanti',
                       value:
-                          '${widget.e.participantsCurrent}/${widget.e.participantsMax}',
+                          '${widget.e.participants}/${widget.e.maxParticipants}',
                       color: colorScheme.primary,
                     ),
                   ),
@@ -125,7 +124,9 @@ class _EventInfoPageState extends State<EventInfoPage> {
                     child: InfoCard(
                       icon: Icons.calendar_today,
                       title: 'Data',
-                      value: widget.e.date,
+                      value: DateFormat(
+                        'yyyy MMM d',
+                      ).format(widget.e.startDate),
                       color: colorScheme.secondary,
                     ),
                   ),
@@ -146,14 +147,15 @@ class _EventInfoPageState extends State<EventInfoPage> {
                       DetailRow(
                         icon: Icons.access_time,
                         title: 'Orario',
-                        value: '${widget.e.startTime} - ${widget.e.endTime}',
+                        value:
+                            '${DateFormat('HH:mm').format(widget.e.startDate)} - ${DateFormat('HH:mm').format(widget.e.endDate)}',
                         iconColor: colorScheme.tertiary,
                       ),
                       const SizedBox(height: 12),
                       DetailRow(
                         icon: Icons.location_on,
                         title: 'Luogo',
-                        value: widget.e.location,
+                        value: '${widget.e.latitude}, ${widget.e.longitude}',
                         iconColor: colorScheme.error,
                       ),
                     ],
