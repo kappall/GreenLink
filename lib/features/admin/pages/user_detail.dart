@@ -10,10 +10,10 @@ import 'package:greenlinkapp/features/user/widgets/post_card.dart';
 
 import '../providers/admin_provider.dart';
 
-class UserDetailScreen extends ConsumerWidget {
+class UserDetailPage extends ConsumerWidget {
   final UserModel user;
 
-  const UserDetailScreen({super.key, required this.user});
+  const UserDetailPage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

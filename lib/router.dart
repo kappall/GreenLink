@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/features/admin/screens/reports_screen.dart';
-import 'package:greenlinkapp/features/admin/screens/user_detail.dart';
-import 'package:greenlinkapp/features/admin/screens/users_screen.dart';
+import 'package:greenlinkapp/features/admin/pages/reports_screen.dart';
+import 'package:greenlinkapp/features/admin/pages/user_detail.dart';
+import 'package:greenlinkapp/features/admin/pages/users_screen.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:greenlinkapp/features/event/screen/event_info.dart';
-import 'package:greenlinkapp/features/feed/screen/feed.dart';
-import 'package:greenlinkapp/features/main-wrapper/screen/main_wrapper.dart';
-import 'package:greenlinkapp/features/map/screen/map.dart';
-import 'package:greenlinkapp/features/post/screen/post_info.dart';
+import 'package:greenlinkapp/features/event/pages/event_info.dart';
+import 'package:greenlinkapp/features/event/pages/volunteeringfeed.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
-import 'package:greenlinkapp/features/volunteering/domain/event.dart';
+import 'package:greenlinkapp/features/feed/pages/feed.dart';
+import 'package:greenlinkapp/features/main-wrapper/screen/main_wrapper.dart';
+import 'package:greenlinkapp/features/map/pages/map.dart';
+import 'package:greenlinkapp/features/post/pages/post_info.dart';
 import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
-import 'package:greenlinkapp/features/volunteering/screen/volunteeringfeed.dart';
+import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 
-import 'features/admin/screens/admin_dashboard.dart';
-import 'features/admin/screens/admin_wrapper.dart';
-import 'features/post/models/post_model.dart';
+import 'features/admin/pages/admin_dashboard.dart';
+import 'features/admin/pages/admin_wrapper.dart';
 import 'features/settings/screens/settings_screen.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
@@ -86,13 +84,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/',
-                builder: (context, state) => const FeedScreen(),
-              ),
+              GoRoute(path: '/', builder: (context, state) => const FeedPage()),
               GoRoute(
                 path: '/home',
-                builder: (context, state) => const FeedScreen(),
+                builder: (context, state) => const FeedPage(),
               ),
             ],
           ),
@@ -100,7 +95,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/map',
-                builder: (context, state) => const MapScreen(),
+                builder: (context, state) => const MapPage(),
               ),
             ],
           ),
@@ -108,7 +103,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/volunteering',
-                builder: (context, state) => const VolunteeringScreen(),
+                builder: (context, state) => const VolunteeringPage(),
               ),
             ],
           ),
@@ -125,7 +120,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/admin',
-                builder: (context, state) => const AdminDashboardScreen(),
+                builder: (context, state) => const AdminDashboardPage(),
               ),
             ],
           ),
@@ -133,7 +128,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/admin/reports',
-                builder: (context, state) => const ReportsScreen(),
+                builder: (context, state) => const ReportsPage(),
               ),
             ],
           ),
@@ -141,14 +136,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/admin/users',
-                builder: (context, state) => const UsersScreen(),
+                builder: (context, state) => const UsersPage(),
                 routes: [
                   GoRoute(
                     path: ':userId',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final user = state.extra as UserModel;
-                      return UserDetailScreen(user: user);
+                      return UserDetailPage(user: user);
                     },
                   ),
                 ],
@@ -160,12 +155,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ProfileScreen(),
+        builder: (context, state) => const ProfilePage(),
       ),
       GoRoute(
         path: '/settings',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const SettingsScreen(),
+        builder: (context, state) => const SettingsPage(),
       ),
       GoRoute(
         path: '/register',
@@ -183,7 +178,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final post = state.extra as Post;
-          return PostInfoScreen(p: post);
+          return PostInfoPage(p: post);
         },
       ),
 
@@ -192,14 +187,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final event = state.extra as Event;
-          return EventInfoScreen(e: event);
+          return EventInfoPage(e: event);
         },
       ),
 
       GoRoute(
         path: '/ui-demo',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const UiShowcaseScreen(),
+        builder: (context, state) => const UiShowcasePage(),
       ),
     ],
   );

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
-import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
-import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
+import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
 
-
-class FeedScreen extends ConsumerWidget {
-  const FeedScreen({super.key});
+class FeedPage extends ConsumerWidget {
+  const FeedPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loggedIn = true;
@@ -42,7 +40,7 @@ class FeedScreen extends ConsumerWidget {
         imageUrl: [
           'https://oltrelalinea.news/wp-content/uploads/2024/04/Foto-Dubai-e-scossa-dal-caos-delle-inondazioni-mentre-piogge.jpg',
           'https://immagini.alvolante.it/sites/default/files/styles/anteprima_lunghezza_640/public/dasapere_galleria/2014/02/auto-acqua_2.jpg',
-          'https://immagini.alvolante.it/sites/default/files/styles/editor_1_colonna/public/dasapere_galleria/2014/02/auto-acqua_4.jpg'
+          'https://immagini.alvolante.it/sites/default/files/styles/editor_1_colonna/public/dasapere_galleria/2014/02/auto-acqua_4.jpg',
         ],
         location: 'Centro Comunitario, Zona Nord',
         upvotes: 30,

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/event/widgets/detailrow.dart';
 import 'package:greenlinkapp/features/event/widgets/infocard.dart';
+import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 
-class EventInfoScreen extends StatefulWidget {
+class EventInfoPage extends StatefulWidget {
   final Event e;
 
-  const EventInfoScreen({super.key, required this.e});
+  const EventInfoPage({super.key, required this.e});
 
   @override
-  State<EventInfoScreen> createState() => _EventInfoScreenState();
+  State<EventInfoPage> createState() => _EventInfoPageState();
 }
 
-class _EventInfoScreenState extends State<EventInfoScreen> {
+class _EventInfoPageState extends State<EventInfoPage> {
   bool isJoined = false;
 
   @override

@@ -6,14 +6,14 @@ import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'change_password.dart';
 
-class SettingsScreen extends ConsumerStatefulWidget {
-  const SettingsScreen({super.key});
+class SettingsPage extends ConsumerStatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _notificationsEnabled = false;
   bool _isDeletingAccount = false;
 
@@ -52,7 +52,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     // Navigate to the new screen instead of showing a dialog
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const ChangePasswordScreen(),
+                        builder: (context) => const ChangePasswordPage(),
                       ),
                     );
                   },

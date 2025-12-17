@@ -6,14 +6,14 @@ import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 import '../providers/admin_provider.dart';
 
-class UsersScreen extends ConsumerStatefulWidget {
-  const UsersScreen({super.key});
+class UsersPage extends ConsumerStatefulWidget {
+  const UsersPage({super.key});
 
   @override
-  ConsumerState<UsersScreen> createState() => _UsersScreenState();
+  ConsumerState<UsersPage> createState() => _UsersPageState();
 }
 
-class _UsersScreenState extends ConsumerState<UsersScreen> {
+class _UsersPageState extends ConsumerState<UsersPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
 

@@ -3,19 +3,17 @@ import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
-import '../models/post_model.dart';
 
-
-class PostInfoScreen extends StatefulWidget {
+class PostInfoPage extends StatefulWidget {
   final Post p;
 
-  const PostInfoScreen({super.key, required this.p});
+  const PostInfoPage({super.key, required this.p});
 
   @override
-  State<PostInfoScreen> createState() => _PostInfoScreenState();
+  State<PostInfoPage> createState() => _PostInfoPageState();
 }
 
-class _PostInfoScreenState extends State<PostInfoScreen> {
+class _PostInfoPageState extends State<PostInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,10 +24,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PostCard(
-                post: widget.p,
-                insidePost: true,
-              ),
+              PostCard(post: widget.p, insidePost: true),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [

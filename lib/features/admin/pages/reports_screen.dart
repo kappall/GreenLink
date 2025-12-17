@@ -5,14 +5,14 @@ import '../models/report.dart';
 import '../providers/admin_provider.dart';
 import '../widgets/report_card.dart';
 
-class ReportsScreen extends ConsumerStatefulWidget {
-  const ReportsScreen({super.key});
+class ReportsPage extends ConsumerStatefulWidget {
+  const ReportsPage({super.key});
 
   @override
-  ConsumerState<ReportsScreen> createState() => _ReportsScreenState();
+  ConsumerState<ReportsPage> createState() => _ReportsPageState();
 }
 
-class _ReportsScreenState extends ConsumerState<ReportsScreen> {
+class _ReportsPageState extends ConsumerState<ReportsPage> {
   void _handleAction(Report report, bool isApprove) async {
     await ref
         .read(adminServiceProvider)

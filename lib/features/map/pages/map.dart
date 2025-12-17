@@ -126,14 +126,14 @@ extension EventTypeUI on EventType {
   }
 }
 
-class MapScreen extends ConsumerStatefulWidget {
-  const MapScreen({super.key});
+class MapPage extends ConsumerStatefulWidget {
+  const MapPage({super.key});
 
   @override
-  ConsumerState<MapScreen> createState() => _MapScreenState();
+  ConsumerState<MapPage> createState() => _MapPageState();
 }
 
-class _MapScreenState extends ConsumerState<MapScreen> {
+class _MapPageState extends ConsumerState<MapPage> {
   final LatLng _initialCenter = const LatLng(45.4398, 12.3319);
   final MapController _mapController = MapController();
 
