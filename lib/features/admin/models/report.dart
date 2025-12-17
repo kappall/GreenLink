@@ -1,10 +1,11 @@
 // ignore_for_file: invalid_annotation_target
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:greenlinkapp/features/user/models/user_model.dart';
-import 'package:greenlinkapp/features/post/models/post_model.dart';
-import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/comment/models/comment_model.dart';
+import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
+
+import '../../feed/models/post_model.dart';
 
 part 'report.freezed.dart';
 part 'report.g.dart';
@@ -36,26 +37,26 @@ abstract class Report with _$Report {
 
   String get reporter => author.displayName;
   String get timestamp => createdAt?.toIso8601String() ?? '';
-  
+
   String get targetContent => content.when(
-        post: (data) => data.description,
-        event: (data) => data.description,
-        comment: (data) => data.description,
-      );
-  
+    post: (data) => data.description,
+    event: (data) => data.description,
+    comment: (data) => data.description,
+  );
+
   String get targetId => content.when(
-        post: (data) => data.id?.toString() ?? '',
-        event: (data) => data.id?.toString() ?? '',
-        comment: (data) => data.id?.toString() ?? '',
-      );
-  
+    post: (data) => data.id?.toString() ?? '',
+    event: (data) => data.id?.toString() ?? '',
+    comment: (data) => data.id?.toString() ?? '',
+  );
+
   String? get details => null; // Campo non più presente nello schema
-  
+
   ReportType get type => content.when(
-        post: (_) => ReportType.post,
-        event: (_) => ReportType.event,
-        comment: (_) => ReportType.comment,
-      );
+    post: (_) => ReportType.post,
+    event: (_) => ReportType.event,
+    comment: (_) => ReportType.comment,
+  );
 
   factory Report.fromJson(Map<String, dynamic> json) => _$ReportFromJson(json);
 }

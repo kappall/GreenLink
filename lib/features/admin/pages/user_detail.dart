@@ -5,9 +5,9 @@ import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/common/widgets/post_card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
-import 'package:greenlinkapp/features/post/providers/post_provider.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
+import '../../feed/providers/post_provider.dart';
 import '../providers/admin_provider.dart';
 
 class UserDetailPage extends ConsumerWidget {
@@ -53,14 +53,8 @@ class UserDetailPage extends ConsumerWidget {
             const SizedBox(height: 12),
             _buildStatsGrid(
               user,
-              userPosts.asData?.value
-                      .where((p) => p.author?.id == user.id)
-                      .length ??
-                  0,
-              userEvents.asData?.value
-                      .where((e) => e.author?.id == user.id)
-                      .length ??
-                  0,
+              userPosts.asData?.value.length ?? 0,
+              userEvents.asData?.value.length ?? 0,
               userComments.where((c) => c.userId == user.id).length,
             ),
             const SizedBox(height: 20),
