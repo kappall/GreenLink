@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
-import 'package:greenlinkapp/features/post/providers/post_provider.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 
 import '../../../core/common/widgets/event_card.dart';
 import '../../../core/common/widgets/post_card.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../feed/providers/post_provider.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
