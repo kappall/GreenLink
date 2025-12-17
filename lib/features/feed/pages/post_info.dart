@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
+import 'package:greenlinkapp/core/common/widgets/post_card.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
-import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
 
-class PostInfoPage extends StatefulWidget {
-  final Post p;
+import '../models/post_model.dart';
 
-  const PostInfoPage({super.key, required this.p});
+class PostInfoScreen extends StatefulWidget {
+  final PostModel p;
+
+  const PostInfoScreen({super.key, required this.p});
 
   @override
-  State<PostInfoPage> createState() => _PostInfoPageState();
+  State<PostInfoScreen> createState() => _PostInfoScreenState();
 }
 
-class _PostInfoPageState extends State<PostInfoPage> {
+class _PostInfoScreenState extends State<PostInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,12 +25,12 @@ class _PostInfoPageState extends State<PostInfoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PostCard(post: widget.p, insidePost: true),
+              PostCard(post: widget.p),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   ButtonWidget(
-                    label: "${widget.p.upvotes}",
+                    label: "${widget.p.votes.length}",
                     onPressed: () {
                       setState(() {});
                     },
