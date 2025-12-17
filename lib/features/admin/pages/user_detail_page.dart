@@ -65,18 +65,14 @@ class UserDetailPage extends ConsumerWidget {
             const SizedBox(height: 12),
             userPosts.when(
               data: (posts) {
-                final postsByUser = posts
-                    .where((p) => p.author?.id == user.id)
-                    .toList();
-                if (postsByUser.isEmpty) {
+                if (posts.isEmpty) {
                   return const Text("Nessun post pubblicato. ");
                 }
                 return ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: postsByUser.length,
-                  itemBuilder: (context, index) =>
-                      PostCard(post: postsByUser[index]),
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) => PostCard(post: posts[index]),
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 10),
                 );
