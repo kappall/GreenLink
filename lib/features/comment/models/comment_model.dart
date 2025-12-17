@@ -2,7 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
-import 'package:greenlinkapp/features/post/models/post_model.dart';
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
 
 part 'comment_model.freezed.dart';
 part 'comment_model.g.dart';

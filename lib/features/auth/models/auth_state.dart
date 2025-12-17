@@ -12,7 +12,7 @@ abstract class AuthState with _$AuthState {
   const factory AuthState({
     UserModel? user,
     String? token,
-    @JsonKey(includeFromJson: false, includeToJson: false) AuthRole? derivedRole,
+    AuthRole? derivedRole,
   }) = _AuthState;
 
   bool get isAuthenticated => user != null || token != null;

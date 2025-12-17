@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
-import 'package:greenlinkapp/features/post/models/post_model.dart';
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
