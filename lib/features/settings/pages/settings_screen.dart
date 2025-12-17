@@ -14,7 +14,6 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
-  bool _notificationsEnabled = false;
   bool _isDeletingAccount = false;
 
   @override
@@ -49,7 +48,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   title: "Cambia Password",
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                   onTap: () {
-                    // Navigate to the new screen instead of showing a dialog
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => const ChangePasswordPage(),
@@ -83,16 +81,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               title: "Impostazioni Applicazione",
               icon: Icons.settings_outlined,
               children: [
-                _buildSettingsItem(
-                  context,
-                  title: "Notifiche Push",
-                  trailing: Switch.adaptive(
-                    value: _notificationsEnabled,
-                    onChanged: (val) =>
-                        setState(() => _notificationsEnabled = val),
-                  ),
-                ),
-                const Divider(height: 1),
                 _buildSettingsItem(
                   context,
                   title: "Tema Scuro",
