@@ -6,7 +6,7 @@ Il progetto utilizza una struttura feature-first: ogni funzionalità ha la propr
 
 * Sviluppo basato su **branch per feature**:
   `feature/nome-feature`
-* Ogni membro lavora nel proprio branch e apre una Pull Request al termine.
+* Ogni membro lavora nel proprio branch e apre una Pull Request se ha toccato qualcosa che interessa tutti, altrimenti fa un semplice merge, al termine.
 
 ## Ruoli del team
 
