@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../../auth/utils/role_parser.dart';
@@ -55,14 +54,15 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        final users = jsonList.map((jsonItem) {
-          final json = jsonItem as Map<String, dynamic>;
-          json['role'] = AuthRole.user.name;
-          debugPrint(json.toString());
-          return UserModel.fromJson(json);
-        }).toList();
-
-        return users;
+        return jsonList
+            .map((jsonItem) {
+              final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
+              // Se il ruolo non è presente nel JSON, lo impostiamo
+              return user.role == null 
+                  ? user.copyWith(role: AuthRole.user)
+                  : user;
+            })
+            .toList();
       } else {
         throw Exception(
           'Fallimento nel caricamento degli user: ${response.statusCode}',
@@ -85,13 +85,15 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        final users = jsonList.map((jsonItem) {
-          final json = jsonItem as Map<String, dynamic>;
-          json['role'] = AuthRole.partner.name;
-          return UserModel.fromJson(json);
-        }).toList();
-
-        return users;
+        return jsonList
+            .map((jsonItem) {
+              final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
+              // Se il ruolo non è presente nel JSON, lo impostiamo
+              return user.role == null
+                  ? user.copyWith(role: AuthRole.partner)
+                  : user;
+            })
+            .toList();
       } else {
         throw Exception(
           'Fallimento nel caricamento dei partner: ${response.statusCode}',
@@ -108,23 +110,45 @@ class AdminService {
   }) async {
     try {
       if (approve) {
-        String endpoint;
-        switch (report.type) {
-          case ReportType.post:
-            endpoint = 'posts';
-            break;
-          case ReportType.comment:
-            endpoint = 'comments';
-            break;
-          case ReportType.event:
-            endpoint = 'events';
-            break;
-          case ReportType.unknown:
-            return;
-        }
+        // Determina endpoint e ID dal tipo di content (type-safe!)
+        String? endpoint;
+        int? contentId;
 
+        report.content.when(
+          post: (post) {
+            endpoint = 'posts';
+            contentId = post.id;
+          },
+          event: (event) {
+            endpoint = 'events';
+            contentId = event.id;
+          },
+          comment: (comment) {
+            endpoint = 'comments';
+            contentId = comment.id;
+          },
+        );
+
+        if (endpoint != null && contentId != null) {
+          final response = await http.delete(
+            Uri.parse('$_baseUrl/$endpoint/$contentId'),
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          );
+
+          if (response.statusCode != 200) {
+            throw Exception(
+              'Fallimento nella rimozione del contenuto: ${response.statusCode}',
+            );
+          }
+        }
+      }
+
+      if (report.id != null) {
         final response = await http.delete(
-          Uri.parse('$_baseUrl/$endpoint/${report.targetId}'),
+          Uri.parse('$_baseUrl/reports/${report.id}'),
           headers: {
             'Accept': 'application/json',
             'Authorization': 'Bearer $token',
@@ -133,23 +157,9 @@ class AdminService {
 
         if (response.statusCode != 200) {
           throw Exception(
-            'Fallimento nella rimozione del contenuto: ${response.statusCode}',
+            'Fallimento nella rimozione del report: ${response.statusCode}',
           );
         }
-      }
-
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/reports/${report.id}'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-          'Fallimento nella rimozione del report: ${response.statusCode}',
-        );
       }
     } catch (e) {
       throw Exception('Errore di connessione: $e');

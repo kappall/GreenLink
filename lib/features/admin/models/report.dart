@@ -1,67 +1,61 @@
+// ignore_for_file: invalid_annotation_target
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:greenlinkapp/features/post/models/post_model.dart';
+import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/comment/models/comment_model.dart';
+
+part 'report.freezed.dart';
+part 'report.g.dart';
+
 enum ReportType { post, comment, event, unknown }
 
-enum ReportStatus { pending, approved, rejected }
+@Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.snake)
+abstract class ReportContent with _$ReportContent {
+  const factory ReportContent.post(PostModel data) = ReportContentPost;
+  const factory ReportContent.event(EventModel data) = ReportContentEvent;
+  const factory ReportContent.comment(CommentModel data) = ReportContentComment;
 
-class Report {
-  final String id;
-  final ReportType type;
-  final String targetId;
-  final String targetContent;
-  final String reason;
-  final String? details;
-  final String reporter;
-  final String timestamp;
-  final ReportStatus status;
+  factory ReportContent.fromJson(Map<String, dynamic> json) =>
+      _$ReportContentFromJson(json);
+}
 
-  const Report({
-    required this.id,
-    required this.type,
-    required this.targetId,
-    required this.targetContent,
-    required this.reason,
-    this.details,
-    required this.reporter,
-    required this.timestamp,
-    required this.status,
-  });
+@freezed
+abstract class Report with _$Report {
+  const Report._();
 
-  factory Report.fromJson(Map<String, dynamic> json) {
-    return Report(
-      id: json['id'] as String,
-      type: _parseReportType(json['type']),
-      targetId: json['targetId'] as String,
-      targetContent: json['targetContent'] as String,
-      reason: json['reason'] as String,
-      details: json['details'] as String?,
-      reporter: json['reporter'] as String,
-      timestamp: json['timestamp'] as String,
-      status: _parseReportStatus(json['status']),
-    );
-  }
+  const factory Report({
+    int? id,
+    required String reason,
+    required UserModel author,
+    required ReportContent content,
+    @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+  }) = _Report;
 
-  static ReportType _parseReportType(String? value) {
-    switch (value) {
-      case 'post':
-        return ReportType.post;
-      case 'comment':
-        return ReportType.comment;
-      case 'event':
-        return ReportType.event;
-      default:
-        return ReportType.unknown;
-    }
-  }
+  String get reporter => author.displayName;
+  String get timestamp => createdAt?.toIso8601String() ?? '';
+  
+  String get targetContent => content.when(
+        post: (data) => data.description,
+        event: (data) => data.description,
+        comment: (data) => data.description,
+      );
+  
+  String get targetId => content.when(
+        post: (data) => data.id?.toString() ?? '',
+        event: (data) => data.id?.toString() ?? '',
+        comment: (data) => data.id?.toString() ?? '',
+      );
+  
+  String? get details => null; // Campo non più presente nello schema
+  
+  ReportType get type => content.when(
+        post: (_) => ReportType.post,
+        event: (_) => ReportType.event,
+        comment: (_) => ReportType.comment,
+      );
 
-  static ReportStatus _parseReportStatus(String? value) {
-    switch (value) {
-      case 'approved':
-        return ReportStatus.approved;
-      case 'resolved':
-        return ReportStatus.approved;
-      case 'rejected':
-        return ReportStatus.rejected;
-      default:
-        return ReportStatus.pending;
-    }
-  }
+  factory Report.fromJson(Map<String, dynamic> json) => _$ReportFromJson(json);
 }
