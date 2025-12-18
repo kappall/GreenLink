@@ -65,6 +65,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     AuthTextField(
                       controller: _passwordController,
                       hint: "Password",
+                      obscure: true,
                     ),
                     const SizedBox(height: 24),
 

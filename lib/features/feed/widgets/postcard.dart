@@ -29,7 +29,7 @@ class PostCard extends StatelessWidget {
               radius: 26, // diametro = radius * 2
               backgroundColor: Colors.grey[200],
               child: Text(
-                post.author!.displayName[0].toUpperCase(),
+                post.author?.displayName[0].toUpperCase() ?? '?',
                 style: const TextStyle(fontSize: 24, color: Colors.black54),
               ),
             ),
@@ -39,7 +39,7 @@ class PostCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    post.author!.displayName,
+                    post.author?.username ?? 'Utente Anonimo',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(getTimePassedBy(post.createdAt)), // time passed since post creation

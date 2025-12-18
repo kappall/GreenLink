@@ -54,7 +54,7 @@ class EventCard extends StatelessWidget {
                     radius: 13, // diametro = radius * 2
                     backgroundColor: Colors.grey[200],
                     child: Text(
-                      event.author!.displayName[0].toUpperCase(),
+                      event.author?.displayName[0].toUpperCase() ?? '?',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
@@ -65,7 +65,7 @@ class EventCard extends StatelessWidget {
 
                   Flexible(
                     child: Text(
-                      event.author!.displayName,
+                      event.author?.displayName ?? 'Utente Anonimo',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -112,7 +112,7 @@ class EventCard extends StatelessWidget {
             Icon(Icons.group, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
-              '${event.participants} / ${event.maxParticipants} Partecipanti',
+              '${event.participants.length} / ${event.maxParticipants} Partecipanti',
             ),
           ],
         ),

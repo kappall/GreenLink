@@ -60,7 +60,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                         radius: 20,
                         backgroundColor: colorScheme.primaryContainer,
                         child: Text(
-                          widget.e.author!.displayName[0].toUpperCase(),
+                          widget.e.author?.displayName[0].toUpperCase() ?? '?',
                           style: TextStyle(
                             fontSize: 18,
                             color: colorScheme.onPrimaryContainer,
@@ -80,7 +80,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                               ),
                             ),
                             Text(
-                              widget.e.author!.displayName,
+                              widget.e.author?.displayName ?? 'Utente Anonimo',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -115,7 +115,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                       icon: Icons.group,
                       title: 'Partecipanti',
                       value:
-                          '${widget.e.participants}/${widget.e.maxParticipants}',
+                          '${widget.e.participants.length}/${widget.e.maxParticipants}',
                       color: colorScheme.primary,
                     ),
                   ),
