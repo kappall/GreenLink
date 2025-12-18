@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
+import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 
 class FeedPage extends ConsumerWidget {
   const FeedPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final postsAsync = ref.watch(postsProvider);
 
     return Scaffold(
       body: ListView(
@@ -51,14 +53,35 @@ class FeedPage extends ConsumerWidget {
             ],
           ),
 
-          for (final p in posts)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: UiCard(
-                child: PostCard(post: p),
-                onTap: () => context.push('/post-info', extra: p),
+          postsAsync.when(
+            data: (posts) => Column(
+              children: [
+                for (final p in posts)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: UiCard(
+                      child: PostCard(post: p),
+                      onTap: () => context.push('/post-info', extra: p),
+                    ),
+                  ),
+              ],
+            ),
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: CircularProgressIndicator(),
               ),
             ),
+            error: (error, stack) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Errore nel caricamento dei post: $error',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
