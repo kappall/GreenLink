@@ -25,7 +25,7 @@ class EventCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                event.TITOLO?,
+                'titolo',//event.TITOLO?,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

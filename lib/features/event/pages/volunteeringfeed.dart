@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/event/widgets/button.dart';
 import 'package:greenlinkapp/features/event/widgets/eventcard.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 
-class VolunteeringPage extends StatelessWidget {
+class VolunteeringPage extends ConsumerWidget {
   const VolunteeringPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final eventsAsync = ref.watch(eventsProvider);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -56,16 +59,37 @@ class VolunteeringPage extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        for (final e in events)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: UiCard(
-              child: EventCard(
-                event: e,
-                onTap: () => context.push('/event-info', extra: e),
+        eventsAsync.when(
+          data: (events) => Column(
+            children: [
+              for (final e in events)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: UiCard(
+                    child: EventCard(
+                      event: e,
+                      onTap: () => context.push('/event-info', extra: e),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (error, stack) => Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Errore nel caricamento degli eventi: $error',
+                style: TextStyle(color: Colors.red),
               ),
             ),
           ),
+        ),
       ],
     );
   }

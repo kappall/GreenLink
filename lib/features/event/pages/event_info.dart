@@ -39,7 +39,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          widget.e.TITOLO,
+                          'titolo',//widget.e.TITOLO,
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

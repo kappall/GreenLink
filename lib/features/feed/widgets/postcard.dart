@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
-import 'package:greenlinkapp/features/feed/widgets/imagesview.dart';
+//import 'package:greenlinkapp/features/feed/widgets/imagesview.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/utils/time_passed_by.dart';
 class PostCard extends StatelessWidget {
@@ -77,10 +77,10 @@ class PostCard extends StatelessWidget {
 
         Text(post.description),
 
-        if (post.IMMAGINI.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          ImagesView(imageUrl: post.IMMAGINI, insidePost: insidePost),
-        ],
+        // if (post.IMMAGINI.isNotEmpty) ...[
+        //   const SizedBox(height: 12),
+        //   ImagesView(imageUrl: post.IMMAGINI, insidePost: insidePost),
+        // ],
 
         const SizedBox(height: 12),
         Row(
@@ -101,7 +101,7 @@ class PostCard extends StatelessWidget {
               const SizedBox(width: 16),
               Icon(Icons.comment, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text('${post.COMMENTI.length} Commenti'),
+              // Text('${post.COMMENTI.length} Commenti'),
             ],
           ],
         ),
