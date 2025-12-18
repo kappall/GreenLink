@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
 import 'package:greenlinkapp/features/feed/widgets/imagesview.dart';
-
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
+import 'package:greenlinkapp/features/feed/utils/time_passed_by.dart';
 class PostCard extends StatelessWidget {
-  final Post post;
+  final PostModel post;
   final VoidCallback? onTap;
   final bool insidePost;
 
@@ -29,7 +29,7 @@ class PostCard extends StatelessWidget {
               radius: 26, // diametro = radius * 2
               backgroundColor: Colors.grey[200],
               child: Text(
-                post.authorName.isNotEmpty ? post.authorName[0] : '',
+                post.author!.displayName[0].toUpperCase(),
                 style: const TextStyle(fontSize: 24, color: Colors.black54),
               ),
             ),
@@ -39,11 +39,10 @@ class PostCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    post.authorName,
+                    post.author!.displayName,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Text(post.authorRole),
-                  Text(post.timeAgo),
+                  Text(getTimePassedBy(post.createdAt)), // time passed since post creation
                 ],
               ),
             ),
@@ -52,7 +51,7 @@ class PostCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 UiBadge(
-                  label: post.eventType,
+                  label: post.category.name,
                   icon: Icons.warning_amber_rounded,
                   color: Colors.blue,
                 ),
@@ -76,11 +75,11 @@ class PostCard extends StatelessWidget {
 
         const SizedBox(height: 12),
 
-        Text(post.text),
+        Text(post.description),
 
-        if (post.imageUrl.isNotEmpty) ...[
+        if (post.IMMAGINI.isNotEmpty) ...[
           const SizedBox(height: 12),
-          ImagesView(imageUrl: post.imageUrl, insidePost: insidePost),
+          ImagesView(imageUrl: post.IMMAGINI, insidePost: insidePost),
         ],
 
         const SizedBox(height: 12),
@@ -88,7 +87,7 @@ class PostCard extends StatelessWidget {
           children: [
             Icon(Icons.location_on, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
-            Text(post.location),
+            Text("${post.latitude}, ${post.longitude}"),
           ],
         ),
 
@@ -98,11 +97,11 @@ class PostCard extends StatelessWidget {
             if (!insidePost) ...[
               Icon(Icons.trending_up, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text('${post.upvotes} Upvotes'),
+              Text('${post.votes.length} Upvotes'),
               const SizedBox(width: 16),
               Icon(Icons.comment, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text('${post.comments.length} Commenti'),
+              Text('${post.COMMENTI.length} Commenti'),
             ],
           ],
         ),

@@ -6,6 +6,13 @@ import 'package:http/http.dart' as http;
 class EventService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
+  Future<List<EventModel>> fetchAllEvents({
+    required String token,
+  }) {
+    final uri = Uri.parse('$_baseUrl/events');
+    return _requestEvents(uri: uri, token: token);
+  }
+
   Future<List<EventModel>> fetchEvents({
     required String token,
     int? partnerId,
@@ -16,6 +23,13 @@ class EventService {
       },
     );
 
+    return _requestEvents(uri: uri, token: token);
+  }
+
+  Future<List<EventModel>> _requestEvents({
+    required Uri uri,
+    required String token,
+  }) async {
     final response = await http.get(
       uri,
       headers: {

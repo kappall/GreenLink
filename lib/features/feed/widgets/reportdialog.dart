@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
-import 'package:greenlinkapp/features/volunteering/domain/event.dart';
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
+import 'package:greenlinkapp/features/event/models/event_model.dart';
 
 void showReportDialog(BuildContext context, {required Object item}) {
 
 
-  if (item is Post) {
+  if (item is PostModel) {
 
-  } else if (item is Event) {
+  } else if (item is EventModel) {
 
   } else {
     throw ArgumentError('Item must be either Post or Event');
@@ -28,9 +28,9 @@ void showReportDialog(BuildContext context, {required Object item}) {
               icon: Icons.spa_sharp,
               label: 'Spam o contenuto ingannevole',
               onTap: () {
-                if (item is Post) {
+                if (item is PostModel) {
                   print("post");
-                } else if (item is Event) {
+                } else if (item is EventModel) {
                   print("event");
                 }
                 Navigator.of(context).pop();

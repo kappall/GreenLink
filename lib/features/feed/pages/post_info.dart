@@ -1,23 +1,23 @@
-import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
+import 'package:flutter/material.dart';
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
 
-class PostInfoPage extends StatefulWidget {
-  final Post p;
+class PostInfoScreen extends StatefulWidget {
+  final PostModel p;
 
-  const PostInfoPage({super.key, required this.p});
+  const PostInfoScreen({super.key, required this.p});
 
   @override
-  State<PostInfoPage> createState() => _PostInfoPageState();
+  State<PostInfoScreen> createState() => _PostInfoScreenState();
 }
 
-class _PostInfoPageState extends State<PostInfoPage> {
+class _PostInfoScreenState extends State<PostInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Segnalazione")),
+      appBar: AppBar(title: Text(widget.p.category.name)),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -29,17 +29,23 @@ class _PostInfoPageState extends State<PostInfoPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   ButtonWidget(
-                    label: "${widget.p.upvotes}",
+                    label: "${widget.p.votes.length}",
                     onPressed: () {
-                      setState(() {});
+                      setState(() {
+                        // Aggiungi la logica per gestire l'upvote qui
+                      });
                     },
                     icon: const Icon(Icons.arrow_upward, color: Colors.white),
                   ),
                   const SizedBox(width: 16),
-                  Text("0 Commenti", style: const TextStyle(fontSize: 16)),
+                  Text(
+                    "(${widget.p.COMMENTI.length}) Commenti",
+                    style: const TextStyle(fontSize: 16),
+                  ),
                 ],
               ),
 
+              // comments section
               const SizedBox(height: 8),
               TextField(
                 controller: TextEditingController(),
@@ -60,7 +66,7 @@ class _PostInfoPageState extends State<PostInfoPage> {
 
               const SizedBox(height: 16),
 
-              for (final comment in ["ciao", "bielo"]) ...[
+              for (final comment in widget.p.comments) ...[
                 SizedBox(
                   width: double.infinity,
                   child: UiCard(
@@ -72,7 +78,7 @@ class _PostInfoPageState extends State<PostInfoPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          radius: 22,
+                          radius: 22, // diametro = radius * 2
                           backgroundColor: Colors.grey[200],
                           child: Text(
                             'U', // primo carattere del nome utente che verrà preso dal backend
