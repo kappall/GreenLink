@@ -10,19 +10,15 @@ import 'package:greenlinkapp/features/auth/pages/register.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/pages/event_info.dart';
 import 'package:greenlinkapp/features/event/pages/volunteeringfeed.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/pages/feed.dart';
-import 'package:greenlinkapp/features/main-wrapper/screen/main_wrapper.dart';
 import 'package:greenlinkapp/features/map/pages/map.dart';
-import 'package:greenlinkapp/features/post/pages/post_info.dart';
-import 'package:greenlinkapp/features/ui-showcase/ui_showcase_screen.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
-import 'package:greenlinkapp/features/volunteering/domain/event.dart';
 
 import 'features/admin/pages/admin_dashboard.dart';
 import 'features/admin/pages/admin_wrapper.dart';
-import 'features/settings/screens/settings_screen.dart';
+import 'features/main-wrapper/pages/main_wrapper.dart';
+import 'features/settings/pages/settings_page.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
