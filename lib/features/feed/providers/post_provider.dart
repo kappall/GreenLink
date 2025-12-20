@@ -20,6 +20,13 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
     state = await AsyncValue.guard(() => _fetchPosts(userId: _userId));
   }
 
+  Future<void> refreshAll() async {
+    _userId = null;
+
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_fetchPosts);
+  }
+
   Future<List<PostModel>> _fetchPosts({int? userId}) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
@@ -28,7 +35,14 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
       return <PostModel>[];
     }
 
-    return _postService.fetchPosts(token: token, userId: userId);
+    if (userId != null && userId > 0) {
+      return _postService.fetchPosts(
+        token: token,
+        userId: userId,
+      );
+    }
+
+    return _postService.fetchAllPosts(token: token);
   }
 }
 

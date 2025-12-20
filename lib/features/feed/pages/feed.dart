@@ -2,70 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/features/feed/domain/post.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
+import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 
 class FeedPage extends ConsumerWidget {
   const FeedPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final loggedIn = true;
-    final List<Post> posts = [
-      //hardcoded sample posts
-      Post(
-        id: 1,
-        authorName: 'Giulia Rossi',
-        authorRole: 'Volontaria',
-        eventType: "Alluvione",
-        timeAgo: '2h fa',
-        text:
-            'Ciao community! Sabato organizziamo una pulizia del parco insieme. Ci troviamo alle 9:30 vicino all\'ingresso principale, portate guanti e buona energia!',
-        imageUrl: [
-          'https://www.repstatic.it/content/localirep/img/rep-milano/2023/09/25/083218547-1dc2a908-3fd6-4860-a333-a7ddc6bd792f.jpg?webp',
-          'https://mountaingenius.org/wp-content/uploads/2023/08/tempesta-milano-.jpg.webp',
-        ],
-        location: 'Parco Sempione, Milano',
-        upvotes: 42,
-        comments: ['Partecipo!', 'Ottima iniziativa!'],
-      ),
-      Post(
-        id: 2,
-        authorName: 'Luca Bianchi',
-        authorRole: 'Soccorritore',
-        eventType: "Emergenza Idrica",
-        timeAgo: '1h fa',
-        text:
-            'Emergenza idrica in corso nella zona nord della città. Stiamo distribuendo bottiglie d\'acqua presso il centro comunitario. Venite a prenderle se ne avete bisogno!',
-        imageUrl: [
-          'https://oltrelalinea.news/wp-content/uploads/2024/04/Foto-Dubai-e-scossa-dal-caos-delle-inondazioni-mentre-piogge.jpg',
-          'https://immagini.alvolante.it/sites/default/files/styles/anteprima_lunghezza_640/public/dasapere_galleria/2014/02/auto-acqua_2.jpg',
-          'https://immagini.alvolante.it/sites/default/files/styles/editor_1_colonna/public/dasapere_galleria/2014/02/auto-acqua_4.jpg',
-        ],
-        location: 'Centro Comunitario, Zona Nord',
-        upvotes: 30,
-        comments: ['Servono altre bottiglie?', 'Grazie per l\'aiuto'],
-      ),
-      Post(
-        id: 3,
-        authorName: 'Sara Verdi',
-        authorRole: 'Cittadina',
-        eventType: "Acquazzone",
-        timeAgo: '30m fa',
-        text:
-            'Ho notato che molte persone stanno avendo difficoltà a trovare cibo nelle vicinanze. Ho creato una lista di punti di distribuzione alimentare nella nostra area. Contattatemi per maggiori dettagli!',
-        imageUrl: [
-          'https://www.scienzainrete.it/files/styles/molto_grande/public/hurricane-irma-ea80c77ac527f450.jpg?itok=kSr-QrgV',
-        ],
-        location: 'Via Roma, Centro Città',
-        upvotes: 25,
-        comments: [
-          'Posso aiutare con la distribuzione',
-          'Grazie per la lista',
-          'Ci sono punti per diete speciali?',
-        ],
-      ),
-    ];
+    final postsAsync = ref.watch(postsProvider);
 
     return Scaffold(
       body: ListView(
@@ -97,7 +42,7 @@ class FeedPage extends ConsumerWidget {
                 "Bacheca Emergenze",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
-              if (loggedIn)
+              
                 ButtonWidget(
                   label: 'Nuovo Post',
                   onPressed: () {
@@ -108,14 +53,35 @@ class FeedPage extends ConsumerWidget {
             ],
           ),
 
-          for (final p in posts)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: UiCard(
-                child: PostCard(post: p),
-                onTap: () => context.push('/post-info', extra: p),
+          postsAsync.when(
+            data: (posts) => Column(
+              children: [
+                for (final p in posts)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: UiCard(
+                      child: PostCard(post: p),
+                      onTap: () => context.push('/post-info', extra: p),
+                    ),
+                  ),
+              ],
+            ),
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: CircularProgressIndicator(),
               ),
             ),
+            error: (error, stack) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Errore nel caricamento dei post: $error',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

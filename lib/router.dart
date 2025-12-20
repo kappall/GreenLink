@@ -10,18 +10,15 @@ import 'package:greenlinkapp/features/event/pages/event_info.dart';
 import 'package:greenlinkapp/features/event/pages/volunteeringfeed.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/pages/feed.dart';
+import 'package:greenlinkapp/features/feed/pages/post_info.dart';
+import 'package:greenlinkapp/features/main-wrapper/pages/main_wrapper.dart';
 import 'package:greenlinkapp/features/map/pages/map.dart';
+import 'package:greenlinkapp/features/settings/pages/settings_page.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
 
 import 'features/admin/pages/admin_dashboard_page.dart';
 import 'features/admin/pages/admin_wrapper.dart';
-import 'features/admin/pages/reports_page.dart';
-import 'features/admin/pages/user_detail_page.dart';
-import 'features/admin/pages/users_page.dart';
-import 'features/feed/pages/post_info.dart';
-import 'features/main-wrapper/pages/main_wrapper.dart';
-import 'features/settings/pages/settings_page.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
@@ -177,7 +174,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final post = state.extra as PostModel;
-          return PostInfoPage(p: post);
+          return PostInfoScreen(p: post);
         },
       ),
 

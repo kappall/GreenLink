@@ -1,10 +1,16 @@
 import 'dart:convert';
-
-import 'package:greenlinkapp/features/post/models/post_model.dart';
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
 
 class PostService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
+
+  Future<List<PostModel>> fetchAllPosts({
+    required String token,
+  }) {
+    final uri = Uri.parse('$_baseUrl/posts');
+    return _requestPosts(uri: uri, token: token);
+  }
 
   Future<List<PostModel>> fetchPosts({
     required String token,
@@ -16,6 +22,13 @@ class PostService {
       },
     );
 
+    return _requestPosts(uri: uri, token: token);
+  }
+
+  Future<List<PostModel>> _requestPosts({
+    required Uri uri,
+    required String token,
+  }) async {
     final response = await http.get(
       uri,
       headers: {
