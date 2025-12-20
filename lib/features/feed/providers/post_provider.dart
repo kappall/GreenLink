@@ -31,15 +31,8 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    if (token == null || token.isEmpty) {
-      return <PostModel>[];
-    }
-
     if (userId != null && userId > 0) {
-      return _postService.fetchPosts(
-        token: token,
-        userId: userId,
-      );
+      return _postService.fetchPosts(token: token!, userId: userId);
     }
 
     return _postService.fetchAllPosts(token: token);

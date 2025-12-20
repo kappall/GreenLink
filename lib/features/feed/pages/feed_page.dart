@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/core/common/widgets/post_card.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 
 import '../../auth/providers/auth_provider.dart';
-import '../../post/providers/post_provider.dart';
+import '../providers/post_provider.dart';
+import '../widgets/postcard.dart';
 
-class FeedScreen extends ConsumerWidget {
-  const FeedScreen({super.key});
+class FeedPage extends ConsumerWidget {
+  const FeedPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final loggedIn = authState.asData?.value.isAuthenticated ?? false;
     final postsAsync = ref.watch(postsProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: RefreshIndicator(
@@ -38,9 +39,9 @@ class FeedScreen extends ConsumerWidget {
                       onPressed: () {
                         context.push('/create-post');
                       },
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.add,
-                        color: Colors.white,
+                        color: colorScheme.onSecondary,
                         size: 20,
                       ),
                     ),

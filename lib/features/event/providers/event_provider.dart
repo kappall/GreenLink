@@ -17,9 +17,7 @@ class EventsNotifier extends AsyncNotifier<List<EventModel>> {
       _partnerId = partnerId;
     }
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => _fetchEvents(partnerId: _partnerId),
-    );
+    state = await AsyncValue.guard(() => _fetchEvents(partnerId: _partnerId));
   }
 
   Future<void> refreshAll() async {
@@ -33,22 +31,16 @@ class EventsNotifier extends AsyncNotifier<List<EventModel>> {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    if (token == null || token.isEmpty) {
-      return <EventModel>[];
-    }
-
     if (partnerId != null && partnerId > 0) {
-      return _eventService.fetchEvents(
-        token: token,
-        partnerId: partnerId,
-      );
+      return _eventService.fetchEvents(token: token!, partnerId: partnerId);
     }
 
     return _eventService.fetchAllEvents(token: token);
   }
 }
 
-final eventsProvider =
-    AsyncNotifierProvider<EventsNotifier, List<EventModel>>(() {
-  return EventsNotifier();
-});
+final eventsProvider = AsyncNotifierProvider<EventsNotifier, List<EventModel>>(
+  () {
+    return EventsNotifier();
+  },
+);

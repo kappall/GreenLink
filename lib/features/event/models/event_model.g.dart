@@ -22,19 +22,8 @@ _EventModel _$EventModelFromJson(Map<String, dynamic> json) => _EventModel(
     json['event_type'],
     unknownValue: EventType.unknown,
   ),
-  author: json['author'] == null
-      ? null
-      : UserModel.fromJson(json['author'] as Map<String, dynamic>),
-  votes:
-      (json['votes'] as List<dynamic>?)
-          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const <UserModel>[],
-  participants:
-      (json['participants'] as List<dynamic>?)
-          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const <UserModel>[],
+  author: (json['author'] as num).toInt(),
+  votes_count: (json['votes_count'] as num?)?.toInt() ?? 0,
   maxParticipants: (json['max_participants'] as num).toInt(),
   startDate: DateTime.parse(json['start_date'] as String),
   endDate: DateTime.parse(json['end_date'] as String),
@@ -50,8 +39,7 @@ Map<String, dynamic> _$EventModelToJson(_EventModel instance) =>
       'longitude': instance.longitude,
       'event_type': _$EventTypeEnumMap[instance.eventType]!,
       'author': instance.author,
-      'votes': instance.votes,
-      'participants': instance.participants,
+      'votes_count': instance.votes_count,
       'max_participants': instance.maxParticipants,
       'start_date': instance.startDate.toIso8601String(),
       'end_date': instance.endDate.toIso8601String(),

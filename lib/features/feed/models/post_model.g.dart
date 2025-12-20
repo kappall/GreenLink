@@ -17,14 +17,9 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       : DateTime.parse(json['deleted_at'] as String),
   latitude: (json['latitude'] as num).toDouble(),
   longitude: (json['longitude'] as num).toDouble(),
-  author: json['author'] == null
-      ? null
-      : UserModel.fromJson(json['author'] as Map<String, dynamic>),
-  votes:
-      (json['votes'] as List<dynamic>?)
-          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const <UserModel>[],
+  author: (json['author'] as num).toInt(),
+  votes_count: (json['votes_count'] as num?)?.toInt() ?? 0,
+  has_voted: json['has_voted'] as bool? ?? false,
   category: $enumDecode(
     _$PostCategoryEnumMap,
     json['category'],
@@ -41,7 +36,8 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'author': instance.author,
-      'votes': instance.votes,
+      'votes_count': instance.votes_count,
+      'has_voted': instance.has_voted,
       'category': _$PostCategoryEnumMap[instance.category]!,
     };
 

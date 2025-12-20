@@ -1,14 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:http/http.dart' as http;
 
 class EventService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
-  Future<List<EventModel>> fetchAllEvents({
-    required String token,
-  }) {
+  Future<List<EventModel>> fetchAllEvents({required String? token}) {
     final uri = Uri.parse('$_baseUrl/events');
     return _requestEvents(uri: uri, token: token);
   }
@@ -28,15 +27,14 @@ class EventService {
 
   Future<List<EventModel>> _requestEvents({
     required Uri uri,
-    required String token,
+    required String? token,
   }) async {
-    final response = await http.get(
-      uri,
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+    final headers = {'Accept': 'application/json'};
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await http.get(uri, headers: headers);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);
@@ -52,7 +50,7 @@ class EventService {
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /events: $rawList');
     }
-
+    debugPrint(rawList.toString());
     return rawList
         .whereType<Map<String, dynamic>>()
         .map(EventModel.fromJson)

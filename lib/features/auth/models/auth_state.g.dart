@@ -11,7 +11,19 @@ _AuthState _$AuthStateFromJson(Map<String, dynamic> json) => _AuthState(
       ? null
       : UserModel.fromJson(json['user'] as Map<String, dynamic>),
   token: json['token'] as String?,
+  derivedRole: $enumDecodeNullable(_$AuthRoleEnumMap, json['derivedRole']),
 );
 
 Map<String, dynamic> _$AuthStateToJson(_AuthState instance) =>
-    <String, dynamic>{'user': instance.user, 'token': instance.token};
+    <String, dynamic>{
+      'user': instance.user,
+      'token': instance.token,
+      'derivedRole': _$AuthRoleEnumMap[instance.derivedRole],
+    };
+
+const _$AuthRoleEnumMap = {
+  AuthRole.admin: 'admin',
+  AuthRole.partner: 'partner',
+  AuthRole.user: 'user',
+  AuthRole.unknown: 'unknown',
+};

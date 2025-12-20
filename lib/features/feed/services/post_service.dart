@@ -1,13 +1,12 @@
 import 'dart:convert';
+
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
 
 class PostService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
-  Future<List<PostModel>> fetchAllPosts({
-    required String token,
-  }) {
+  Future<List<PostModel>> fetchAllPosts({required String? token}) {
     final uri = Uri.parse('$_baseUrl/posts');
     return _requestPosts(uri: uri, token: token);
   }
@@ -27,15 +26,14 @@ class PostService {
 
   Future<List<PostModel>> _requestPosts({
     required Uri uri,
-    required String token,
+    required String? token,
   }) async {
-    final response = await http.get(
-      uri,
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+    final headers = {'Accept': 'application/json'};
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await http.get(uri, headers: headers);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);

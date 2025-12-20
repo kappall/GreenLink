@@ -1,18 +1,19 @@
-import 'package:greenlinkapp/core/common/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 
-class PostInfoScreen extends StatefulWidget {
+import '../widgets/postcard.dart';
+
+class PostInfoPage extends StatefulWidget {
   final PostModel p;
 
-  const PostInfoScreen({super.key, required this.p});
+  const PostInfoPage({super.key, required this.p});
 
   @override
-  State<PostInfoScreen> createState() => _PostInfoScreenState();
+  State<PostInfoPage> createState() => _PostInfoPageState();
 }
 
-class _PostInfoScreenState extends State<PostInfoScreen> {
+class _PostInfoPageState extends State<PostInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +29,7 @@ class _PostInfoScreenState extends State<PostInfoScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   ButtonWidget(
-                    label: "${widget.p.votes.length}",
+                    label: "${widget.p.votes_count}",
                     onPressed: () {
                       setState(() {
                         // Aggiungi la logica per gestire l'upvote qui

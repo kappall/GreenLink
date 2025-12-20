@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthState {
 
- UserModel? get user; String? get token;@JsonKey(includeFromJson: false, includeToJson: false) AuthRole? get derivedRole;
+ UserModel? get user; String? get token; AuthRole? get derivedRole;
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $AuthStateCopyWith<$Res>  {
   factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) _then) = _$AuthStateCopyWithImpl;
 @useResult
 $Res call({
- UserModel? user, String? token,@JsonKey(includeFromJson: false, includeToJson: false) AuthRole? derivedRole
+ UserModel? user, String? token, AuthRole? derivedRole
 });
 
 
@@ -167,7 +167,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UserModel? user,  String? token, @JsonKey(includeFromJson: false, includeToJson: false)  AuthRole? derivedRole)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UserModel? user,  String? token,  AuthRole? derivedRole)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthState() when $default != null:
 return $default(_that.user,_that.token,_that.derivedRole);case _:
@@ -188,7 +188,7 @@ return $default(_that.user,_that.token,_that.derivedRole);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UserModel? user,  String? token, @JsonKey(includeFromJson: false, includeToJson: false)  AuthRole? derivedRole)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UserModel? user,  String? token,  AuthRole? derivedRole)  $default,) {final _that = this;
 switch (_that) {
 case _AuthState():
 return $default(_that.user,_that.token,_that.derivedRole);case _:
@@ -208,7 +208,7 @@ return $default(_that.user,_that.token,_that.derivedRole);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UserModel? user,  String? token, @JsonKey(includeFromJson: false, includeToJson: false)  AuthRole? derivedRole)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UserModel? user,  String? token,  AuthRole? derivedRole)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthState() when $default != null:
 return $default(_that.user,_that.token,_that.derivedRole);case _:
@@ -223,12 +223,12 @@ return $default(_that.user,_that.token,_that.derivedRole);case _:
 @JsonSerializable()
 
 class _AuthState extends AuthState {
-  const _AuthState({this.user, this.token, @JsonKey(includeFromJson: false, includeToJson: false) this.derivedRole}): super._();
+  const _AuthState({this.user, this.token, this.derivedRole}): super._();
   factory _AuthState.fromJson(Map<String, dynamic> json) => _$AuthStateFromJson(json);
 
 @override final  UserModel? user;
 @override final  String? token;
-@override@JsonKey(includeFromJson: false, includeToJson: false) final  AuthRole? derivedRole;
+@override final  AuthRole? derivedRole;
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
@@ -263,7 +263,7 @@ abstract mixin class _$AuthStateCopyWith<$Res> implements $AuthStateCopyWith<$Re
   factory _$AuthStateCopyWith(_AuthState value, $Res Function(_AuthState) _then) = __$AuthStateCopyWithImpl;
 @override @useResult
 $Res call({
- UserModel? user, String? token,@JsonKey(includeFromJson: false, includeToJson: false) AuthRole? derivedRole
+ UserModel? user, String? token, AuthRole? derivedRole
 });
 
 

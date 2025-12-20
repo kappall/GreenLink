@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
-import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';  
 import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
+import 'package:intl/intl.dart';
 
 class EventCard extends StatelessWidget {
   final EventModel event;
   final VoidCallback? onTap;
 
-  const EventCard({
-    super.key,
-    required this.event,
-    this.onTap,
-  });
+  const EventCard({super.key, required this.event, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +21,7 @@ class EventCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'titolo',//event.TITOLO?,
+                'titolo', //event.TITOLO?,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -54,7 +50,7 @@ class EventCard extends StatelessWidget {
                     radius: 13, // diametro = radius * 2
                     backgroundColor: Colors.grey[200],
                     child: Text(
-                      event.author?.displayName[0].toUpperCase() ?? '?',
+                      '?',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
@@ -65,7 +61,7 @@ class EventCard extends StatelessWidget {
 
                   Flexible(
                     child: Text(
-                      event.author?.displayName ?? 'Utente Anonimo',
+                      'Utente Anonimo',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -92,11 +88,7 @@ class EventCard extends StatelessWidget {
 
         SizedBox(height: 12),
 
-        Text(
-          event.description,
-          maxLines: 4,
-          overflow: TextOverflow.ellipsis,
-        ),
+        Text(event.description, maxLines: 4, overflow: TextOverflow.ellipsis),
 
         SizedBox(height: 12),
         Row(
@@ -112,7 +104,7 @@ class EventCard extends StatelessWidget {
             Icon(Icons.group, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
-              '${event.participants.length} / ${event.maxParticipants} Partecipanti',
+              '${event.votes_count} / ${event.maxParticipants} Partecipanti',
             ),
           ],
         ),
@@ -122,18 +114,15 @@ class EventCard extends StatelessWidget {
             Icon(Icons.calendar_month, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
-              '${DateFormat('d MMM yyyy').format(event.startDate)} • ${DateFormat('HH:mm').format(event.startDate)} - ${DateFormat('HH:mm').format(event.endDate)}'
+              '${DateFormat('d MMM yyyy').format(event.startDate)} • ${DateFormat('HH:mm').format(event.startDate)} - ${DateFormat('HH:mm').format(event.endDate)}',
             ),
           ],
         ),
         SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: onTap,
-              child: const Text('Partecipa'),
-            ),
-          ),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(onPressed: onTap, child: const Text('Dettagli')),
+        ),
       ],
     );
   }

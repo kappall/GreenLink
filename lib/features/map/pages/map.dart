@@ -215,8 +215,7 @@ class _MapPageState extends ConsumerState<MapPage> {
       width: 40,
       height: 40,
       child: Semantics(
-        label:
-            "Segnalazione di ${post.author?.displayName ?? 'utente'}, categoria ${post.category.label}",
+        label: "Segnalazione di  ?? 'utente', categoria ${post.category.label}",
         button: true,
         enabled: true,
         child: GestureDetector(
@@ -286,7 +285,7 @@ class _MapPageState extends ConsumerState<MapPage> {
     final isPost = post != null;
     final color = isPost ? post.category.color : event!.eventType.color;
     final title = isPost
-        ? (post.author?.displayName ?? 'Segnalazione')
+        ? 'Segnalazione'
         : event!.description.split('\n').first;
     final description = isPost ? post.description : event!.description;
 

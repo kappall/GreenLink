@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
-import 'package:greenlinkapp/features/event/widgets/detailrow.dart';
+import 'package:greenlinkapp/features/event/widgets/detail_row.dart';
 import 'package:greenlinkapp/features/event/widgets/infocard.dart';
+import 'package:intl/intl.dart';
 
 class EventInfoPage extends StatefulWidget {
   final EventModel e;
@@ -39,7 +39,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          'titolo',//widget.e.TITOLO,
+                          'titolo', //widget.e.TITOLO,
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -60,7 +60,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                         radius: 20,
                         backgroundColor: colorScheme.primaryContainer,
                         child: Text(
-                          widget.e.author?.displayName[0].toUpperCase() ?? '?',
+                          '?',
                           style: TextStyle(
                             fontSize: 18,
                             color: colorScheme.onPrimaryContainer,
@@ -80,7 +80,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                               ),
                             ),
                             Text(
-                              widget.e.author?.displayName ?? 'Utente Anonimo',
+                              'Utente Anonimo',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -115,7 +115,7 @@ class _EventInfoPageState extends State<EventInfoPage> {
                       icon: Icons.group,
                       title: 'Partecipanti',
                       value:
-                          '${widget.e.participants.length}/${widget.e.maxParticipants}',
+                          '${widget.e.votes_count}/${widget.e.maxParticipants}',
                       color: colorScheme.primary,
                     ),
                   ),

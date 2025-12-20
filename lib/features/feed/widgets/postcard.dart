@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
-import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
-//import 'package:greenlinkapp/features/feed/widgets/imagesview.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/utils/time_passed_by.dart';
+import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
+
 class PostCard extends StatelessWidget {
   final PostModel post;
   final VoidCallback? onTap;
@@ -14,7 +14,6 @@ class PostCard extends StatelessWidget {
     required this.post,
     this.onTap,
     this.insidePost = false,
-    
   });
 
   @override
@@ -29,7 +28,7 @@ class PostCard extends StatelessWidget {
               radius: 26, // diametro = radius * 2
               backgroundColor: Colors.grey[200],
               child: Text(
-                post.author?.displayName[0].toUpperCase() ?? '?',
+                '?',
                 style: const TextStyle(fontSize: 24, color: Colors.black54),
               ),
             ),
@@ -39,10 +38,12 @@ class PostCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    post.author?.username ?? 'Utente Anonimo',
+                    'Utente Anonimo',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Text(getTimePassedBy(post.createdAt)), // time passed since post creation
+                  Text(
+                    getTimePassedBy(post.createdAt),
+                  ), // time passed since post creation
                 ],
               ),
             ),
@@ -81,7 +82,6 @@ class PostCard extends StatelessWidget {
         //   const SizedBox(height: 12),
         //   ImagesView(imageUrl: post.IMMAGINI, insidePost: insidePost),
         // ],
-
         const SizedBox(height: 12),
         Row(
           children: [
@@ -97,7 +97,7 @@ class PostCard extends StatelessWidget {
             if (!insidePost) ...[
               Icon(Icons.trending_up, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text('${post.votes.length} Upvotes'),
+              Text('${post.votes_count} Upvotes'),
               const SizedBox(width: 16),
               Icon(Icons.comment, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
