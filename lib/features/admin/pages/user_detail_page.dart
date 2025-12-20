@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/core/common/widgets/post_card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
-import '../../feed/providers/post_provider.dart';
 import '../providers/admin_provider.dart';
 
 class UserDetailPage extends ConsumerWidget {
@@ -92,7 +90,7 @@ class UserDetailPage extends ConsumerWidget {
               userEvents.when(
                 data: (events) {
                   final eventsByUser = events
-                      .where((e) => e.author?.id == user.id)
+                      .where((e) => e.author == user.id)
                       .toList();
                   if (eventsByUser.isEmpty) {
                     return const Text("Nessun evento creato. ");
