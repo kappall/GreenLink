@@ -5,16 +5,16 @@ import 'package:greenlinkapp/features/feed/widgets/button.dart';
 
 import '../models/post_model.dart';
 
-class PostInfoScreen extends StatefulWidget {
+class PostInfoPage extends StatefulWidget {
   final PostModel p;
 
-  const PostInfoScreen({super.key, required this.p});
+  const PostInfoPage({super.key, required this.p});
 
   @override
-  State<PostInfoScreen> createState() => _PostInfoScreenState();
+  State<PostInfoPage> createState() => _PostInfoPageState();
 }
 
-class _PostInfoScreenState extends State<PostInfoScreen> {
+class _PostInfoPageState extends State<PostInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
