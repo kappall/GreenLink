@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
-import 'package:greenlinkapp/features/post/models/post_model.dart';
-import 'package:greenlinkapp/features/post/services/post_service.dart';
+
+import '../models/post_model.dart';
+import '../services/post_service.dart';
 
 class PostsNotifier extends AsyncNotifier<List<PostModel>> {
   final PostService _postService = PostService();
@@ -16,9 +17,7 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
     if (userId != null) _userId = userId;
 
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => _fetchPosts(userId: _userId),
-    );
+    state = await AsyncValue.guard(() => _fetchPosts(userId: _userId));
   }
 
   Future<List<PostModel>> _fetchPosts({int? userId}) async {
@@ -29,12 +28,10 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
       return <PostModel>[];
     }
 
-    return _postService.fetchPosts(
-      token: token,
-      userId: userId,
-    );
+    return _postService.fetchPosts(token: token, userId: userId);
   }
 }
 
-final postsProvider =
-    AsyncNotifierProvider<PostsNotifier, List<PostModel>>(PostsNotifier.new);
+final postsProvider = AsyncNotifierProvider<PostsNotifier, List<PostModel>>(
+  PostsNotifier.new,
+);
