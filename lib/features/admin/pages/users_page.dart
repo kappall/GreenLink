@@ -6,125 +6,157 @@ import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 import '../providers/admin_provider.dart';
 
-class UsersPage extends ConsumerStatefulWidget {
+class UsersPage extends ConsumerWidget {
   const UsersPage({super.key});
 
   @override
-  ConsumerState<UsersPage> createState() => _UsersPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final usersAsync = ref.watch(usersListProvider);
+    final selectedRole = ref.watch(userRoleFilterProvider);
+
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade50,
+        appBar: AppBar(
+          title: const Text("Gestione Utenti"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () => ref.read(usersProvider.notifier).refresh(),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => context.push('/admin/create-partner'),
+          icon: const Icon(Icons.add_business),
+          label: const Text("Nuovo Partner"),
+        ),
+        body: Column(
+          children: [
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Column(
+                children: [
+                  TextField(
+                    onChanged: (val) =>
+                        ref.read(usersSearchQueryProvider.notifier).state = val,
+                    decoration: InputDecoration(
+                      hintText: "Cerca per nome o email...",
+                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        FilterChip(
+                          label: const Text("Tutti"),
+                          selected: selectedRole == null,
+                          onSelected: (_) =>
+                              ref.read(userRoleFilterProvider.notifier).state =
+                                  null,
+                        ),
+                        const SizedBox(width: 8),
+                        FilterChip(
+                          label: const Text("Utenti"),
+                          selected: selectedRole == AuthRole.user,
+                          onSelected: (_) =>
+                              ref.read(userRoleFilterProvider.notifier).state =
+                                  AuthRole.user,
+                        ),
+                        const SizedBox(width: 8),
+                        FilterChip(
+                          label: const Text("Partner"),
+                          selected: selectedRole == AuthRole.partner,
+                          onSelected: (_) =>
+                              ref.read(userRoleFilterProvider.notifier).state =
+                                  AuthRole.partner,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const TabBar(
+              labelColor: Colors.green,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Colors.green,
+              tabs: [
+                Tab(text: "ATTIVI"),
+                Tab(text: "BLOCCATI"),
+              ],
+            ),
+            Expanded(
+              child: usersAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('Errore: $err')),
+                data: (_) => TabBarView(
+                  children: [
+                    _UserList(users: ref.watch(activeFilteredUsersProvider)),
+                    _UserList(users: ref.watch(blockedFilteredUsersProvider)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _UsersPageState extends ConsumerState<UsersPage> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = "";
+class _UserList extends ConsumerWidget {
+  final List<UserModel> users;
+
+  const _UserList({required this.users});
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _blockUser(UserModel user) async {
-    Navigator.pop(context);
-
-    await ref.read(adminServiceProvider).blockUser(user.id);
-
-    ref.invalidate(usersListProvider);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Utente ${user.displayName} bloccato"),
-        backgroundColor: Colors.red.shade700,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final usersAsync = ref.watch(usersListProvider);
-
-    return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      body: Column(
-        children: [
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Cerca per nome o email...",
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              ),
-              onChanged: (val) =>
-                  setState(() => _searchQuery = val.toLowerCase()),
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (users.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.person_search_outlined,
+              size: 64,
+              color: Colors.grey.shade300,
             ),
-          ),
-
-          Expanded(
-            child: usersAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Errore: $err')),
-              data: (users) {
-                final filteredUsers = users.where((u) {
-                  return u.displayName.toLowerCase().contains(_searchQuery) ||
-                      u.email.toLowerCase().contains(_searchQuery);
-                }).toList();
-
-                if (filteredUsers.isEmpty) {
-                  return _buildEmptyState();
-                }
-
-                return ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filteredUsers.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    return _UserCard(
-                      user: filteredUsers[index],
-                      onOptionsTap: () =>
-                          _showUserOptions(context, filteredUsers[index]),
-                    );
-                  },
-                );
-              },
+            const SizedBox(height: 16),
+            const Text(
+              "Nessun utente trovato",
+              style: TextStyle(color: Colors.grey),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 40),
+      itemCount: users.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        return _UserCard(
+          user: users[index],
+          onOptionsTap: () => _showUserOptions(context, ref, users[index]),
+        );
+      },
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.person_search_outlined,
-            size: 64,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            _searchQuery.isEmpty
-                ? "Nessun utente trovato"
-                : "Nessun risultato per '$_searchQuery'",
-            style: const TextStyle(color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showUserOptions(BuildContext context, UserModel user) {
+  void _showUserOptions(BuildContext context, WidgetRef ref, UserModel user) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -138,13 +170,13 @@ class _UsersPageState extends ConsumerState<UsersPage> {
               ListTile(
                 title: Text(
                   "Opzioni per ${user.displayName}",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               const Divider(height: 1),
               ListTile(
                 leading: Icon(
-                  Icons.block,
+                  user.isBlocked ? Icons.lock_open : Icons.block,
                   color: user.isBlocked ? Colors.green : Colors.red,
                 ),
                 title: Text(
@@ -153,15 +185,29 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                     color: user.isBlocked ? Colors.green : Colors.red,
                   ),
                 ),
-                onTap: () => _blockUser(user),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await ref.read(usersProvider.notifier).blockUser(user.id);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          user.isBlocked
+                              ? "Utente sbloccato"
+                              : "Utente bloccato",
+                        ),
+                      ),
+                    );
+                  }
+                },
               ),
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: const Text("Vedi dettagli completi"),
                 onTap: () {
-                  ctx.pop();
-                  context.go('/admin/users/${user.id}', extra: user);
+                  Navigator.pop(ctx);
+                  context.push('/admin/users/${user.id}', extra: user);
                 },
               ),
             ],
@@ -198,7 +244,7 @@ class _UserCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -208,7 +254,7 @@ class _UserCard extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: roleColor.withValues(alpha: 0.1),
+          backgroundColor: roleColor.withOpacity(0.1),
           child: Text(
             user.displayName.isNotEmpty
                 ? user.displayName[0].toUpperCase()
@@ -216,16 +262,10 @@ class _UserCard extends StatelessWidget {
             style: TextStyle(color: roleColor, fontWeight: FontWeight.bold),
           ),
         ),
-        title: Row(
-          children: [
-            Flexible(
-              child: Text(
-                user.displayName,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        title: Text(
+          user.displayName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+          overflow: TextOverflow.ellipsis,
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,12 +278,12 @@ class _UserCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: roleColor.withValues(alpha: 0.1),
+                color: roleColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: roleColor.withValues(alpha: 0.3)),
+                border: Border.all(color: roleColor.withOpacity(0.3)),
               ),
               child: Text(
-                user.role.toString().split('.').last.toUpperCase(),
+                user.role?.name.toUpperCase() ?? "SCONOSCIUTO",
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,

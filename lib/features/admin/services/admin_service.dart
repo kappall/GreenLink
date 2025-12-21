@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:greenlinkapp/features/admin/models/PartnerModel.dart';
 import 'package:http/http.dart' as http;
 
 import '../../auth/utils/role_parser.dart';
@@ -54,15 +56,11 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList
-            .map((jsonItem) {
-              final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
-              // Se il ruolo non è presente nel JSON, lo impostiamo
-              return user.role == null 
-                  ? user.copyWith(role: AuthRole.user)
-                  : user;
-            })
-            .toList();
+        return jsonList.map((jsonItem) {
+          final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
+          // Se il ruolo non è presente nel JSON, lo impostiamo
+          return user.role == null ? user.copyWith(role: AuthRole.user) : user;
+        }).toList();
       } else {
         throw Exception(
           'Fallimento nel caricamento degli user: ${response.statusCode}',
@@ -85,15 +83,13 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList
-            .map((jsonItem) {
-              final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
-              // Se il ruolo non è presente nel JSON, lo impostiamo
-              return user.role == null
-                  ? user.copyWith(role: AuthRole.partner)
-                  : user;
-            })
-            .toList();
+        return jsonList.map((jsonItem) {
+          final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
+          // Se il ruolo non è presente nel JSON, lo impostiamo
+          return user.role == null
+              ? user.copyWith(role: AuthRole.partner)
+              : user;
+        }).toList();
       } else {
         throw Exception(
           'Fallimento nel caricamento dei partner: ${response.statusCode}',
@@ -178,11 +174,34 @@ class AdminService {
 
       if (response.statusCode != 200) {
         throw Exception(
-          'Fallimento nella modifica del ruolo: ${response.statusCode}',
+          'Fallimento del blocco user $userId: ${response.statusCode}',
         );
       }
     } catch (e) {
       throw Exception('Errore di connessione: $e');
+    }
+  }
+
+  Future<void> createPartner(PartnerModel partner) async {
+    try {
+      debugPrint(jsonEncode(partner.toJson()));
+      final response = await http.post(
+        Uri.parse('$_baseUrl/partner/register'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(partner.toJson()),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Fallimento nella creazione partner: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e);
     }
   }
 }

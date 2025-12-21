@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/admin/models/PartnerModel.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
@@ -7,7 +8,6 @@ import '../../comment/models/comment_model.dart';
 import '../models/report.dart';
 import '../services/admin_service.dart';
 
-// Reports Notifier
 class ReportsNotifier extends AsyncNotifier<List<Report>> {
   @override
   Future<List<Report>> build() async {
@@ -41,10 +41,9 @@ class ReportsNotifier extends AsyncNotifier<List<Report>> {
       throw Exception('Utente non autenticato');
     }
 
-    await AdminService(token: token).moderateReport(
-      report: report,
-      approve: approve,
-    );
+    await AdminService(
+      token: token,
+    ).moderateReport(report: report, approve: approve);
 
     await refresh();
   }
@@ -54,7 +53,6 @@ final reportsProvider = AsyncNotifierProvider<ReportsNotifier, List<Report>>(
   ReportsNotifier.new,
 );
 
-// Users Notifier
 class UsersNotifier extends AsyncNotifier<List<UserModel>> {
   @override
   Future<List<UserModel>> build() async {
@@ -92,6 +90,18 @@ class UsersNotifier extends AsyncNotifier<List<UserModel>> {
     await AdminService(token: token).blockUser(userId);
     await refresh();
   }
+
+  Future<void> createPartner(PartnerModel partner) async {
+    final authState = ref.read(authProvider);
+    final token = authState.asData?.value.token;
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Utente non autenticato');
+    }
+
+    await AdminService(token: token).createPartner(partner);
+    await refresh();
+  }
 }
 
 final usersProvider = AsyncNotifierProvider<UsersNotifier, List<UserModel>>(
@@ -109,8 +119,8 @@ class UsersSearchQueryNotifier extends Notifier<String> {
 
 final usersSearchQueryProvider =
     NotifierProvider<UsersSearchQueryNotifier, String>(
-  UsersSearchQueryNotifier.new,
-);
+      UsersSearchQueryNotifier.new,
+    );
 
 // Role Filter Notifier
 class UserRoleFilterNotifier extends Notifier<AuthRole?> {
@@ -123,8 +133,8 @@ class UserRoleFilterNotifier extends Notifier<AuthRole?> {
 
 final userRoleFilterProvider =
     NotifierProvider<UserRoleFilterNotifier, AuthRole?>(
-  UserRoleFilterNotifier.new,
-);
+      UserRoleFilterNotifier.new,
+    );
 
 // TODO: Provider temporaneo per compatibilità - da collegare a vero backend
 final userCommentProvider = Provider<List<CommentModel>>((ref) => const []);
@@ -132,10 +142,7 @@ final userCommentProvider = Provider<List<CommentModel>>((ref) => const []);
 // Derived providers
 final usersCountProvider = Provider<int>((ref) {
   final usersAsync = ref.watch(usersProvider);
-  return usersAsync.maybeWhen(
-    data: (users) => users.length,
-    orElse: () => 0,
-  );
+  return usersAsync.maybeWhen(data: (users) => users.length, orElse: () => 0);
 });
 
 final reportsCountProvider = Provider<int>((ref) {
