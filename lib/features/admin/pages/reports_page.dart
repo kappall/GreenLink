@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/event/providers/event_provider.dart';
+import 'package:greenlinkapp/features/event/widgets/event_feed.dart';
+import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
+import 'package:greenlinkapp/features/feed/widgets/post_feed.dart';
 
 import '../models/report.dart';
 import '../providers/admin_provider.dart';
@@ -13,11 +17,12 @@ class ReportsPage extends ConsumerStatefulWidget {
 }
 
 class _ReportsPageState extends ConsumerState<ReportsPage> {
+  bool _showOnlyReported = true;
+
   void _handleAction(Report report, bool isApprove) async {
     await ref
-        .read(adminServiceProvider)
+        .read(reportsProvider.notifier)
         .moderateReport(report: report, approve: isApprove);
-    ref.invalidate(reportsListProvider);
 
     if (!mounted) return;
 
@@ -34,7 +39,27 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final reportsAsync = ref.watch(reportsListProvider);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Gestione Contenuti"),
+        actions: [
+          Row(
+            children: [
+              const Text("Solo segnalati", style: TextStyle(fontSize: 12)),
+              Switch(
+                value: _showOnlyReported,
+                onChanged: (val) => setState(() => _showOnlyReported = val),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: _showOnlyReported ? _buildReportedView() : _buildAllContentView(),
+    );
+  }
+
+  Widget _buildReportedView() {
+    final reportsAsync = ref.watch(reportsProvider);
 
     return reportsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -82,6 +107,46 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         );
       },
     );
+  }
+
+  Widget _buildAllContentView() {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          Container(
+            color: Colors.white,
+            child: const TabBar(
+              labelColor: Colors.green,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Colors.green,
+              tabs: [
+                Tab(text: "Tutti i Post", icon: Icon(Icons.feed_outlined)),
+                Tab(
+                  text: "Tutti gli Eventi",
+                  icon: Icon(Icons.event_note_outlined),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [_buildAllPostsList(), _buildAllEventsList()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAllPostsList() {
+    final postsAsync = ref.watch(postsProvider);
+    return CustomScrollView(slivers: [PostFeed(postsAsync: postsAsync)]);
+  }
+
+  Widget _buildAllEventsList() {
+    final eventsAsync = ref.watch(eventsProvider);
+    return CustomScrollView(slivers: [EventFeed(eventsAsync: eventsAsync)]);
   }
 
   Widget _buildReportList(List<Report> reports) {

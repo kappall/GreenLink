@@ -1,248 +1,217 @@
 import 'package:flutter/material.dart';
-import 'package:greenlinkapp/core/common/widgets/badge.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
-import 'package:greenlinkapp/features/event/widgets/detail_row.dart';
-import 'package:greenlinkapp/features/event/widgets/infocard.dart';
+import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
-class EventInfoPage extends StatefulWidget {
-  final EventModel e;
+import '../../../core/common/widgets/badge.dart';
+import '../../../core/providers/geocoding_provider.dart';
+import '../../auth/providers/auth_provider.dart';
 
-  const EventInfoPage({super.key, required this.e});
+class EventInfoPage extends ConsumerStatefulWidget {
+  final EventModel event;
+
+  const EventInfoPage({super.key, required this.event});
 
   @override
-  State<EventInfoPage> createState() => _EventInfoPageState();
+  ConsumerState<EventInfoPage> createState() => _EventInfoPageState();
 }
 
-class _EventInfoPageState extends State<EventInfoPage> {
-  bool isJoined = false;
+class _EventInfoPageState extends ConsumerState<EventInfoPage> {
+  bool _isDeleting = false;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final event = widget.event;
+    final startDate = DateFormat('dd MMM yyyy, HH:mm').format(event.startDate);
+    final endDate = DateFormat('dd MMM yyyy, HH:mm').format(event.endDate);
+
+    final geoKey = (lat: event.latitude, lng: event.longitude);
+    final locationAsync = ref.watch(placeNameProvider(geoKey));
+    final locationName =
+        locationAsync.value ?? "${event.latitude}, ${event.longitude}";
+
+    final authState = ref.watch(authProvider);
+    final isAdmin = authState.asData?.value.isAdmin ?? false;
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isAuthor = currentUser?.id == event.author.id;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.e.eventType.name)),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title Section
-            Padding(
-              padding: const EdgeInsets.all(20.0),
+      appBar: AppBar(
+        title: const Text("Dettaglio Evento"),
+        actions: [
+          if (isAdmin || isAuthor)
+            IconButton(
+              icon: _isDeleting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.delete_outline, color: Colors.red),
+              onPressed: _isDeleting ? null : () => _confirmDelete(context),
+            ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          'titolo', //widget.e.TITOLO,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      UiBadge(
-                        label: widget.e.eventType.name,
-                        icon: Icons.eco,
-                        color: colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: colorScheme.primaryContainer,
-                        child: Text(
-                          '?',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Organizzato da',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
+                              event.description.split('\n').first,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
+                            const SizedBox(height: 4),
                             Text(
-                              'Utente Anonimo',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                              "Organizzato da ${event.author?.displayName ?? 'Utente'}",
+                              style: TextStyle(color: Colors.grey[600]),
                             ),
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.flag_outlined,
-                          color: Colors.grey[600],
-                        ),
-                        onPressed: () {
-                          // Report event
-                        },
+                      UiBadge(
+                        label: "Evento",
+                        color: Colors.blue,
+                        icon: Icons.event,
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    "Descrizione",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    event.description,
+                    style: const TextStyle(fontSize: 16, height: 1.5),
+                  ),
+                  const SizedBox(height: 32),
+                  _buildInfoRow(Icons.calendar_today, "Inizio", startDate),
+                  const SizedBox(height: 12),
+                  _buildInfoRow(Icons.calendar_today, "Fine", endDate),
+                  const SizedBox(height: 12),
+                  _buildInfoRow(
+                    Icons.people_outline,
+                    "Partecipanti",
+                    "${event.votes_count} / ${event.maxParticipants}", //TODO: partecipants not votes
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoRow(
+                    Icons.location_on_outlined,
+                    "Posizione",
+                    locationName,
+                  ),
+                  const SizedBox(height: 40),
+                  Center(
+                    child: Text(
+                      "ID Evento: ${event.id}",
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                    ),
                   ),
                 ],
               ),
             ),
-
-            const Divider(height: 1),
-
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InfoCard(
-                      icon: Icons.group,
-                      title: 'Partecipanti',
-                      value:
-                          '${widget.e.votes_count}/${widget.e.maxParticipants}',
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: InfoCard(
-                      icon: Icons.calendar_today,
-                      title: 'Data',
-                      value: DateFormat(
-                        'yyyy MMM d',
-                      ).format(widget.e.startDate),
-                      color: colorScheme.secondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Date & Time Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Card(
-                elevation: 0,
-                color: Colors.grey[100],
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      DetailRow(
-                        icon: Icons.access_time,
-                        title: 'Orario',
-                        value:
-                            '${DateFormat('HH:mm').format(widget.e.startDate)} - ${DateFormat('HH:mm').format(widget.e.endDate)}',
-                        iconColor: colorScheme.tertiary,
-                      ),
-                      const SizedBox(height: 12),
-                      DetailRow(
-                        icon: Icons.location_on,
-                        title: 'Luogo',
-                        value: '${widget.e.latitude}, ${widget.e.longitude}',
-                        iconColor: colorScheme.error,
-                      ),
-                    ],
-                  ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: FilledButton(
+                onPressed: () {
+                  // TODO: implement participation
+                },
+                child: const Text(
+                  "PARTECIPA ALL'EVENTO",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
-
-            const SizedBox(height: 24),
-
-            // Description Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Descrizione',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.e.description,
-                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Location with directions button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Posizione',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      // Open map
-                    },
-                    icon: const Icon(Icons.directions),
-                    label: const Text('Ottieni indicazioni'),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 48),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Bottom spacing for FAB
-            const SizedBox(height: 120),
-          ],
-        ),
+          ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: FloatingActionButton.extended(
-            elevation: 4,
-            onPressed: () {
-              setState(() {
-                isJoined = !isJoined;
-              });
-            },
-            icon: Icon(
-              isJoined ? Icons.check_circle : Icons.volunteer_activism,
-            ),
-            label: Text(
-              isJoined ? 'Iscritto' : 'Partecipa',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            backgroundColor: isJoined ? Colors.grey[600] : colorScheme.primary,
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Elimina Evento"),
+        content: const Text("Sei sicuro di voler eliminare questo evento?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Annulla"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Elimina", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() => _isDeleting = true);
+      try {
+        // TODO: implement delete call in provider/service
+        // await ref.read(eventsProvider.notifier).deleteEvent(widget.event.id!);
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Errore durante l'eliminazione: $e")),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isDeleting = false);
+        }
+      }
+    }
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey[600]),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
-      ),
+      ],
     );
   }
 }
