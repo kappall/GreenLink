@@ -58,6 +58,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isRegistering = state.uri.path == '/register';
       final isAdminRoute = state.uri.path.startsWith('/admin');
 
+      final isSharedRoute = [
+        '/profile',
+        '/settings',
+        '/post-info',
+        '/event-info',
+      ].contains(state.uri.path);
+
       if (authState.isLoading) return null;
 
       if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
@@ -70,7 +77,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/home';
       }
 
-      if (isLoggedIn && isAdmin && !isAdminRoute) {
+      if (isLoggedIn && isAdmin && !isAdminRoute && !isSharedRoute) {
         return '/admin';
       }
 
@@ -182,7 +189,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final post = state.extra as PostModel;
-          return PostInfoPage(p: post);
+          return PostInfoPage(post: post);
         },
       ),
 
@@ -191,7 +198,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final event = state.extra as EventModel;
-          return EventInfoPage(e: event);
+          return EventInfoPage(event: event);
         },
       ),
     ],
