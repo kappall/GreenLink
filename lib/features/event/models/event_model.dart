@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_annotation_target
 
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
@@ -32,4 +33,57 @@ abstract class EventModel with _$EventModel {
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>
       _$EventModelFromJson(json);
+}
+
+extension EventTypeUI on EventType {
+  String get label {
+    switch (this) {
+      case EventType.cleaning:
+        return 'Pulizia';
+      case EventType.planting:
+        return 'Piantumazione';
+      case EventType.emergency:
+        return 'Emergenza';
+      case EventType.learning:
+        return 'Formazione';
+      case EventType.other:
+        return 'Altro';
+      case EventType.unknown:
+        return 'Sconosciuto';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case EventType.cleaning:
+        return Icons.cleaning_services;
+      case EventType.planting:
+        return Icons.park;
+      case EventType.emergency:
+        return Icons.emergency;
+      case EventType.learning:
+        return Icons.school;
+      case EventType.other:
+        return Icons.help_outline;
+      case EventType.unknown:
+        return Icons.help;
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case EventType.cleaning:
+        return Colors.cyan;
+      case EventType.planting:
+        return Colors.green;
+      case EventType.emergency:
+        return Colors.orange;
+      case EventType.learning:
+        return Colors.blue;
+      case EventType.other:
+        return Colors.grey;
+      case EventType.unknown:
+        return Colors.black;
+    }
+  }
 }

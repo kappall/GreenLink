@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_annotation_target
 
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
@@ -38,4 +39,67 @@ abstract class PostModel with _$PostModel {
 
   factory PostModel.fromJson(Map<String, dynamic> json) =>
       _$PostModelFromJson(json);
+}
+
+extension PostCategoryUI on PostCategory {
+  String get label {
+    switch (this) {
+      case PostCategory.flood:
+        return 'Alluvione';
+      case PostCategory.fire:
+        return 'Incendio';
+      case PostCategory.earthquake:
+        return 'Terremoto';
+      case PostCategory.pollution:
+        return 'Inquinamento';
+      case PostCategory.storm:
+        return 'Tempesta';
+      case PostCategory.hurricane:
+        return 'Uragano';
+      case PostCategory.other:
+        return 'Altro';
+      case PostCategory.unknown:
+        return 'Sconosciuto';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case PostCategory.flood:
+        return Icons.water_drop;
+      case PostCategory.fire:
+        return Icons.local_fire_department;
+      case PostCategory.earthquake:
+        return Icons.landslide;
+      case PostCategory.pollution:
+        return Icons.factory;
+      case PostCategory.storm:
+        return Icons.storm;
+      case PostCategory.hurricane:
+        return Icons.cyclone;
+      case PostCategory.other:
+      case PostCategory.unknown:
+        return Icons.question_mark;
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case PostCategory.flood:
+        return Colors.blue;
+      case PostCategory.fire:
+        return Colors.red;
+      case PostCategory.earthquake:
+        return Colors.brown;
+      case PostCategory.pollution:
+        return Colors.grey;
+      case PostCategory.storm:
+        return Colors.indigo;
+      case PostCategory.hurricane:
+        return Colors.purple;
+      case PostCategory.other:
+      case PostCategory.unknown:
+        return Colors.black;
+    }
+  }
 }
