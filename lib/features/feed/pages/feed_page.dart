@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
+import 'package:greenlinkapp/features/feed/widgets/post_feed.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../providers/post_provider.dart';
-import '../widgets/postcard.dart';
 
 class FeedPage extends ConsumerWidget {
   const FeedPage({super.key});
@@ -50,40 +49,7 @@ class FeedPage extends ConsumerWidget {
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               elevation: 1,
             ),
-            postsAsync.when(
-              data: (posts) => posts.isEmpty
-                  ? const SliverFillRemaining(
-                      child: Center(
-                        child: Text("Nessun post da visualizzare."),
-                      ),
-                    )
-                  : SliverPadding(
-                      padding: const EdgeInsets.all(16.0),
-                      sliver: SliverList.separated(
-                        itemCount: posts.length,
-                        itemBuilder: (context, index) {
-                          final post = posts[index];
-                          return UiCard(
-                            child: PostCard(
-                              post: post,
-                              onTap: () =>
-                                  context.push('/post-info', extra: post),
-                            ),
-                            onTap: () =>
-                                context.push('/post-info', extra: post),
-                          );
-                        },
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
-                      ),
-                    ),
-              loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (error, stackTrace) => SliverFillRemaining(
-                child: Center(child: Text("Errore nel caricamento: $error")),
-              ),
-            ),
+            PostFeed(postsAsync: postsAsync),
           ],
         ),
       ),
