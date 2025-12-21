@@ -21,19 +21,22 @@ class AdminWrapper extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "GreenLink",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onPrimary,
+          ),
         ),
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: Icon(Icons.logout, color: colorScheme.onPrimary),
             onPressed: () => ref.read(authProvider.notifier).logout(),
           ),
         ],
         backgroundColor: colorScheme.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
       ),
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
@@ -41,10 +44,6 @@ class AdminWrapper extends ConsumerWidget {
         onDestinationSelected: _goBranch,
         indicatorColor: Colors.indigo.shade100,
         destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
           NavigationDestination(
             icon: Icon(Icons.report_problem),
             label: 'Segnalazioni',

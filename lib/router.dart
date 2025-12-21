@@ -18,7 +18,6 @@ import 'package:greenlinkapp/features/settings/pages/settings_page.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/pages/profile.dart';
 
-import 'features/admin/pages/admin_dashboard_page.dart';
 import 'features/admin/pages/admin_wrapper.dart';
 import 'features/admin/pages/reports_page.dart';
 import 'features/admin/pages/user_detail_page.dart';
@@ -70,7 +69,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
 
       if (isLoggedIn && (isLoggingIn || isRegistering)) {
-        return isAdmin ? '/admin' : '/home';
+        return isAdmin ? '/admin/reports' : '/home';
       }
 
       if (isLoggedIn && !isAdmin && isAdminRoute) {
@@ -123,14 +122,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           ); // Wrapper Admin
         },
         branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/admin',
-                builder: (context, state) => const AdminDashboardPage(),
-              ),
-            ],
-          ),
           StatefulShellBranch(
             routes: [
               GoRoute(
