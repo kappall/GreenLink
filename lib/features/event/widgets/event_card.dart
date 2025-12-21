@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
-import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
+import 'package:greenlinkapp/features/feed/widgets/report_dialog.dart';
 import 'package:intl/intl.dart';
 
 class EventCard extends ConsumerWidget {

@@ -4,7 +4,7 @@ import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/utils/time_passed_by.dart';
-import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
+import 'package:greenlinkapp/features/feed/widgets/report_dialog.dart';
 
 class PostCard extends ConsumerWidget {
   final PostModel post;

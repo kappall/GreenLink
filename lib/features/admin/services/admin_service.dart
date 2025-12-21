@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:greenlinkapp/features/admin/models/PartnerModel.dart';
 import 'package:http/http.dart' as http;
 
@@ -58,7 +57,6 @@ class AdminService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((jsonItem) {
           final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
-          // Se il ruolo non è presente nel JSON, lo impostiamo
           return user.role == null ? user.copyWith(role: AuthRole.user) : user;
         }).toList();
       } else {
@@ -85,7 +83,6 @@ class AdminService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((jsonItem) {
           final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
-          // Se il ruolo non è presente nel JSON, lo impostiamo
           return user.role == null
               ? user.copyWith(role: AuthRole.partner)
               : user;
@@ -106,7 +103,6 @@ class AdminService {
   }) async {
     try {
       if (approve) {
-        // Determina endpoint e ID dal tipo di content (type-safe!)
         String? endpoint;
         int? contentId;
 
@@ -184,7 +180,6 @@ class AdminService {
 
   Future<void> createPartner(PartnerModel partner) async {
     try {
-      debugPrint(jsonEncode(partner.toJson()));
       final response = await http.post(
         Uri.parse('$_baseUrl/partner/register'),
         headers: {
@@ -200,7 +195,6 @@ class AdminService {
         );
       }
     } catch (e) {
-      debugPrint(e.toString());
       throw Exception(e);
     }
   }

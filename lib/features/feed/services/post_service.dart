@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -54,6 +55,38 @@ class PostService {
         .whereType<Map<String, dynamic>>()
         .map(PostModel.fromJson)
         .toList();
+  }
+
+  Future<void> reportPost({
+    required String token,
+    required PostModel post,
+    required String reason,
+    required int currentUserId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/report');
+    debugPrint(token);
+    final response = await http.post(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        "reason": reason,
+        "author": {"id": currentUserId},
+        "content": {
+          "id": post.id,
+          "description": post.description,
+          "author": {"id": post.author.id},
+        },
+      }),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      throw Exception('Errore durante la segnalazione: $message');
+    }
   }
 
   String _errorMessage(http.Response response) {

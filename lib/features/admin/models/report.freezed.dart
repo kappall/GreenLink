@@ -463,7 +463,7 @@ $CommentModelCopyWith<$Res> get data {
 /// @nodoc
 mixin _$Report {
 
- int? get id; String get reason; UserModel get author; ReportContent get content;@JsonKey(name: 'deleted_at') DateTime? get deletedAt;@JsonKey(name: 'created_at') DateTime? get createdAt;
+ int? get id; String get reason; int get author; ReportContent get content;@JsonKey(name: 'deleted_at') DateTime? get deletedAt;@JsonKey(name: 'created_at') DateTime? get createdAt;
 /// Create a copy of Report
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -496,11 +496,11 @@ abstract mixin class $ReportCopyWith<$Res>  {
   factory $ReportCopyWith(Report value, $Res Function(Report) _then) = _$ReportCopyWithImpl;
 @useResult
 $Res call({
- int? id, String reason, UserModel author, ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
+ int? id, String reason, int author, ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
 });
 
 
-$UserModelCopyWith<$Res> get author;$ReportContentCopyWith<$Res> get content;
+$ReportContentCopyWith<$Res> get content;
 
 }
 /// @nodoc
@@ -518,22 +518,13 @@ class _$ReportCopyWithImpl<$Res>
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
 as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as UserModel,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as int,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as ReportContent,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
 /// Create a copy of Report
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UserModelCopyWith<$Res> get author {
-  
-  return $UserModelCopyWith<$Res>(_self.author, (value) {
-    return _then(_self.copyWith(author: value));
-  });
-}/// Create a copy of Report
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -624,7 +615,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String reason,  UserModel author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String reason,  int author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Report() when $default != null:
 return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt,_that.createdAt);case _:
@@ -645,7 +636,7 @@ return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String reason,  UserModel author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String reason,  int author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _Report():
 return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt,_that.createdAt);case _:
@@ -665,7 +656,7 @@ return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String reason,  UserModel author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String reason,  int author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Report() when $default != null:
 return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt,_that.createdAt);case _:
@@ -685,7 +676,7 @@ class _Report extends Report {
 
 @override final  int? id;
 @override final  String reason;
-@override final  UserModel author;
+@override final  int author;
 @override final  ReportContent content;
 @override@JsonKey(name: 'deleted_at') final  DateTime? deletedAt;
 @override@JsonKey(name: 'created_at') final  DateTime? createdAt;
@@ -723,11 +714,11 @@ abstract mixin class _$ReportCopyWith<$Res> implements $ReportCopyWith<$Res> {
   factory _$ReportCopyWith(_Report value, $Res Function(_Report) _then) = __$ReportCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String reason, UserModel author, ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
+ int? id, String reason, int author, ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
 });
 
 
-@override $UserModelCopyWith<$Res> get author;@override $ReportContentCopyWith<$Res> get content;
+@override $ReportContentCopyWith<$Res> get content;
 
 }
 /// @nodoc
@@ -745,7 +736,7 @@ class __$ReportCopyWithImpl<$Res>
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
 as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as UserModel,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as int,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as ReportContent,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -753,15 +744,6 @@ as DateTime?,
 }
 
 /// Create a copy of Report
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UserModelCopyWith<$Res> get author {
-  
-  return $UserModelCopyWith<$Res>(_self.author, (value) {
-    return _then(_self.copyWith(author: value));
-  });
-}/// Create a copy of Report
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

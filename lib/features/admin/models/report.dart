@@ -3,7 +3,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:greenlinkapp/features/comment/models/comment_model.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
-import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 import '../../feed/models/post_model.dart';
 
@@ -29,13 +28,14 @@ abstract class Report with _$Report {
   const factory Report({
     int? id,
     required String reason,
-    required UserModel author,
+    required int author,
     required ReportContent content,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _Report;
 
-  String get reporter => author.displayName;
+  String get reporter =>
+      author.toString(); //TODO: if backend changes change to author.name
   String get timestamp => createdAt?.toIso8601String() ?? '';
 
   String get targetContent => content.when(

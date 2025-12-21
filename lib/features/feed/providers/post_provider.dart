@@ -37,6 +37,26 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
 
     return _postService.fetchAllPosts(token: token);
   }
+
+  Future<void> reportPost({
+    required PostModel post,
+    required String reason,
+  }) async {
+    final authState = ref.read(authProvider);
+    final token = authState.asData?.value.token;
+    final userId = authState.asData?.value.user?.id;
+
+    if (token == null || userId == null) {
+      throw Exception('Utente non autenticato');
+    }
+
+    await _postService.reportPost(
+      token: token,
+      post: post,
+      reason: reason,
+      currentUserId: userId,
+    );
+  }
 }
 
 final postsProvider = AsyncNotifierProvider<PostsNotifier, List<PostModel>>(
