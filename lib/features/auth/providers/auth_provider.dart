@@ -6,15 +6,34 @@ import 'package:greenlinkapp/features/auth/services/auth_service.dart';
 import 'package:greenlinkapp/features/auth/utils/auth_validators.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
-import 'package:greenlinkapp/features/user/services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthState> {
   final AuthService _authService = AuthService();
-  final UserService _userService = UserService();
+  static const String _tokenKey = 'auth_token';
 
   @override
-  FutureOr<AuthState> build() {
-    return AuthState.unauthenticated();
+  FutureOr<AuthState> build() async {
+    return _loadPersistedToken();
+  }
+
+  Future<AuthState> _loadPersistedToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(_tokenKey);
+
+    if (token == null || token.isEmpty) {
+      return AuthState.unauthenticated();
+    }
+
+    try {
+      final user = await _authService.fetchCurrentUser(token: token);
+      final derivedRole = deriveRoleFromToken(token);
+
+      return AuthState(user: user, token: token, derivedRole: derivedRole);
+    } catch (e) {
+      await prefs.remove(_tokenKey);
+      return AuthState.unauthenticated();
+    }
   }
 
   Future<void> login(String email, String password) async {
@@ -30,6 +49,9 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         email: trimmedEmail,
         password: trimmedPassword,
       );
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenKey, authResult.token);
 
       final derivedRole = deriveRoleFromToken(authResult.token);
       final user = UserModel(id: authResult.userId, email: authResult.email);
@@ -78,6 +100,9 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         password: trimmedPassword,
       );
 
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenKey, authResult.token);
+
       final derivedRole = deriveRoleFromToken(authResult.token);
       final user = UserModel(id: authResult.userId, email: authResult.email);
 
@@ -89,7 +114,10 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     });
   }
 
-  void logout() {
+  Future<void> logout() async {
+    state = const AsyncLoading();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
     state = AsyncData(AuthState.unauthenticated());
   }
 
@@ -111,7 +139,9 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     state = const AsyncLoading();
 
     try {
-      await _userService.deleteAccount(userId: userId, token: token);
+      await _authService.deleteAccount(userId: userId, token: token);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
       state = AsyncData(AuthState.unauthenticated());
     } catch (error, stackTrace) {
       state = AsyncData(currentState);
