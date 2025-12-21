@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -64,7 +63,6 @@ class PostService {
     required int currentUserId,
   }) async {
     final uri = Uri.parse('$_baseUrl/report');
-    debugPrint(token);
     final response = await http.post(
       uri,
       headers: {
@@ -81,6 +79,19 @@ class PostService {
           "author": {"id": post.author.id},
         },
       }),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      throw Exception('Errore durante la segnalazione: $message');
+    }
+  }
+
+  Future<void> deletePost({required String token, required int postId}) async {
+    final uri = Uri.parse('$_baseUrl/post/$postId');
+    final response = await http.delete(
+      uri,
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {

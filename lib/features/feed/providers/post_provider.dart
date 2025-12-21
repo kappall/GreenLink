@@ -57,6 +57,17 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
       currentUserId: userId,
     );
   }
+
+  Future<void> deletePost(int postId) async {
+    final authState = ref.read(authProvider);
+    final token = authState.asData?.value.token;
+    if (token == null) {
+      throw Exception('Utente non autenticato');
+    }
+
+    await _postService.deletePost(token: token, postId: postId);
+    refreshAll();
+  }
 }
 
 final postsProvider = AsyncNotifierProvider<PostsNotifier, List<PostModel>>(

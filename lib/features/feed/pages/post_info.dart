@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/badge.dart';
 import '../../../core/providers/geocoding_provider.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../providers/post_provider.dart';
 
 class PostInfoPage extends ConsumerStatefulWidget {
@@ -156,8 +156,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
     if (confirmed == true) {
       setState(() => _isDeleting = true);
       try {
-        // TODO: implement delete call in provider/service
-        // await ref.read(postsProvider.notifier).deletePost(widget.post.id!);
+        await ref.read(postsProvider.notifier).deletePost(widget.post.id!);
         if (mounted) {
           Navigator.pop(context);
         }
