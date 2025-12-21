@@ -1,3 +1,4 @@
+// classe per il form creazione partner, non usare freezed
 class PartnerModel {
   final String name;
   final String email;
