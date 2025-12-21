@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
+import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/utils/time_passed_by.dart';
 import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends ConsumerWidget {
   final PostModel post;
   final VoidCallback? onTap;
   final bool insidePost;
@@ -17,7 +19,12 @@ class PostCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final geoKey = (lat: post.latitude, lng: post.longitude);
+    final locationAsync = ref.watch(placeNameProvider(geoKey));
+    final locationName =
+        locationAsync.value ?? "${post.latitude}, ${post.longitude}";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,11 +32,11 @@ class PostCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(
-              radius: 26, // diametro = radius * 2
+              radius: 26,
               backgroundColor: Colors.grey[200],
-              child: Text(
+              child: const Text(
                 '?',
-                style: const TextStyle(fontSize: 24, color: Colors.black54),
+                style: TextStyle(fontSize: 24, color: Colors.black54),
               ),
             ),
             const SizedBox(width: 12),
@@ -37,13 +44,11 @@ class PostCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Utente Anonimo',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    getTimePassedBy(post.createdAt),
-                  ), // time passed since post creation
+                  Text(getTimePassedBy(post.createdAt)),
                 ],
               ),
             ),
@@ -73,35 +78,32 @@ class PostCard extends StatelessWidget {
             ),
           ],
         ),
-
         const SizedBox(height: 12),
-
         Text(post.description),
-
-        // if (post.IMMAGINI.isNotEmpty) ...[
-        //   const SizedBox(height: 12),
-        //   ImagesView(imageUrl: post.IMMAGINI, insidePost: insidePost),
-        // ],
         const SizedBox(height: 12),
         Row(
           children: [
-            Icon(Icons.location_on, size: 16, color: Colors.grey),
+            const Icon(Icons.location_on, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
-            Text("${post.latitude}, ${post.longitude}"),
+            Expanded(
+              child: Text(
+                locationName,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
-
         const SizedBox(height: 12),
         Row(
           children: [
             if (!insidePost) ...[
-              Icon(Icons.trending_up, size: 16, color: Colors.grey),
+              const Icon(Icons.trending_up, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
               Text('${post.votes_count} Upvotes'),
               const SizedBox(width: 16),
-              Icon(Icons.comment, size: 16, color: Colors.grey),
+              const Icon(Icons.comment, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              // Text('${post.COMMENTI.length} Commenti'),
             ],
           ],
         ),

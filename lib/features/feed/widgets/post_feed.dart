@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
+import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 
 import '../models/post_model.dart';
 

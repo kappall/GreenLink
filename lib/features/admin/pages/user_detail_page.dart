@@ -5,7 +5,7 @@ import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
-import 'package:greenlinkapp/features/feed/widgets/postcard.dart';
+import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 import '../providers/admin_provider.dart';

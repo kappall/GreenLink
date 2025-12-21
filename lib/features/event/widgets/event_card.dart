@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
+import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/feed/widgets/reportdialog.dart';
 import 'package:intl/intl.dart';
 
-class EventCard extends StatelessWidget {
+class EventCard extends ConsumerWidget {
   final EventModel event;
   final VoidCallback? onTap;
 
   const EventCard({super.key, required this.event, this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final geoKey = (lat: event.latitude, lng: event.longitude);
+    final locationAsync = ref.watch(placeNameProvider(geoKey));
+    final locationName =
+        locationAsync.value ?? "${event.latitude}, ${event.longitude}";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -21,7 +28,7 @@ class EventCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'titolo', //event.TITOLO?,
+                event.description.split('\n').first,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -30,15 +37,14 @@ class EventCard extends StatelessWidget {
                 maxLines: 1,
               ),
             ),
-
             UiBadge(
               label: event.eventType.name,
-              icon: Icons.warning_amber_rounded,
+              icon: Icons.event,
               color: Colors.blue,
             ),
           ],
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -47,10 +53,12 @@ class EventCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 13, // diametro = radius * 2
+                    radius: 13,
                     backgroundColor: Colors.grey[200],
                     child: Text(
-                      '?',
+                      event.author?.displayName.isNotEmpty == true
+                          ? event.author!.displayName[0].toUpperCase()
+                          : '?',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
@@ -58,10 +66,9 @@ class EventCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-
                   Flexible(
                     child: Text(
-                      'Utente Anonimo',
+                      event.author?.displayName ?? 'Utente Anonimo',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -85,40 +92,43 @@ class EventCard extends StatelessWidget {
             ),
           ],
         ),
-
-        SizedBox(height: 12),
-
+        const SizedBox(height: 12),
         Text(event.description, maxLines: 4, overflow: TextOverflow.ellipsis),
-
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           children: [
-            Icon(Icons.location_on, size: 16, color: Colors.grey),
+            const Icon(Icons.location_on, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
-            Text("${event.latitude}, ${event.longitude}"),
-          ],
-        ),
-        SizedBox(height: 12),
-        Row(
-          children: [
-            Icon(Icons.group, size: 16, color: Colors.grey),
-            const SizedBox(width: 4),
-            Text(
-              '${event.votes_count} / ${event.maxParticipants} Partecipanti',
+            Expanded(
+              child: Text(
+                locationName,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           children: [
-            Icon(Icons.calendar_month, size: 16, color: Colors.grey),
+            const Icon(Icons.group, size: 16, color: Colors.grey),
+            const SizedBox(width: 4),
+            Text(
+              '${event.votes_count} / ${event.maxParticipants} Partecipanti', //TODO: change with participants
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            const Icon(Icons.calendar_month, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
               '${DateFormat('d MMM yyyy').format(event.startDate)} • ${DateFormat('HH:mm').format(event.startDate)} - ${DateFormat('HH:mm').format(event.endDate)}',
             ),
           ],
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: FilledButton(onPressed: onTap, child: const Text('Dettagli')),
