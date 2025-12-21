@@ -13,7 +13,7 @@ abstract class UserModel with _$UserModel {
 
   const factory UserModel({
     required int id,
-    required String email,
+    @Default("default@example.com") String email,
     String? username,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,

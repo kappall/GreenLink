@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PostModel {
 
- int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude; int get author; int get votes_count; bool get has_voted;@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory get category;
+ int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude; UserModel get author; int get votes_count; bool get has_voted;@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory get category;
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,11 +48,11 @@ abstract mixin class $PostModelCopyWith<$Res>  {
   factory $PostModelCopyWith(PostModel value, $Res Function(PostModel) _then) = _$PostModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, int author, int votes_count, bool has_voted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author, int votes_count, bool has_voted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
 });
 
 
-
+$UserModelCopyWith<$Res> get author;
 
 }
 /// @nodoc
@@ -74,13 +74,22 @@ as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ig
 as DateTime?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as int,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
+as UserModel,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
 as int,has_voted: null == has_voted ? _self.has_voted : has_voted // ignore: cast_nullable_to_non_nullable
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as PostCategory,
   ));
 }
-
+/// Create a copy of PostModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserModelCopyWith<$Res> get author {
+  
+  return $UserModelCopyWith<$Res>(_self.author, (value) {
+    return _then(_self.copyWith(author: value));
+  });
+}
 }
 
 
@@ -162,7 +171,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  int author,  int votes_count,  bool has_voted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author,  int votes_count,  bool has_voted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PostModel() when $default != null:
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.votes_count,_that.has_voted,_that.category);case _:
@@ -183,7 +192,7 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  int author,  int votes_count,  bool has_voted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author,  int votes_count,  bool has_voted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)  $default,) {final _that = this;
 switch (_that) {
 case _PostModel():
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.votes_count,_that.has_voted,_that.category);case _:
@@ -203,7 +212,7 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  int author,  int votes_count,  bool has_voted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author,  int votes_count,  bool has_voted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,) {final _that = this;
 switch (_that) {
 case _PostModel() when $default != null:
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.votes_count,_that.has_voted,_that.category);case _:
@@ -227,7 +236,7 @@ class _PostModel extends PostModel {
 @override@JsonKey(name: 'deleted_at') final  DateTime? deletedAt;
 @override final  double latitude;
 @override final  double longitude;
-@override final  int author;
+@override final  UserModel author;
 @override@JsonKey() final  int votes_count;
 @override@JsonKey() final  bool has_voted;
 @override@JsonKey(unknownEnumValue: PostCategory.unknown) final  PostCategory category;
@@ -265,11 +274,11 @@ abstract mixin class _$PostModelCopyWith<$Res> implements $PostModelCopyWith<$Re
   factory _$PostModelCopyWith(_PostModel value, $Res Function(_PostModel) _then) = __$PostModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, int author, int votes_count, bool has_voted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author, int votes_count, bool has_voted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
 });
 
 
-
+@override $UserModelCopyWith<$Res> get author;
 
 }
 /// @nodoc
@@ -291,14 +300,23 @@ as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ig
 as DateTime?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as int,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
+as UserModel,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
 as int,has_voted: null == has_voted ? _self.has_voted : has_voted // ignore: cast_nullable_to_non_nullable
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as PostCategory,
   ));
 }
 
-
+/// Create a copy of PostModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserModelCopyWith<$Res> get author {
+  
+  return $UserModelCopyWith<$Res>(_self.author, (value) {
+    return _then(_self.copyWith(author: value));
+  });
+}
 }
 
 // dart format on

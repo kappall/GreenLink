@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_annotation_target
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 part 'post_model.freezed.dart';
 part 'post_model.g.dart';
@@ -28,7 +29,7 @@ abstract class PostModel with _$PostModel {
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     required double latitude,
     required double longitude,
-    required int author,
+    required UserModel author,
     @Default(0) int votes_count,
     @Default(false) bool has_voted,
     @JsonKey(unknownEnumValue: PostCategory.unknown)

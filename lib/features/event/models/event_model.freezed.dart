@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$EventModel {
 
- int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude;@JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown) EventType get eventType; int get author; int get votes_count;//@Default(<UserModel>[]) List<UserModel> participants,
+ int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude;@JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown) EventType get eventType; UserModel get author; int get votes_count;//@Default(<UserModel>[]) List<UserModel> participants,
 @JsonKey(name: 'max_participants') int get maxParticipants;@JsonKey(name: 'start_date') DateTime get startDate;@JsonKey(name: 'end_date') DateTime get endDate;
 /// Create a copy of EventModel
 /// with the given fields replaced by the non-null parameter values.
@@ -49,11 +49,11 @@ abstract mixin class $EventModelCopyWith<$Res>  {
   factory $EventModelCopyWith(EventModel value, $Res Function(EventModel) _then) = _$EventModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude,@JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown) EventType eventType, int author, int votes_count,@JsonKey(name: 'max_participants') int maxParticipants,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude,@JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown) EventType eventType, UserModel author, int votes_count,@JsonKey(name: 'max_participants') int maxParticipants,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate
 });
 
 
-
+$UserModelCopyWith<$Res> get author;
 
 }
 /// @nodoc
@@ -76,14 +76,23 @@ as DateTime?,latitude: null == latitude ? _self.latitude : latitude // ignore: c
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,eventType: null == eventType ? _self.eventType : eventType // ignore: cast_nullable_to_non_nullable
 as EventType,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as int,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
+as UserModel,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
 as int,maxParticipants: null == maxParticipants ? _self.maxParticipants : maxParticipants // ignore: cast_nullable_to_non_nullable
 as int,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }
-
+/// Create a copy of EventModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserModelCopyWith<$Res> get author {
+  
+  return $UserModelCopyWith<$Res>(_self.author, (value) {
+    return _then(_self.copyWith(author: value));
+  });
+}
 }
 
 
@@ -165,7 +174,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude, @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)  EventType eventType,  int author,  int votes_count, @JsonKey(name: 'max_participants')  int maxParticipants, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude, @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)  EventType eventType,  UserModel author,  int votes_count, @JsonKey(name: 'max_participants')  int maxParticipants, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _EventModel() when $default != null:
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.eventType,_that.author,_that.votes_count,_that.maxParticipants,_that.startDate,_that.endDate);case _:
@@ -186,7 +195,7 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude, @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)  EventType eventType,  int author,  int votes_count, @JsonKey(name: 'max_participants')  int maxParticipants, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude, @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)  EventType eventType,  UserModel author,  int votes_count, @JsonKey(name: 'max_participants')  int maxParticipants, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate)  $default,) {final _that = this;
 switch (_that) {
 case _EventModel():
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.eventType,_that.author,_that.votes_count,_that.maxParticipants,_that.startDate,_that.endDate);case _:
@@ -206,7 +215,7 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude, @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)  EventType eventType,  int author,  int votes_count, @JsonKey(name: 'max_participants')  int maxParticipants, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude, @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)  EventType eventType,  UserModel author,  int votes_count, @JsonKey(name: 'max_participants')  int maxParticipants, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate)?  $default,) {final _that = this;
 switch (_that) {
 case _EventModel() when $default != null:
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.eventType,_that.author,_that.votes_count,_that.maxParticipants,_that.startDate,_that.endDate);case _:
@@ -231,7 +240,7 @@ class _EventModel extends EventModel {
 @override final  double latitude;
 @override final  double longitude;
 @override@JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown) final  EventType eventType;
-@override final  int author;
+@override final  UserModel author;
 @override@JsonKey() final  int votes_count;
 //@Default(<UserModel>[]) List<UserModel> participants,
 @override@JsonKey(name: 'max_participants') final  int maxParticipants;
@@ -271,11 +280,11 @@ abstract mixin class _$EventModelCopyWith<$Res> implements $EventModelCopyWith<$
   factory _$EventModelCopyWith(_EventModel value, $Res Function(_EventModel) _then) = __$EventModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude,@JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown) EventType eventType, int author, int votes_count,@JsonKey(name: 'max_participants') int maxParticipants,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude,@JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown) EventType eventType, UserModel author, int votes_count,@JsonKey(name: 'max_participants') int maxParticipants,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate
 });
 
 
-
+@override $UserModelCopyWith<$Res> get author;
 
 }
 /// @nodoc
@@ -298,7 +307,7 @@ as DateTime?,latitude: null == latitude ? _self.latitude : latitude // ignore: c
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,eventType: null == eventType ? _self.eventType : eventType // ignore: cast_nullable_to_non_nullable
 as EventType,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as int,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
+as UserModel,votes_count: null == votes_count ? _self.votes_count : votes_count // ignore: cast_nullable_to_non_nullable
 as int,maxParticipants: null == maxParticipants ? _self.maxParticipants : maxParticipants // ignore: cast_nullable_to_non_nullable
 as int,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
@@ -306,7 +315,16 @@ as DateTime,
   ));
 }
 
-
+/// Create a copy of EventModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserModelCopyWith<$Res> get author {
+  
+  return $UserModelCopyWith<$Res>(_self.author, (value) {
+    return _then(_self.copyWith(author: value));
+  });
+}
 }
 
 // dart format on

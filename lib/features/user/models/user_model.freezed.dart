@@ -214,11 +214,11 @@ return $default(_that.id,_that.email,_that.username,_that.createdAt,_that.delete
 @JsonSerializable()
 
 class _UserModel extends UserModel {
-  const _UserModel({required this.id, required this.email, this.username, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'deleted_at') this.deletedAt, this.role}): super._();
+  const _UserModel({required this.id, this.email = "default@example.com", this.username, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'deleted_at') this.deletedAt, this.role}): super._();
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  int id;
-@override final  String email;
+@override@JsonKey() final  String email;
 @override final  String? username;
 @override@JsonKey(name: 'created_at') final  DateTime? createdAt;
 @override@JsonKey(name: 'deleted_at') final  DateTime? deletedAt;

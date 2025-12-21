@@ -22,7 +22,7 @@ _EventModel _$EventModelFromJson(Map<String, dynamic> json) => _EventModel(
     json['event_type'],
     unknownValue: EventType.unknown,
   ),
-  author: (json['author'] as num).toInt(),
+  author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
   votes_count: (json['votes_count'] as num?)?.toInt() ?? 0,
   maxParticipants: (json['max_participants'] as num).toInt(),
   startDate: DateTime.parse(json['start_date'] as String),
