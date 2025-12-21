@@ -34,8 +34,8 @@ class PostCard extends ConsumerWidget {
             CircleAvatar(
               radius: 26,
               backgroundColor: Colors.grey[200],
-              child: const Text(
-                '?',
+              child: Text(
+                post.author.displayName[0],
                 style: TextStyle(fontSize: 24, color: Colors.black54),
               ),
             ),
@@ -44,9 +44,9 @@ class PostCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Utente Anonimo',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    post.author.displayName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(getTimePassedBy(post.createdAt)),
                 ],
@@ -58,8 +58,8 @@ class PostCard extends ConsumerWidget {
               children: [
                 UiBadge(
                   label: post.category.name,
-                  icon: Icons.warning_amber_rounded,
-                  color: Colors.blue,
+                  icon: post.category.icon,
+                  color: post.category.color,
                 ),
                 InkWell(
                   onTap: () {

@@ -79,7 +79,7 @@ extension PostCategoryUI on PostCategory {
         return Icons.cyclone;
       case PostCategory.other:
       case PostCategory.unknown:
-        return Icons.question_mark;
+        return Icons.warning_amber_outlined;
     }
   }
 
