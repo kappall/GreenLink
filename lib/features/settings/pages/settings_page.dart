@@ -62,22 +62,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
             _buildSection(
               context,
-              title: "Supporto",
-              icon: Icons.help_outline,
-              children: [
-                _buildSettingsItem(
-                  context,
-                  title: "Centro Assistenza",
-                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  onTap: () {},
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            _buildSection(
-              context,
               title: "Impostazioni Applicazione",
               icon: Icons.settings_outlined,
               children: [
