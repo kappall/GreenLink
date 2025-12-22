@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/services/event_service.dart';
@@ -44,3 +45,75 @@ final eventsProvider = AsyncNotifierProvider<EventsNotifier, List<EventModel>>(
     return EventsNotifier();
   },
 );
+
+class EventsSearchQueryNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  @override
+  set state(String value) => super.state = value;
+}
+
+final eventsSearchQueryProvider =
+    NotifierProvider<EventsSearchQueryNotifier, String>(
+      EventsSearchQueryNotifier.new,
+    );
+
+final filteredEventsProvider = FutureProvider<List<EventModel>>((ref) async {
+  final eventsAsync = ref.watch(eventsProvider);
+  final query = ref.watch(eventsSearchQueryProvider).toLowerCase();
+
+  final events = eventsAsync.value ?? [];
+
+  if (query.isEmpty) {
+    return events;
+  }
+
+  // Se la query non è vuota provo a risolvere la città
+  String? targetCity;
+  try {
+    final locations = await geo.locationFromAddress(query);
+    if (locations.isNotEmpty) {
+      final placemarks = await geo.placemarkFromCoordinates(
+        locations.first.latitude,
+        locations.first.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        targetCity = placemarks.first.locality?.toLowerCase();
+      }
+    }
+  } catch (_) {
+    targetCity = null;
+  }
+
+  // Se abbiamo trovato una città confronto le città degli eventi
+  if (targetCity != null) {
+    final filtered = <EventModel>[];
+    for (final e in events) {
+      try {
+        final placemarks = await geo.placemarkFromCoordinates(
+          e.latitude,
+          e.longitude,
+        );
+        if (placemarks.isNotEmpty) {
+          final eventCity = placemarks
+              .where((p) => p.locality != null)
+              .map((p) => p.locality!.toLowerCase());
+          if (eventCity.contains(targetCity)) {
+            filtered.add(e);
+            continue;
+          }
+        }
+      } catch (_) {}
+
+      if (e.description.toLowerCase().contains(query)) {
+        filtered.add(e);
+      }
+    }
+    return filtered;
+  }
+
+  return events
+      .where((e) => e.description.toLowerCase().contains(query))
+      .toList();
+});

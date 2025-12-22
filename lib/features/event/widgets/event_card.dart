@@ -114,7 +114,7 @@ class EventCard extends ConsumerWidget {
             const Icon(Icons.group, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
-              '${event.votes_count} / ${event.maxParticipants} Partecipanti', //TODO: change with participants
+              '${event.participants_count} / ${event.maxParticipants} Partecipanti',
             ),
           ],
         ),

@@ -107,7 +107,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                   _buildInfoRow(
                     Icons.people_outline,
                     "Partecipanti",
-                    "${event.votes_count} / ${event.maxParticipants}", //TODO: partecipants not votes
+                    "${event.participants_count} / ${event.maxParticipants}",
                   ),
                   const SizedBox(height: 12),
                   _buildInfoRow(

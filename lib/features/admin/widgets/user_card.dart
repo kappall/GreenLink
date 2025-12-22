@@ -20,7 +20,7 @@ class UserCard extends StatelessWidget {
   final UserModel user;
   final VoidCallback onOptionsTap;
 
-  const UserCard({required this.user, required this.onOptionsTap});
+  const UserCard({super.key, required this.user, required this.onOptionsTap});
 
   @override
   Widget build(BuildContext context) {

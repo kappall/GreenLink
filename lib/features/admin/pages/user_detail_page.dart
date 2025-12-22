@@ -90,7 +90,7 @@ class UserDetailPage extends ConsumerWidget {
               userEvents.when(
                 data: (events) {
                   final eventsByUser = events
-                      .where((e) => e.author == user.id)
+                      .where((e) => e.author.id == user.id)
                       .toList();
                   if (eventsByUser.isEmpty) {
                     return const Text("Nessun evento creato. ");

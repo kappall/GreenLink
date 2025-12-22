@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/event/widgets/button.dart';
 import 'package:greenlinkapp/features/event/widgets/event_feed.dart';
@@ -9,7 +10,8 @@ class VolunteeringFeedPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final eventsAsync = ref.watch(eventsProvider);
+    final eventsAsync = ref.watch(filteredEventsProvider);
+    final isPartner = ref.watch(authProvider).asData?.value.isPartner ?? false;
     final colorScheme = Theme.of(context).colorScheme;
 
     return RefreshIndicator(
@@ -22,6 +24,9 @@ class VolunteeringFeedPage extends ConsumerWidget {
               child: Column(
                 children: [
                   TextField(
+                    onChanged: (val) =>
+                        ref.read(eventsSearchQueryProvider.notifier).state =
+                            val,
                     decoration: InputDecoration(
                       hintText: 'Cerca eventi di volontariato...',
                       prefixIcon: const Icon(Icons.search),
@@ -52,13 +57,15 @@ class VolunteeringFeedPage extends ConsumerWidget {
                           maxLines: 1,
                         ),
                       ),
-                      ButtonWidget(
-                        label: 'Nuovo Evento',
-                        onPressed: () {
-                          // context.push('/create-event');
-                        },
-                        icon: Icon(Icons.add, color: colorScheme.onSecondary),
-                      ),
+                      if (isPartner) ...[
+                        ButtonWidget(
+                          label: 'Nuovo Evento',
+                          onPressed: () {
+                            // context.push('/create-event');
+                          },
+                          icon: Icon(Icons.add, color: colorScheme.onSecondary),
+                        ),
+                      ],
                     ],
                   ),
                 ],

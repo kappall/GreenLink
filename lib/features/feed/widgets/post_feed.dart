@@ -8,7 +8,7 @@ import '../models/post_model.dart';
 
 class PostFeed extends ConsumerWidget {
   final AsyncValue<List<PostModel>> postsAsync;
-  PostFeed({required this.postsAsync});
+  const PostFeed({super.key, required this.postsAsync});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

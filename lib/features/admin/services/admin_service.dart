@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/features/admin/models/PartnerModel.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,7 +25,6 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        debugPrint(jsonList.toString());
 
         final reports = jsonList
             .map(

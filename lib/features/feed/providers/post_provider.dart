@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
@@ -114,7 +113,6 @@ class UserPosts extends _$UserPosts {
     final token = authState.asData?.value.token;
 
     if (token == null) throw Exception('Token richiesto');
-    debugPrint('Token: $token uId: $uId');
     if (uId != null && uId > 0) {
       return _postService.fetchPosts(token: token, userId: uId);
     }

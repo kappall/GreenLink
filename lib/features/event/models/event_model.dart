@@ -25,6 +25,7 @@ abstract class EventModel with _$EventModel {
     required EventType eventType,
     required UserModel author,
     @Default(0) int votes_count,
+    @Default(0) int participants_count,
     //@Default(<UserModel>[]) List<UserModel> participants,
     @JsonKey(name: 'max_participants') required int maxParticipants,
     @JsonKey(name: 'start_date') required DateTime startDate,

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -50,7 +49,6 @@ class EventService {
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /events: $rawList');
     }
-    debugPrint(rawList.toString());
     return rawList
         .whereType<Map<String, dynamic>>()
         .map(EventModel.fromJson)

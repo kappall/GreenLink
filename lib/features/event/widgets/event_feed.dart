@@ -8,7 +8,7 @@ import 'event_card.dart';
 
 class EventFeed extends ConsumerWidget {
   final AsyncValue<List<EventModel>> eventsAsync;
-  EventFeed({required this.eventsAsync});
+  const EventFeed({super.key, required this.eventsAsync});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
