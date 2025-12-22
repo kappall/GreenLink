@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/admin/pages/create_partner_page.dart';
@@ -16,12 +17,12 @@ import 'package:greenlinkapp/features/main-wrapper/pages/main_wrapper.dart';
 import 'package:greenlinkapp/features/map/pages/map.dart';
 import 'package:greenlinkapp/features/settings/pages/settings_page.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
-import 'package:greenlinkapp/features/user/pages/profile.dart';
 
 import 'features/admin/pages/admin_wrapper.dart';
 import 'features/admin/pages/reports_page.dart';
 import 'features/admin/pages/user_detail_page.dart';
 import 'features/admin/pages/users_page.dart';
+import 'features/user/pages/profile_page.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
@@ -37,6 +38,9 @@ final routerProvider = Provider<GoRouter>((ref) {
   final routerListenable = ValueNotifier<bool>(true);
 
   ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
+    if (!next.isLoading) {
+      FlutterNativeSplash.remove();
+    }
     routerListenable.value = !routerListenable.value;
   });
 
