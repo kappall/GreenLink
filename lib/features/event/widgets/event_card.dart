@@ -56,8 +56,8 @@ class EventCard extends ConsumerWidget {
                     radius: 13,
                     backgroundColor: Colors.grey[200],
                     child: Text(
-                      event.author?.displayName.isNotEmpty == true
-                          ? event.author!.displayName[0].toUpperCase()
+                      event.author.displayName.isNotEmpty == true
+                          ? event.author.displayName[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
                         fontSize: 16,
@@ -68,7 +68,7 @@ class EventCard extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Flexible(
                     child: Text(
-                      event.author?.displayName ?? 'Utente Anonimo',
+                      event.author.displayName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,

@@ -244,7 +244,7 @@ class _UserCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -254,7 +254,7 @@ class _UserCard extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: roleColor.withOpacity(0.1),
+          backgroundColor: roleColor.withValues(alpha: 0.1),
           child: Text(
             user.displayName.isNotEmpty
                 ? user.displayName[0].toUpperCase()
@@ -278,9 +278,9 @@ class _UserCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: roleColor.withOpacity(0.1),
+                color: roleColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: roleColor.withOpacity(0.3)),
+                border: Border.all(color: roleColor.withValues(alpha: 0.3)),
               ),
               child: Text(
                 user.role?.name.toUpperCase() ?? "SCONOSCIUTO",

@@ -24,7 +24,6 @@ dependencies:
   flutter_native_splash: ^2.4.7
   flutter_launcher_icons: ^0.14.4
   riverpod_annotation: ^3.0.3
-  riverpod_generator: ^3.0.3
 
 dev_dependencies:
   flutter_test:

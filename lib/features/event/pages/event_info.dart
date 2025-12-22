@@ -76,7 +76,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "Organizzato da ${event.author?.displayName ?? 'Utente'}",
+                              "Organizzato da ${event.author.displayName}",
                               style: TextStyle(color: Colors.grey[600]),
                             ),
                           ],

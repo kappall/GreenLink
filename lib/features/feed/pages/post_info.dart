@@ -36,7 +36,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
     final authState = ref.watch(authProvider);
     final isAdmin = authState.asData?.value.isAdmin ?? false;
     final currentUser = ref.watch(currentUserProvider).value;
-    final isAuthor = currentUser?.id == post.author?.id;
+    final isAuthor = currentUser?.id == post.author.id;
 
     return Scaffold(
       appBar: AppBar(
@@ -66,8 +66,8 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                   radius: 20,
                   backgroundColor: Colors.grey[200],
                   child: Text(
-                    post.author?.displayName.isNotEmpty == true
-                        ? post.author!.displayName[0].toUpperCase()
+                    post.author.displayName.isNotEmpty == true
+                        ? post.author.displayName[0].toUpperCase()
                         : '?',
                   ),
                 ),
@@ -76,7 +76,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post.author?.displayName ?? 'Utente Sconosciuto',
+                      post.author.displayName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
