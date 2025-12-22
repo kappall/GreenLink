@@ -68,7 +68,7 @@ Future<void> _handleReport(
   try {
     if (item is PostModel) {
       await ref
-          .read(postsProvider.notifier)
+          .read(userPostsProvider(null).notifier)
           .reportPost(post: item, reason: reason);
     } else if (item is EventModel) {
       //await ref.read(eventsProvider.notifier).reportEvent(event: item, reason: reason);

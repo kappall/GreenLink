@@ -21,7 +21,7 @@ class FeedPage extends ConsumerWidget {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(postsProvider.notifier).refresh(),
+        onRefresh: () => ref.read(userPostsProvider(null).notifier).refresh(),
         child: CustomScrollView(
           slivers: [
             SliverAppBar(

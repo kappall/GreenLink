@@ -1,10 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../models/post_model.dart';
 import '../services/post_service.dart';
+
+part 'post_provider.g.dart';
 
 enum PostSortCriteria { date, votes, proximity }
 
@@ -91,27 +95,28 @@ final postSortCriteriaProvider =
       PostSortCriteriaNotifier.new,
     );
 
-class PostsNotifier extends AsyncNotifier<List<PostModel>> {
-  final PostService _postService = PostService();
-  int? _userId;
+@riverpod
+class UserPosts extends _$UserPosts {
+  final _postService = PostService();
 
   @override
-  Future<List<PostModel>> build() async {
-    return _fetchPosts(userId: _userId);
+  FutureOr<List<PostModel>> build(int? userId) async {
+    return _fetchPosts(uId: userId);
   }
 
-  Future<void> refresh({int? userId}) async {
-    if (userId != null) _userId = userId;
+  Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _fetchPosts(userId: _userId));
+    state = await AsyncValue.guard(() => _fetchPosts(uId: userId));
   }
 
-  Future<List<PostModel>> _fetchPosts({int? userId}) async {
+  Future<List<PostModel>> _fetchPosts({int? uId}) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    if (userId != null && userId > 0) {
-      return _postService.fetchPosts(token: token!, userId: userId);
+    if (token == null) throw Exception('Token richiesto');
+    debugPrint('Token: $token uId: $uId');
+    if (uId != null && uId > 0) {
+      return _postService.fetchPosts(token: token, userId: uId);
     }
     return _postService.fetchAllPosts(token: token);
   }
@@ -122,9 +127,9 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
   }) async {
     final authState = ref.read(authProvider);
     final token = authState.asData?.value.token;
-    final userId = authState.asData?.value.user?.id;
+    final currentUserId = authState.asData?.value.user?.id;
 
-    if (token == null || userId == null) {
+    if (token == null || currentUserId == null) {
       throw Exception('Utente non autenticato');
     }
 
@@ -132,7 +137,7 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
       token: token,
       post: post,
       reason: reason,
-      currentUserId: userId,
+      currentUserId: currentUserId,
     );
   }
 
@@ -144,17 +149,13 @@ class PostsNotifier extends AsyncNotifier<List<PostModel>> {
     }
 
     await _postService.deletePost(token: token, postId: postId);
-    refresh();
+    await refresh();
   }
 }
 
-final postsProvider = AsyncNotifierProvider<PostsNotifier, List<PostModel>>(
-  PostsNotifier.new,
-);
-
 // ordine desc automatico
 final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
-  final postsAsync = ref.watch(postsProvider);
+  final postsAsync = ref.watch(userPostsProvider(null));
   final criteria = ref.watch(postSortCriteriaProvider);
   final filter = ref.watch(postFilterProvider);
 

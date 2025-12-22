@@ -21,7 +21,9 @@ class ProfilePage extends ConsumerWidget {
     );
     final colorScheme = Theme.of(context).colorScheme;
     final currentUserAsync = ref.watch(currentUserProvider);
-    final userPostsAsync = ref.watch(postsProvider);
+    final userPostsAsync = ref.watch(
+      userPostsProvider(currentUserAsync.value?.id),
+    );
     final userEventsAsync = ref.watch(eventsProvider);
 
     return authState.when(

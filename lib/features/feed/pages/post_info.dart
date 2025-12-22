@@ -156,7 +156,9 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
     if (confirmed == true) {
       setState(() => _isDeleting = true);
       try {
-        await ref.read(postsProvider.notifier).deletePost(widget.post.id!);
+        await ref
+            .read(userPostsProvider(null).notifier)
+            .deletePost(widget.post.id!);
         if (mounted) {
           Navigator.pop(context);
         }
