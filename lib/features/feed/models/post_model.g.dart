@@ -18,8 +18,13 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
   latitude: (json['latitude'] as num).toDouble(),
   longitude: (json['longitude'] as num).toDouble(),
   author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
-  votes_count: (json['votes_count'] as num?)?.toInt() ?? 0,
-  has_voted: json['has_voted'] as bool? ?? false,
+  votesCount: (json['votes_count'] as num?)?.toInt() ?? 0,
+  comments:
+      (json['comments'] as List<dynamic>?)
+          ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  hasVoted: json['has_voted'] as bool? ?? false,
   category: $enumDecode(
     _$PostCategoryEnumMap,
     json['category'],
@@ -36,8 +41,9 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'author': instance.author,
-      'votes_count': instance.votes_count,
-      'has_voted': instance.has_voted,
+      'votes_count': instance.votesCount,
+      'comments': instance.comments,
+      'has_voted': instance.hasVoted,
       'category': _$PostCategoryEnumMap[instance.category]!,
     };
 

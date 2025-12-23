@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:greenlinkapp/features/comment/models/comment_model.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 part 'post_model.freezed.dart';
@@ -31,8 +32,9 @@ abstract class PostModel with _$PostModel {
     required double latitude,
     required double longitude,
     required UserModel author,
-    @Default(0) int votes_count,
-    @Default(false) bool has_voted,
+    @JsonKey(name: 'votes_count') @Default(0) int votesCount,
+    @Default([]) List<CommentModel> comments,
+    @JsonKey(name: 'has_voted') @Default(false) bool hasVoted,
     @JsonKey(unknownEnumValue: PostCategory.unknown)
     required PostCategory category,
   }) = _PostModel;

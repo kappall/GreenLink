@@ -159,7 +159,7 @@ final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
 
   return postsAsync.whenData((posts) {
     var filtered = posts.where((post) {
-      final matchesVotes = post.votes_count >= filter.minVotes;
+      final matchesVotes = post.votesCount >= filter.minVotes;
       final matchesDate =
           filter.startDate == null ||
           (post.createdAt != null &&
@@ -175,7 +175,7 @@ final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
           final dateB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
           return dateB.compareTo(dateA);
         case PostSortCriteria.votes:
-          return b.votes_count.compareTo(a.votes_count);
+          return b.votesCount.compareTo(a.votesCount);
         case PostSortCriteria.proximity:
           if (filter.resolvedLocation == null) return 0;
           final distA = distance.as(
