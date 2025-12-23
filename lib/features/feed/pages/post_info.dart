@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
+import 'package:greenlinkapp/features/feed/widgets/comment_input_field.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -188,10 +189,16 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                     );
                   },
                 ),
-
-            const SizedBox(height: 100),
           ],
         ),
+      ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          CommentInputField(postId: post.id!),
+          SizedBox(height: 40),
+        ],
       ),
     );
   }

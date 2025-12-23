@@ -55,14 +55,15 @@ class Comments extends _$Comments {
     return sortedList;
   }
 
-  Future<void> addComment(String description, int contentId) async {
+  Future<void> addComment(String description, int? replyTo) async {
     //contentId può essere id di un post o di un commento
     final token = ref.read(authProvider).asData?.value.token;
     if (token == null) return;
 
     await _commentService.postComment(
       token: token,
-      contentId: contentId,
+      contentId:
+          postId, // TODO: da capire se va passato anche il post in ogni caso, come passare il commento al backend
       description: description,
     );
 
