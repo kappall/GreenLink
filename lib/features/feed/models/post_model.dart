@@ -2,8 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:greenlinkapp/features/comment/models/comment_model.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
+
+import 'comment_model.dart';
 
 part 'post_model.freezed.dart';
 part 'post_model.g.dart';

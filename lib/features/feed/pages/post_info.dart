@@ -7,7 +7,9 @@ import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/badge.dart';
 import '../../../core/providers/geocoding_provider.dart';
+import '../providers/comment_provider.dart';
 import '../providers/post_provider.dart';
+import '../widgets/comment_card.dart';
 
 class PostInfoPage extends ConsumerStatefulWidget {
   final PostModel post;
@@ -101,8 +103,6 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
               post.description,
               style: const TextStyle(fontSize: 18, height: 1.5),
             ),
-            const SizedBox(height: 32),
-            const Divider(),
             const SizedBox(height: 16),
             const Text(
               "Posizione",
@@ -121,13 +121,75 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 40),
-            Center(
-              child: Text(
-                "ID Post: ${post.id}",
-                style: TextStyle(color: Colors.grey[400], fontSize: 12),
-              ),
+            const SizedBox(height: 20),
+            const Divider(),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                ChoiceChip(
+                  label: const Text("Recenti"),
+                  selected:
+                      ref.watch(commentSortProvider) ==
+                      CommentSortCriteria.recent,
+                  onSelected: (val) =>
+                      ref.read(commentSortProvider.notifier).state =
+                          CommentSortCriteria.recent,
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text("Più votati"),
+                  selected:
+                      ref.watch(commentSortProvider) ==
+                      CommentSortCriteria.mostLiked,
+                  onSelected: (val) =>
+                      ref.read(commentSortProvider.notifier).state =
+                          CommentSortCriteria.mostLiked,
+                ),
+              ],
             ),
+            const SizedBox(height: 40),
+            ref
+                .watch(commentsProvider(post.id!))
+                .when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) =>
+                      Text("Errore nel caricamento dei commenti: $err"),
+                  data: (comments) {
+                    if (comments.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          "Nessun commento presente. Sii il primo!",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        final comment = comments[index];
+                        return CommentCard(
+                          comment: comment,
+                          onLike: () {
+                            // Logica like
+                          },
+                          onReply: () {
+                            // Logica risposta
+                          },
+                          onReport: () {
+                            // Logica segnalazione
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),

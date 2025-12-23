@@ -4,7 +4,7 @@ import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 import '../../auth/providers/auth_provider.dart';
-import '../../comment/models/comment_model.dart';
+import '../../feed/models/comment_model.dart';
 import '../models/report.dart';
 import '../services/admin_service.dart';
 
