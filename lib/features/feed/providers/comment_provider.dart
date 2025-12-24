@@ -21,23 +21,22 @@ class CommentSort extends _$CommentSort {
 @riverpod
 class Comments extends _$Comments {
   final _commentService = CommentService();
-
   @override
-  FutureOr<List<CommentModel>> build(int postId) async {
+  FutureOr<List<CommentModel>> build(int contentId) async {
     final criteria = ref.watch(commentSortProvider);
 
-    final comments = await _fetchComments(postId);
+    final comments = await _fetchComments(contentId);
 
     return _sortComments(comments, criteria);
   }
 
-  Future<List<CommentModel>> _fetchComments(int postId) async {
+  Future<List<CommentModel>> _fetchComments(int contentId) async {
     final authState = ref.read(authProvider);
     final token = authState.asData?.value.token;
 
     if (token == null) throw Exception('Autenticazione necessaria');
 
-    return _commentService.fetchCommentsByPost(postId: postId);
+    return _commentService.fetchComments(contentId: contentId);
   }
 
   List<CommentModel> _sortComments(
@@ -62,8 +61,7 @@ class Comments extends _$Comments {
 
     await _commentService.postComment(
       token: token,
-      contentId:
-          postId, // TODO: da capire se va passato anche il post in ogni caso, come passare il commento al backend
+      contentId: contentId, //il contentId è passato come parametro al provider
       description: description,
     );
 

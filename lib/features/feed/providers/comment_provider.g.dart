@@ -123,8 +123,8 @@ final class CommentsFamily extends $Family
         isAutoDispose: true,
       );
 
-  CommentsProvider call(int postId) =>
-      CommentsProvider._(argument: postId, from: this);
+  CommentsProvider call(int contentId) =>
+      CommentsProvider._(argument: contentId, from: this);
 
   @override
   String toString() => r'commentsProvider';
@@ -132,9 +132,9 @@ final class CommentsFamily extends $Family
 
 abstract class _$Comments extends $AsyncNotifier<List<CommentModel>> {
   late final _$args = ref.$arg as int;
-  int get postId => _$args;
+  int get contentId => _$args;
 
-  FutureOr<List<CommentModel>> build(int postId);
+  FutureOr<List<CommentModel>> build(int contentId);
   @$mustCallSuper
   @override
   void runBuild() {

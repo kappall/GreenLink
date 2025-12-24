@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/comment_model.dart';
@@ -8,10 +7,10 @@ import '../models/comment_model.dart';
 class CommentService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
-  Future<List<CommentModel>> fetchCommentsByPost({required int postId}) async {
+  Future<List<CommentModel>> fetchComments({required int contentId}) async {
     //TODO test quando va backend
     final response = await http.get(
-      Uri.parse('$_baseUrl/comments/$postId'),
+      Uri.parse('$_baseUrl/comments/$contentId'),
       headers: {'Accept': 'application/json'},
     );
 
@@ -24,14 +23,20 @@ class CommentService {
 
   Future<List<CommentModel>> _parseComments(String responseBody) async {
     final decoded = jsonDecode(responseBody);
-    debugPrint(responseBody);
-    if (decoded['comments']! is List) {
+    final dynamic rawList = switch (decoded) {
+      final Map<String, dynamic> map => map['comments'] ?? map['data'] ?? map,
+      final List<dynamic> list => list,
+      _ => decoded,
+    };
+
+    if (rawList is! List) {
       throw Exception(
         'Errore durante il recupero dei commenti: malformattato: $responseBody',
       );
     }
-    return decoded['comments']
-        .map<CommentModel>((comment) => CommentModel.fromJson(comment))
+    return rawList
+        .whereType<Map<String, dynamic>>()
+        .map(CommentModel.fromJson)
         .toList();
   }
 
@@ -48,8 +53,8 @@ class CommentService {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        "description": description,
-        "content": {"id": contentId},
+        'description': description,
+        'content': contentId,
       }),
     );
     if (response.statusCode < 200 || response.statusCode >= 300) {
