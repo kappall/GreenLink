@@ -55,7 +55,6 @@ class Comments extends _$Comments {
   }
 
   Future<void> addComment(String description, int? replyTo) async {
-    //contentId può essere id di un post o di un commento
     final token = ref.read(authProvider).asData?.value.token;
     if (token == null) return;
 

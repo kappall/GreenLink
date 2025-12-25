@@ -58,147 +58,163 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
             ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.grey[200],
-                  child: Text(
-                    post.author.displayName.isNotEmpty == true
-                        ? post.author.displayName[0].toUpperCase()
-                        : '?',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      post.author.displayName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      timestamp,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                UiBadge(
-                  label: post.category.label,
-                  icon: post.category.icon,
-                  color: post.category.color,
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              post.description,
-              style: const TextStyle(fontSize: 18, height: 1.5),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              "Posizione",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.location_on, color: Colors.green),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    locationName,
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Divider(),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                ChoiceChip(
-                  label: const Text("Recenti"),
-                  selected:
-                      ref.watch(commentSortProvider) ==
-                      CommentSortCriteria.recent,
-                  onSelected: (val) =>
-                      ref.read(commentSortProvider.notifier).state =
-                          CommentSortCriteria.recent,
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text("Più votati"),
-                  selected:
-                      ref.watch(commentSortProvider) ==
-                      CommentSortCriteria.mostLiked,
-                  onSelected: (val) =>
-                      ref.read(commentSortProvider.notifier).state =
-                          CommentSortCriteria.mostLiked,
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            ref
-                .watch(commentsProvider(post.id!))
-                .when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (err, stack) =>
-                      Text("Errore nel caricamento dei commenti: $err"),
-                  data: (comments) {
-                    if (comments.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(16.0),
+            SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.grey[200],
                         child: Text(
-                          "Nessun commento presente. Sii il primo!",
-                          style: TextStyle(color: Colors.grey),
+                          post.author.displayName.isNotEmpty == true
+                              ? post.author.displayName[0].toUpperCase()
+                              : '?',
                         ),
-                      );
-                    }
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            post.author.displayName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            timestamp,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      UiBadge(
+                        label: post.category.label,
+                        icon: post.category.icon,
+                        color: post.category.color,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    post.description,
+                    style: const TextStyle(fontSize: 18, height: 1.5),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Posizione",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          locationName,
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      ChoiceChip(
+                        label: const Text("Recenti"),
+                        selected:
+                            ref.watch(commentSortProvider) ==
+                            CommentSortCriteria.recent,
+                        onSelected: (val) =>
+                            ref.read(commentSortProvider.notifier).state =
+                                CommentSortCriteria.recent,
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text("Più votati"),
+                        selected:
+                            ref.watch(commentSortProvider) ==
+                            CommentSortCriteria.mostLiked,
+                        onSelected: (val) =>
+                            ref.read(commentSortProvider.notifier).state =
+                                CommentSortCriteria.mostLiked,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  ref
+                      .watch(commentsProvider(post.id!))
+                      .when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (err, stack) =>
+                            Text("Errore nel caricamento dei commenti: $err"),
+                        data: (comments) {
+                          if (comments.isEmpty) {
+                            return const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text(
+                                "Nessun commento presente. Sii il primo!",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            );
+                          }
 
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: comments.length,
-                      itemBuilder: (context, index) {
-                        final comment = comments[index];
-                        return CommentCard(
-                          comment: comment,
-                          onLike: () {
-                            // Logica like
-                          },
-                          onReply: () {
-                            // Logica risposta
-                          },
-                          onReport: () {
-                            // Logica segnalazione
-                          },
-                        );
-                      },
-                    );
-                  },
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: comments.length,
+                            itemBuilder: (context, index) {
+                              final comment = comments[index];
+                              return CommentCard(
+                                comment: comment,
+                                onLike: () {
+                                  // Logica like
+                                },
+                                onReply: () {
+                                  // Logica risposta
+                                },
+                                onReport: () {
+                                  // Logica segnalazione
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedPadding(
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
+                child: SafeArea(
+                  top: false,
+                  child: CommentInputField(postId: post.id!),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          CommentInputField(postId: post.id!),
-          SizedBox(height: 40),
-        ],
       ),
     );
   }
