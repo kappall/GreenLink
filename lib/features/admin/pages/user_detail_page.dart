@@ -55,7 +55,7 @@ class UserDetailPage extends ConsumerWidget {
               user,
               userPosts.asData?.value.length ?? 0,
               userEvents.asData?.value.length ?? 0,
-              userComments.where((c) => c.userId == user.id).length,
+              userComments.where((c) => c.author.id == user.id).length,
             ),
             const SizedBox(height: 20),
             Text(

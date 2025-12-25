@@ -100,7 +100,7 @@ class PostCard extends ConsumerWidget {
             if (!insidePost) ...[
               const Icon(Icons.trending_up, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text('${post.votes_count} Upvotes'),
+              Text('${post.votesCount} Upvotes'),
               const SizedBox(width: 16),
               const Icon(Icons.comment, size: 16, color: Colors.grey),
               const SizedBox(width: 4),

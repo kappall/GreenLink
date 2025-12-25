@@ -28,6 +28,38 @@ class EventsNotifier extends AsyncNotifier<List<EventModel>> {
     state = await AsyncValue.guard(_fetchEvents);
   }
 
+  Future<void> createEvent({
+    required String description,
+    required double latitude,
+    required double longitude,
+    required EventType eventType,
+    required int maxParticipants,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final authState = ref.read(authProvider).asData?.value;
+    final token = authState?.token;
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Utente non autenticato');
+    }
+
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await _eventService.createEvent(
+        token: token,
+        description: description,
+        latitude: latitude,
+        longitude: longitude,
+        eventType: eventType,
+        maxParticipants: maxParticipants,
+        startDate: startDate,
+        endDate: endDate,
+      );
+      return _fetchEvents(partnerId: _partnerId);
+    });
+  }
+
   Future<List<EventModel>> _fetchEvents({int? partnerId}) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;

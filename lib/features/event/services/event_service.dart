@@ -55,6 +55,52 @@ class EventService {
         .toList();
   }
 
+  Future<EventModel> createEvent({
+    required String token,
+    required String description,
+    required double latitude,
+    required double longitude,
+    required EventType eventType,
+    required int maxParticipants,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/event'),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'description': description,
+        'latitude': latitude,
+        'longitude': longitude,
+        'event_type': eventType.name,
+        'max_participants': maxParticipants,
+        'start_date': startDate.toIso8601String(),
+        'end_date': endDate.toIso8601String(),
+      }),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      throw Exception('Errore durante la creazione dell\'evento: $message');
+    }
+
+    final decoded = jsonDecode(response.body);
+    final rawEvent = decoded is Map<String, dynamic>
+        ? decoded['event'] ?? decoded
+        : decoded;
+    if (rawEvent is! Map<String, dynamic>) {
+      throw Exception(
+        'Risposta inattesa dalla creazione evento: ${response.body}',
+      );
+    }
+
+    return EventModel.fromJson(rawEvent);
+  }
+
   String _errorMessage(http.Response response) {
     try {
       final data = jsonDecode(response.body) as Map<String, dynamic>;

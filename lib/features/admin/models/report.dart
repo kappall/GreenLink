@@ -1,9 +1,9 @@
 // ignore_for_file: invalid_annotation_target
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:greenlinkapp/features/comment/models/comment_model.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 
+import '../../feed/models/comment_model.dart';
 import '../../feed/models/post_model.dart';
 
 part 'report.freezed.dart';

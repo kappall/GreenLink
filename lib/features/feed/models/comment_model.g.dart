@@ -8,21 +8,21 @@ part of 'comment_model.dart';
 
 _CommentModel _$CommentModelFromJson(Map<String, dynamic> json) =>
     _CommentModel(
-      id: (json['id'] as num?)?.toInt(),
+      id: (json['id'] as num).toInt(),
       description: json['description'] as String,
       author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
       votes:
           (json['votes'] as List<dynamic>?)
               ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
-          const <UserModel>[],
-      content: PostModel.fromJson(json['content'] as Map<String, dynamic>),
+          const [],
+      votesCount: (json['votes_count'] as num).toInt(),
+      hasVoted: json['has_voted'] as bool? ?? false,
+      content: (json['content'] as num).toInt(),
       deletedAt: json['deleted_at'] == null
           ? null
           : DateTime.parse(json['deleted_at'] as String),
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
 
 Map<String, dynamic> _$CommentModelToJson(_CommentModel instance) =>
@@ -31,7 +31,9 @@ Map<String, dynamic> _$CommentModelToJson(_CommentModel instance) =>
       'description': instance.description,
       'author': instance.author,
       'votes': instance.votes,
+      'votes_count': instance.votesCount,
+      'has_voted': instance.hasVoted,
       'content': instance.content,
       'deleted_at': instance.deletedAt?.toIso8601String(),
-      'created_at': instance.createdAt?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
     };
