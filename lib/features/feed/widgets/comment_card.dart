@@ -37,7 +37,7 @@ class CommentCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: theme.primaryColor.withOpacity(0.1),
+            backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
             child: Text(
               comment.author.displayName.substring(0, 1).toUpperCase(),
               style: TextStyle(
