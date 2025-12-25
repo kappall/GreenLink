@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/admin/providers/admin_provider.dart';
-
-import '../models/PartnerModel.dart';
 
 class CreatePartnerPage extends ConsumerStatefulWidget {
   const CreatePartnerPage({super.key});
@@ -16,15 +14,12 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
   bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _usernameController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -34,22 +29,18 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
     setState(() => _isLoading = true);
 
     try {
-      final partner = PartnerModel(
-        email: _emailController.text.trim(),
-        name: _usernameController.text.trim(),
-        password: _passwordController.text,
-      );
-
-      await ref.read(usersProvider.notifier).createPartner(partner);
+      final token = await ref
+          .read(usersProvider.notifier)
+          .createPartner(
+            email: _emailController.text.trim(),
+            username: _usernameController.text.trim(),
+          );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Partner creato con successo!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        context.pop();
+        _emailController.clear();
+        _usernameController.clear();
+
+        _showSuccessDialog(token);
       }
     } catch (e) {
       if (mounted) {
@@ -65,6 +56,74 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showSuccessDialog(String token) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green),
+              SizedBox(width: 8),
+              Text("Partner Creato"),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "L'account è stato pre-registrato. Invia questo codice di attivazione al partner:",
+              ),
+              const SizedBox(height: 16),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: SelectableText(
+                  token,
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton.icon(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: token));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Token copiato negli appunti!"),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.copy),
+              label: const Text("Copia"),
+            ),
+
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: const Text("Fatto"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -118,37 +177,7 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: 'Password Temporanea',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Inserisci una password';
-                  }
-                  if (value.length < 6) {
-                    return 'La password deve essere di almeno 6 caratteri';
-                  }
-                  return null;
-                },
-              ),
+
               const SizedBox(height: 40),
               FilledButton.icon(
                 onPressed: _isLoading ? null : _submit,

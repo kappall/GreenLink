@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:greenlinkapp/features/admin/models/PartnerModel.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../auth/utils/role_parser.dart';
@@ -178,22 +178,32 @@ class AdminService {
     }
   }
 
-  Future<void> createPartner(PartnerModel partner) async {
+  Future<String> createPartner({
+    required String email,
+    required String username,
+  }) async {
     try {
+      final payload = {'email': email, 'username': username};
+
       final response = await http.post(
-        Uri.parse('$_baseUrl/partner/register'),
+        Uri.parse('$_baseUrl/partner/create'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
         },
-        body: jsonEncode(partner.toJson()),
+        body: jsonEncode(payload),
       );
-
+      debugPrint(response.request.toString());
+      debugPrint(token);
+      debugPrint(jsonEncode(payload));
       if (response.statusCode != 200) {
         throw Exception(
           'Fallimento nella creazione partner: ${response.statusCode}',
         );
       }
+      final body = jsonDecode(response.body);
+      return body['token'];
     } catch (e) {
       throw Exception(e);
     }

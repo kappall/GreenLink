@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:greenlinkapp/features/admin/models/PartnerModel.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
@@ -91,7 +90,10 @@ class UsersNotifier extends AsyncNotifier<List<UserModel>> {
     await refresh();
   }
 
-  Future<void> createPartner(PartnerModel partner) async {
+  Future<String> createPartner({
+    required String email,
+    required String username,
+  }) async {
     final authState = ref.read(authProvider);
     final token = authState.asData?.value.token;
 
@@ -99,8 +101,11 @@ class UsersNotifier extends AsyncNotifier<List<UserModel>> {
       throw Exception('Utente non autenticato');
     }
 
-    await AdminService(token: token).createPartner(partner);
+    final partnerToken = await AdminService(
+      token: token,
+    ).createPartner(email: email, username: username);
     await refresh();
+    return partnerToken;
   }
 }
 
