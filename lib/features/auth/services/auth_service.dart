@@ -49,6 +49,25 @@ class AuthService {
     return _handleAuthResponse(response, 'registrazione');
   }
 
+  Future<AuthResult> registerPartner({
+    required String token,
+    required String password,
+  }) async {
+    final payload = {'password': password};
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/partner/register'),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(payload),
+    );
+
+    return _handleAuthResponse(response, 'registrazione');
+  }
+
   Future<UserModel> fetchCurrentUser({required String token}) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/me'),

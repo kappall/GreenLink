@@ -50,8 +50,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         password: trimmedPassword,
       );
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_tokenKey, authResult.token);
+      setPersistToken(authResult.token);
 
       final derivedRole = deriveRoleFromToken(authResult.token);
       final user = UserModel(id: authResult.userId, email: authResult.email);
@@ -99,9 +98,42 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         email: trimmedEmail,
         password: trimmedPassword,
       );
+      setPersistToken(authResult.token);
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_tokenKey, authResult.token);
+      final derivedRole = deriveRoleFromToken(authResult.token);
+      final user = UserModel(id: authResult.userId, email: authResult.email);
+
+      return AuthState(
+        user: user,
+        token: authResult.token,
+        derivedRole: derivedRole,
+      );
+    });
+  }
+
+  Future<void> setPersistToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
+  }
+
+  Future<void> registerPartner({
+    required String token,
+    required String password,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final trimmedPassword = password.trim();
+
+      if (trimmedPassword.length < 6) {
+        throw Exception('Password troppo corta (min 6 caratteri)');
+      }
+
+      final authResult = await _authService.registerPartner(
+        token: token,
+        password: trimmedPassword,
+      );
+      setPersistToken(authResult.token);
 
       final derivedRole = deriveRoleFromToken(authResult.token);
       final user = UserModel(id: authResult.userId, email: authResult.email);

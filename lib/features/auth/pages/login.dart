@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/core/common/widgets/logo.dart';
-
-
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-
+import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
-
 import 'package:greenlinkapp/features/auth/widgets/textfield.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -36,9 +32,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       next.whenOrNull(
         error: (error, _) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error.toString())),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error.toString())));
         },
       );
     });
@@ -111,6 +107,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         onPressed: () =>
                             ref.read(authProvider.notifier).loginAnonymous(),
                         child: const Text("Continua come Anonimo"),
+                      ),
+                    ),
+
+                    const Divider(height: 32),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.blue),
+                        ),
+                        onPressed: () => context.replace('/partner-token'),
+                        child: const Text(
+                          "Accedi come Partner",
+                          style: TextStyle(color: Colors.blue),
+                        ),
                       ),
                     ),
                   ],

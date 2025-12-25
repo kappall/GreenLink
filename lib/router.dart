@@ -22,6 +22,7 @@ import 'features/admin/pages/admin_wrapper.dart';
 import 'features/admin/pages/reports_page.dart';
 import 'features/admin/pages/user_detail_page.dart';
 import 'features/admin/pages/users_page.dart';
+import 'features/auth/pages/partner_activation_page.dart';
 import 'features/user/pages/profile_page.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
@@ -59,6 +60,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isLoggingIn = state.uri.path == '/login';
       final isRegistering = state.uri.path == '/register';
+      final isPartnerActivation = state.uri.path == '/partner-token';
       final isAdminRoute = state.uri.path.startsWith('/admin');
 
       final isSharedRoute = [
@@ -70,9 +72,14 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (authState.isLoading) return null;
 
-      if (!isLoggedIn && !isLoggingIn && !isRegistering) return '/login';
+      if (!isLoggedIn &&
+          !isLoggingIn &&
+          !isRegistering &&
+          !isPartnerActivation) {
+        return '/login';
+      }
 
-      if (isLoggedIn && (isLoggingIn || isRegistering)) {
+      if (isLoggedIn && (isLoggingIn || isRegistering || isPartnerActivation)) {
         return isAdmin ? '/admin/reports' : '/home';
       }
 
@@ -177,6 +184,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/login',
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => noAnimationPage(const LoginPage()),
+      ),
+
+      GoRoute(
+        path: '/partner-token',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            noAnimationPage(const PartnerActivationPage()),
       ),
 
       GoRoute(
