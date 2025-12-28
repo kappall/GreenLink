@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
+import 'package:geolocator/geolocator.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -93,6 +95,185 @@ final postSortCriteriaProvider =
     NotifierProvider<PostSortCriteriaNotifier, PostSortCriteria>(
       PostSortCriteriaNotifier.new,
     );
+
+class CreatePostState {
+  final PostCategory? category;
+  final List<XFile> images;
+  final String description;
+  final String? locationLabel;
+  final double? latitude;
+  final double? longitude;
+  final bool isLocating;
+  final bool isPublishing;
+
+  CreatePostState({
+    this.category,
+    this.images = const [],
+    this.description = '',
+    this.locationLabel,
+    this.latitude,
+    this.longitude,
+    this.isLocating = false,
+    this.isPublishing = false,
+  });
+
+  CreatePostState copyWith({
+    PostCategory? category,
+    List<XFile>? images,
+    String? description,
+    String? locationLabel,
+    double? latitude,
+    double? longitude,
+    bool? isLocating,
+    bool? isPublishing,
+  }) {
+    return CreatePostState(
+      category: category ?? this.category,
+      images: images ?? this.images,
+      description: description ?? this.description,
+      locationLabel: locationLabel ?? this.locationLabel,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      isLocating: isLocating ?? this.isLocating,
+      isPublishing: isPublishing ?? this.isPublishing,
+    );
+  }
+
+  bool get canPublish =>
+      category != null &&
+      images.isNotEmpty &&
+      description.trim().isNotEmpty &&
+      locationLabel != null &&
+      !isPublishing;
+}
+
+@riverpod
+class CreatePostNotifier extends _$CreatePostNotifier {
+  final _postService = PostService();
+  final _picker = ImagePicker();
+
+  @override
+  CreatePostState build() => CreatePostState();
+
+  void setCategory(PostCategory? category) {
+    state = state.copyWith(category: category);
+  }
+
+  void setDescription(String description) {
+    state = state.copyWith(description: description);
+  }
+
+  Future<void> pickImages() async {
+    try {
+      final List<XFile> images = await _picker.pickMultiImage();
+      if (images.isNotEmpty) {
+        state = state.copyWith(images: [...state.images, ...images]);
+      }
+    } catch (_) {}
+  }
+
+  void removeImage(int index) {
+    final newList = List<XFile>.from(state.images)..removeAt(index);
+    state = state.copyWith(images: newList);
+  }
+
+  Future<void> useCurrentLocation() async {
+    state = state.copyWith(isLocating: true);
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      final placemarks = await geo.placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      final first = placemarks.isNotEmpty ? placemarks.first : null;
+      final address = [
+        first?.street,
+        first?.locality,
+        first?.administrativeArea,
+        first?.country,
+      ].where((p) => p != null && p.trim().isNotEmpty).join(', ');
+
+      state = state.copyWith(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        locationLabel: address.isNotEmpty ? address : 'Posizione Attuale',
+        isLocating: false,
+      );
+    } catch (_) {
+      state = state.copyWith(isLocating: false);
+    }
+  }
+
+  Future<bool> setManualLocation(String addressInput) async {
+    if (addressInput.isEmpty) return false;
+    state = state.copyWith(isLocating: true);
+
+    try {
+      List<geo.Location> locations = await geo.locationFromAddress(
+        addressInput,
+      );
+      if (locations.isNotEmpty) {
+        final loc = locations.first;
+        final placemarks = await geo.placemarkFromCoordinates(
+          loc.latitude,
+          loc.longitude,
+        );
+
+        String resolvedLabel = addressInput;
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          final parts = [
+            p.street,
+            p.locality,
+            p.administrativeArea,
+          ].where((s) => s != null && s.isNotEmpty).toList();
+          if (parts.isNotEmpty) {
+            resolvedLabel = parts.join(", ");
+          }
+        }
+
+        state = state.copyWith(
+          latitude: loc.latitude,
+          longitude: loc.longitude,
+          locationLabel: resolvedLabel,
+          isLocating: false,
+        );
+        return true;
+      }
+    } catch (_) {}
+
+    state = state.copyWith(isLocating: false);
+    return false;
+  }
+
+  Future<bool> publishPost() async {
+    if (!state.canPublish) return false;
+    state = state.copyWith(isPublishing: true);
+
+    try {
+      final auth = ref.read(authProvider).value!;
+      await _postService.createPost(
+        token: auth.token!,
+        authorId: auth.user!.id,
+        description: state.description,
+        latitude: state.latitude!,
+        longitude: state.longitude!,
+        category: state.category!.name,
+        media: state.images,
+      );
+
+      // Refresh user posts and global feed
+      ref.invalidate(userPostsProvider);
+
+      state = CreatePostState(); // Reset state
+      return true;
+    } catch (_) {
+      state = state.copyWith(isPublishing: false);
+      return false;
+    }
+  }
+}
 
 @riverpod
 class UserPosts extends _$UserPosts {

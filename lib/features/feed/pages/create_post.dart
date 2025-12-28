@@ -1,34 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
-import 'dart:io';
+import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
+
 import '../widgets/button.dart';
 
-class CreatePostPage extends StatefulWidget {
+class CreatePostPage extends ConsumerStatefulWidget {
   const CreatePostPage({super.key});
 
   @override
-  State<CreatePostPage> createState() => _CreatePostPageState();
+  ConsumerState<CreatePostPage> createState() => _CreatePostPageState();
 }
 
-class _CreatePostPageState extends State<CreatePostPage> {
-  PostCategory? selectedCategory;
+class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final TextEditingController _descriptionController = TextEditingController();
-  int charCount = 0;
-  final List<XFile> _selectedImages = [];
-  final ImagePicker _picker = ImagePicker();
-  String? _locationLabel;
-  bool _isLocating = false;
-
-  bool _canPublish() {
-    return selectedCategory != null &&
-        _selectedImages.isNotEmpty &&
-        _descriptionController.text.trim().isNotEmpty &&
-        _locationLabel != null;
-  }
 
   @override
   void dispose() {
@@ -36,111 +25,51 @@ class _CreatePostPageState extends State<CreatePostPage> {
     super.dispose();
   }
 
-  void _updateCharCount(String text) {
-    setState(() {
-      charCount = text.length;
-    });
-  }
-
-  Future<void> _pickImages() async {
-    try {
-      final List<XFile> images = await _picker.pickMultiImage();
-      if (images.isNotEmpty) {
-        setState(() {
-          _selectedImages.addAll(images);
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore nel caricamento delle immagini: $e')),
-        );
-      }
-    }
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
-    });
-  }
-
-  void _useCurrentLocation() {
-    _fetchAndSetCurrentLocation();
-  }
-
-  Future<void> _fetchAndSetCurrentLocation() async {
-    setState(() {
-      _isLocating = true;
-    });
-
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Attiva i servizi di localizzazione.')),
-        );
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Permesso posizione negato.')),
-        );
-        return;
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Permessi permanenti negati. Controlla le impostazioni.',
-            ),
+  void _showLocationDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Inserisci Indirizzo"),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: "Es: Via Roma 1, Milano",
+            helperText: "Specifica città e via per risultati migliori",
           ),
-        );
-        return;
-      }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Annulla"),
+          ),
+          TextButton(
+            onPressed: () async {
+              final address = controller.text.trim();
+              if (address.isEmpty) return;
 
-      final position = await Geolocator.getCurrentPosition();
-      final placemarks = await geocoding.placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+              Navigator.pop(context);
+              final success = await ref
+                  .read(createPostProvider.notifier)
+                  .setManualLocation(address);
 
-      final first = placemarks.isNotEmpty ? placemarks.first : null;
-      final address = [
-        first?.street,
-        first?.locality,
-        first?.administrativeArea,
-        first?.country,
-      ].where((p) => p != null && p!.trim().isNotEmpty).join(', ');
-
-      setState(() {
-        _locationLabel = address.isNotEmpty
-            ? address
-            : 'Lat: ${position.latitude.toStringAsFixed(4)}, Lng: ${position.longitude.toStringAsFixed(4)}';
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore nel recupero posizione: $e')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLocating = false;
-        });
-      }
-    }
+              if (!success && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Indirizzo non trovato")),
+                );
+              }
+            },
+            child: const Text("Cerca"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool canPublish = _canPublish();
+    final postState = ref.watch(createPostProvider);
+    final notifier = ref.read(createPostProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Crea Post')),
@@ -150,8 +79,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: const Text(
+              const Center(
+                child: Text(
                   'Scegli la categoria del post',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -164,35 +93,31 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     .where((category) => category != PostCategory.unknown)
                     .map(
                       (category) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = category;
-                          });
-                        },
+                        onTap: () => notifier.setCategory(category),
                         child: UiBadge(
                           label: category.label,
                           icon: category.icon,
                           color: category.color,
-                          isOutline: selectedCategory == category,
+                          isOutline: postState.category == category,
                         ),
                       ),
                     )
                     .toList(),
               ),
-              Divider(height: 32),
-              Center(
-                child: const Text(
+              const Divider(height: 32),
+              const Center(
+                child: Text(
                   'Inserisci una o più foto',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 16),
-              if (_selectedImages.isNotEmpty)
+              if (postState.images.isNotEmpty)
                 SizedBox(
                   height: 120,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: _selectedImages.length,
+                    itemCount: postState.images.length,
                     itemBuilder: (context, index) {
                       return Stack(
                         children: [
@@ -207,7 +132,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.file(
-                                File(_selectedImages[index].path),
+                                File(postState.images[index].path),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -216,7 +141,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             top: 4,
                             right: 12,
                             child: GestureDetector(
-                              onTap: () => _removeImage(index),
+                              onTap: () => notifier.removeImage(index),
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: Colors.black54,
@@ -239,10 +164,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
               const SizedBox(height: 16),
               Center(
                 child: OutlinedButton.icon(
-                  onPressed: _pickImages,
+                  onPressed: notifier.pickImages,
                   icon: const Icon(Icons.add_photo_alternate),
                   label: Text(
-                    _selectedImages.isEmpty
+                    postState.images.isEmpty
                         ? 'Seleziona foto dalla galleria'
                         : 'Aggiungi altre foto',
                   ),
@@ -254,9 +179,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   ),
                 ),
               ),
-              Divider(height: 32),
-              Center(
-                child: const Text(
+              const Divider(height: 32),
+              const Center(
+                child: Text(
                   'Aggiungi una descrizione',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -272,14 +197,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onChanged: _updateCharCount,
+                onChanged: notifier.setDescription,
               ),
-              Divider(height: 32),
+              const Divider(height: 32),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
-                    child: const Text(
+                  const Center(
+                    child: Text(
                       'Inserisci la posizione',
                       style: TextStyle(
                         fontSize: 18,
@@ -287,79 +212,82 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   Text(
-                    _locationLabel ?? 'Nessuna posizione selezionata',
+                    postState.locationLabel ?? 'Nessuna posizione selezionata',
                     style: TextStyle(
-                      color: _locationLabel != null
+                      color: postState.locationLabel != null
                           ? Colors.black
                           : Colors.grey.shade600,
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   Row(
                     children: [
                       Expanded(
                         child: TextButton.icon(
-                          onPressed: _isLocating ? null : _useCurrentLocation,
-                          icon: _isLocating
-                              ? SizedBox(
+                          onPressed: postState.isLocating
+                              ? null
+                              : notifier.useCurrentLocation,
+                          icon: postState.isLocating
+                              ? const SizedBox(
                                   width: 16,
                                   height: 16,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
                                   ),
                                 )
                               : const Icon(Icons.my_location_outlined),
                           label: Text(
-                            _isLocating
-                                ? 'Sto cercando...'
+                            postState.isLocating
+                                ? 'Cercando...'
                                 : 'posizione attuale',
-                          ),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            foregroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextButton.icon(
-                          onPressed: () {}, //_setManualLocation,
+                          onPressed: postState.isLocating
+                              ? null
+                              : _showLocationDialog,
                           icon: const Icon(Icons.edit_location_alt_outlined),
                           label: const Text('Inserisci indirizzo'),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            foregroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                          ),
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ButtonWidget(
-                label: '  Pubblica Post',
-                onPressed: canPublish ? () {} : null,
-                icon: const Icon(Icons.send),
+                label: postState.isPublishing
+                    ? 'Pubblicazione...'
+                    : 'Pubblica Post',
+                onPressed: postState.canPublish
+                    ? () async {
+                        final success = await notifier.publishPost();
+                        if (success && mounted) {
+                          context.pop();
+                        } else if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Errore durante la pubblicazione"),
+                            ),
+                          );
+                        }
+                      }
+                    : null,
+                icon: postState.isPublishing
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.send),
               ),
               const SizedBox(height: 32),
             ],

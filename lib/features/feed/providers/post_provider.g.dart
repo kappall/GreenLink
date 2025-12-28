@@ -9,6 +9,60 @@ part of 'post_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(CreatePostNotifier)
+const createPostProvider = CreatePostNotifierProvider._();
+
+final class CreatePostNotifierProvider
+    extends $NotifierProvider<CreatePostNotifier, CreatePostState> {
+  const CreatePostNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'createPostProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$createPostNotifierHash();
+
+  @$internal
+  @override
+  CreatePostNotifier create() => CreatePostNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CreatePostState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CreatePostState>(value),
+    );
+  }
+}
+
+String _$createPostNotifierHash() =>
+    r'33956d49f1289cf79d82b01a74ea9f4e5fbf9722';
+
+abstract class _$CreatePostNotifier extends $Notifier<CreatePostState> {
+  CreatePostState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<CreatePostState, CreatePostState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<CreatePostState, CreatePostState>,
+              CreatePostState,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(UserPosts)
 const userPostsProvider = UserPostsFamily._();
 
