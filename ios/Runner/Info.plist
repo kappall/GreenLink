@@ -55,5 +55,9 @@
 		<string>Questa app richiede il permesso di salvare le foto scattate.</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Questa app potrebbe usare il microfono per registrare audio con i video.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Usiamo la tua posizione per allegarla ai post.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>Usiamo la tua posizione per allegarla ai post.</string>
 		</dict>
 	</plist>
