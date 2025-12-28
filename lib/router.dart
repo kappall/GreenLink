@@ -24,6 +24,7 @@ import 'features/admin/pages/user_detail_page.dart';
 import 'features/admin/pages/users_page.dart';
 import 'features/auth/pages/partner_activation_page.dart';
 import 'features/user/pages/profile_page.dart';
+import 'features/feed/pages/create_post.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
@@ -209,6 +210,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           final event = state.extra as EventModel;
           return EventInfoPage(event: event);
         },
+      ),
+
+      GoRoute(
+        path: '/create-post',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CreatePostPage(),
       ),
     ],
   );

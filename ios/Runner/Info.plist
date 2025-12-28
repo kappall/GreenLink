@@ -47,5 +47,13 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
-	</dict>
-</plist>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Questa app richiede l'accesso alla galleria per selezionare le foto da caricare nei post.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Questa app richiede l'accesso alla fotocamera per scattare foto.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Questa app richiede il permesso di salvare le foto scattate.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Questa app potrebbe usare il microfono per registrare audio con i video.</string>
+		</dict>
+	</plist>
