@@ -63,6 +63,13 @@ class FeedPage extends ConsumerWidget {
                       icon: const Icon(Icons.filter_list),
                       onPressed: () => showFilterDialog(context, ref, filter),
                     ),
+                    TextButton(
+                      onPressed: () {
+                        ref.read(postFilterProvider.notifier).reset();
+                        ref.read(postSortCriteriaProvider.notifier).reset();
+                      },
+                      child: const Text("Ripristina"),
+                    ),
                     const Spacer(),
                     buildSortDropdown(ref, criteria),
                   ],

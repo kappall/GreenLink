@@ -43,7 +43,19 @@ class PostFilter {
 
 class PostFilterNotifier extends Notifier<PostFilter> {
   @override
-  PostFilter build() => PostFilter();
+  PostFilter build() {
+    _initializeDefaultLocation();
+    return PostFilter();
+  }
+
+  Future<void> _initializeDefaultLocation() async {
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      state = state.copyWith(
+        resolvedLocation: LatLng(position.latitude, position.longitude),
+      );
+    } catch (_) {}
+  }
 
   Future<void> updateFilter({
     int? minVotes,
@@ -78,6 +90,11 @@ class PostFilterNotifier extends Notifier<PostFilter> {
       startDate: clearDate ? null : startDate,
     );
   }
+
+  void reset() {
+    state = PostFilter();
+    _initializeDefaultLocation();
+  }
 }
 
 final postFilterProvider = NotifierProvider<PostFilterNotifier, PostFilter>(
@@ -89,6 +106,10 @@ class PostSortCriteriaNotifier extends Notifier<PostSortCriteria> {
   PostSortCriteria build() => PostSortCriteria.date;
 
   void setCriteria(PostSortCriteria criteria) => state = criteria;
+
+  void reset() {
+    state = PostSortCriteria.date;
+  }
 }
 
 final postSortCriteriaProvider =
