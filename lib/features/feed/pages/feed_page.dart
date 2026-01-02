@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
-import 'package:greenlinkapp/features/feed/widgets/post_feed.dart';
 import 'package:greenlinkapp/features/feed/widgets/filterdialog.dart';
+import 'package:greenlinkapp/features/feed/widgets/post_feed.dart';
 import 'package:greenlinkapp/features/feed/widgets/sortdropdown.dart';
+
 import '../../auth/providers/auth_provider.dart';
 import '../providers/post_provider.dart';
 
@@ -22,7 +23,7 @@ class FeedPage extends ConsumerWidget {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(userPostsProvider(null).notifier).refresh(),
+        onRefresh: () => ref.read(postsProvider(null).notifier).refresh(),
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
@@ -61,6 +62,13 @@ class FeedPage extends ConsumerWidget {
                     IconButton(
                       icon: const Icon(Icons.filter_list),
                       onPressed: () => showFilterDialog(context, ref, filter),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        ref.read(postFilterProvider.notifier).reset();
+                        ref.read(postSortCriteriaProvider.notifier).reset();
+                      },
+                      child: const Text("Ripristina"),
                     ),
                     const Spacer(),
                     buildSortDropdown(ref, criteria),

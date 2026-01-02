@@ -60,7 +60,7 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final postsAsync = ref.watch(userPostsProvider(null));
+    final postsAsync = ref.watch(postsProvider(null));
     final eventsAsync = ref.watch(eventsProvider);
 
     final posts = postsAsync.value ?? [];

@@ -43,7 +43,19 @@ class PostFilter {
 
 class PostFilterNotifier extends Notifier<PostFilter> {
   @override
-  PostFilter build() => PostFilter();
+  PostFilter build() {
+    _initializeDefaultLocation();
+    return PostFilter();
+  }
+
+  Future<void> _initializeDefaultLocation() async {
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      state = state.copyWith(
+        resolvedLocation: LatLng(position.latitude, position.longitude),
+      );
+    } catch (_) {}
+  }
 
   Future<void> updateFilter({
     int? minVotes,
@@ -78,6 +90,11 @@ class PostFilterNotifier extends Notifier<PostFilter> {
       startDate: clearDate ? null : startDate,
     );
   }
+
+  void reset() {
+    state = PostFilter();
+    _initializeDefaultLocation();
+  }
 }
 
 final postFilterProvider = NotifierProvider<PostFilterNotifier, PostFilter>(
@@ -89,6 +106,10 @@ class PostSortCriteriaNotifier extends Notifier<PostSortCriteria> {
   PostSortCriteria build() => PostSortCriteria.date;
 
   void setCriteria(PostSortCriteria criteria) => state = criteria;
+
+  void reset() {
+    state = PostSortCriteria.date;
+  }
 }
 
 final postSortCriteriaProvider =
@@ -264,7 +285,7 @@ class CreatePostNotifier extends _$CreatePostNotifier {
       );
 
       // Refresh user posts and global feed
-      ref.invalidate(userPostsProvider);
+      ref.invalidate(postsProvider);
 
       state = CreatePostState(); // Reset state
       return true;
@@ -276,7 +297,7 @@ class CreatePostNotifier extends _$CreatePostNotifier {
 }
 
 @riverpod
-class UserPosts extends _$UserPosts {
+class Posts extends _$Posts {
   final _postService = PostService();
 
   @override
@@ -330,11 +351,46 @@ class UserPosts extends _$UserPosts {
     await _postService.deletePost(token: token, postId: postId);
     await refresh();
   }
+
+  Future<void> votePost(int postId, bool hasVoted) async {
+    final authState = ref.read(authProvider).value;
+    if (authState == null || authState.token == null) return;
+
+    final previousState = state;
+
+    // Aggiornamento Ottimistico locale
+    if (state.hasValue) {
+      state = AsyncValue.data(
+        state.value!.map((post) {
+          if (post.id == postId) {
+            final isCurrentlyVoted = post.hasVoted;
+            return post.copyWith(
+              hasVoted: !isCurrentlyVoted,
+              votesCount: isCurrentlyVoted
+                  ? post.votesCount - 1
+                  : post.votesCount + 1,
+            );
+          }
+          return post;
+        }).toList(),
+      );
+    }
+
+    try {
+      await _postService.votePost(
+        token: authState.token!,
+        postId: postId,
+        hasVoted: hasVoted,
+      );
+    } catch (e) {
+      state = previousState;
+    }
+  }
 }
 
 // ordine desc automatico
 final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
-  final postsAsync = ref.watch(userPostsProvider(null));
+  final postsAsync = ref.watch(postsProvider(null));
   final criteria = ref.watch(postSortCriteriaProvider);
   final filter = ref.watch(postFilterProvider);
 

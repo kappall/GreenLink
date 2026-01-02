@@ -18,7 +18,7 @@ class UserDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final userPosts = ref.watch(userPostsProvider(user.id));
+    final userPosts = ref.watch(postsProvider(user.id));
     final userEvents = ref.watch(eventsProvider);
     final userComments = ref.watch(userCommentProvider);
 

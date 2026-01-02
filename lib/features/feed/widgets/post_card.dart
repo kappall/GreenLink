@@ -3,20 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
+import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/utils/time_passed_by.dart';
 import 'package:greenlinkapp/features/feed/widgets/report_dialog.dart';
 
 class PostCard extends ConsumerWidget {
   final PostModel post;
   final VoidCallback? onTap;
-  final bool insidePost;
 
-  const PostCard({
-    super.key,
-    required this.post,
-    this.onTap,
-    this.insidePost = false,
-  });
+  const PostCard({super.key, required this.post, this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,6 +19,8 @@ class PostCard extends ConsumerWidget {
     final locationAsync = ref.watch(placeNameProvider(geoKey));
     final locationName =
         locationAsync.value ?? "${post.latitude}, ${post.longitude}";
+
+    final theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,14 +106,58 @@ class PostCard extends ConsumerWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            if (!insidePost) ...[
-              const Icon(Icons.trending_up, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text('${post.votesCount} Upvotes'),
-              const SizedBox(width: 16),
-              const Icon(Icons.comment, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-            ],
+            Semantics(
+              label: "Vota il post. Attualmente ha ${post.votesCount} voti.",
+              button: true,
+              onTapHint: "Clicca per aggiungere il tuo voto",
+              child: InkWell(
+                onTap: () {
+                  ref
+                      .read(postsProvider(null).notifier)
+                      .votePost(post.id!, post.hasVoted);
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        post.hasVoted
+                            ? Icons.trending_up
+                            : Icons.trending_up_outlined,
+                        size: 18,
+                        color: post.hasVoted
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${post.votesCount} Upvotes',
+                        style: TextStyle(
+                          color: post.hasVoted
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.secondary,
+                          fontWeight: post.hasVoted
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Icon(Icons.comment, size: 16, color: theme.colorScheme.primary),
+            const SizedBox(width: 4),
+            Text(
+              "${post.comments.length}",
+              style: TextStyle(color: theme.colorScheme.primary),
+            ),
           ],
         ),
       ],

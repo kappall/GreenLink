@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PostService {
@@ -129,7 +130,7 @@ class PostService {
       'image',
       file.path,
       filename: file.name,
-      contentType: http.MediaType('image', mimeSubtype),
+      contentType: MediaType('image', mimeSubtype),
     );
     request.files.add(multipartFile);
 
@@ -139,6 +140,28 @@ class PostService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);
       throw Exception('Errore durante il caricamento del media: $message');
+    }
+  }
+
+  Future<void> votePost({
+    required String token,
+    required int postId,
+    required bool hasVoted,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/post/$postId/vote');
+    final method = hasVoted ? http.delete : http.post;
+    final response = await method(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      throw Exception('Errore durante la votazione: $message');
     }
   }
 
