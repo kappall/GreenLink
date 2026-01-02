@@ -111,6 +111,26 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                     post.description,
                     style: const TextStyle(fontSize: 18, height: 1.5),
                   ),
+
+                  const SizedBox(height: 24),
+                  const Text(
+                    "Posizione",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          locationName,
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
                   if (post.media.isNotEmpty) ...[
                     const SizedBox(height: 20),
                     SizedBox(
@@ -136,6 +156,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                         },
                       ),
                     ),
+                    const SizedBox(height: 20),
                     if (post.media.length > 1)
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
@@ -150,23 +171,15 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                         ),
                       ),
                   ],
-
-                  const SizedBox(height: 24),
-                  const Text(
-                    "Posizione",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, color: Colors.green),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          locationName,
-                          style: const TextStyle(fontSize: 15),
-                        ),
+                      const Icon(
+                        Icons.trending_up,
+                        size: 16,
+                        color: Colors.grey,
                       ),
+                      const SizedBox(width: 4),
+                      Text('${post.votesCount} Upvotes'),
                     ],
                   ),
                   const SizedBox(height: 20),

@@ -9,14 +9,8 @@ import 'package:greenlinkapp/features/feed/widgets/report_dialog.dart';
 class PostCard extends ConsumerWidget {
   final PostModel post;
   final VoidCallback? onTap;
-  final bool insidePost;
 
-  const PostCard({
-    super.key,
-    required this.post,
-    this.onTap,
-    this.insidePost = false,
-  });
+  const PostCard({super.key, required this.post, this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -109,14 +103,12 @@ class PostCard extends ConsumerWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            if (!insidePost) ...[
-              const Icon(Icons.trending_up, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text('${post.votesCount} Upvotes'),
-              const SizedBox(width: 16),
-              const Icon(Icons.comment, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-            ],
+            const Icon(Icons.trending_up, size: 16, color: Colors.grey),
+            const SizedBox(width: 4),
+            Text('${post.votesCount} Upvotes'),
+            const SizedBox(width: 16),
+            const Icon(Icons.comment, size: 16, color: Colors.grey),
+            const SizedBox(width: 4),
           ],
         ),
       ],
