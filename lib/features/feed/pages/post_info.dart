@@ -290,9 +290,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                                 final comment = comments[index];
                                 return CommentCard(
                                   comment: comment,
-                                  onLike: () {
-                                    // Logica like
-                                  },
+                                  postId: post.id!,
                                   onReply: () {
                                     // Logica risposta
                                   },

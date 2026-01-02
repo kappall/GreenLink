@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/card.dart';
 import '../models/comment_model.dart';
+import '../providers/comment_provider.dart';
 
-class CommentCard extends StatelessWidget {
+class CommentCard extends ConsumerWidget {
   final CommentModel comment;
-  final VoidCallback? onLike;
+  final int postId;
   final VoidCallback? onReply;
   final VoidCallback? onReport;
 
   const CommentCard({
     super.key,
     required this.comment,
-    this.onLike,
+    required this.postId,
     this.onReply,
     this.onReport,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final timestamp = DateFormat(
       'dd MMM, HH:mm',
     ).format(comment.createdAt.toLocal());
@@ -80,25 +82,54 @@ class CommentCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    _CommentActionButton(
-                      icon: comment.hasVoted
-                          ? Icons.thumb_up_rounded
-                          : Icons.thumb_up_outlined,
-                      label: comment.votesCount.toString(),
-                      isActive: comment.hasVoted,
-                      color: comment.hasVoted
-                          ? colorScheme.primary
-                          : colorScheme.onSurfaceVariant,
-                      onTap: onLike,
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              comment.hasVoted
+                                  ? Icons.thumb_up_rounded
+                                  : Icons.thumb_up_outlined,
+                              size: 18,
+                              color: comment.hasVoted
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.secondary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${comment.votesCount} Upvotes',
+                              style: TextStyle(
+                                color: comment.hasVoted
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.secondary,
+                                fontWeight: comment.hasVoted
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        ref
+                            .read(commentsProvider(postId).notifier)
+                            .voteComment(comment.id, comment.hasVoted);
+                      },
                     ),
-                    const SizedBox(width: 24),
+                    /*
                     _CommentActionButton(
                       icon: Icons.chat_bubble_outline_rounded,
                       label: "Rispondi",
-                      isActive: false,
+                      semanticsLabel: "Rispondi al commento",
                       color: colorScheme.onSurfaceVariant,
                       onTap: onReply,
-                    ),
+                    ),*/
                     const Spacer(),
                     Material(
                       color: Colors.transparent,
@@ -110,7 +141,7 @@ class CommentCard extends StatelessWidget {
                           child: Icon(
                             Icons.flag_outlined,
                             size: 18,
-                            color: colorScheme.outline.withValues(alpha: 0.5),
+                            color: colorScheme.outline,
                           ),
                         ),
                       ),
@@ -130,36 +161,38 @@ class _CommentActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  final bool isActive;
   final VoidCallback? onTap;
+  final String? semanticsLabel;
 
   const _CommentActionButton({
     required this.icon,
     required this.label,
     required this.color,
-    required this.isActive,
     this.onTap,
+    this.semanticsLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
+    return Semantics(
+      label: semanticsLabel,
+      button: true,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 18, color: color),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               Text(
                 label,
                 style: TextStyle(
                   color: color,
                   fontSize: 13,
-                  fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ],

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PostService {
@@ -52,8 +51,6 @@ class PostService {
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /posts: $rawList');
     }
-    debugPrint(rawList.toString());
-
     return rawList
         .whereType<Map<String, dynamic>>()
         .map(PostModel.fromJson)
@@ -131,7 +128,7 @@ class PostService {
       'image',
       file.path,
       filename: file.name,
-      contentType: MediaType('image', mimeSubtype),
+      contentType: http.MediaType('image', mimeSubtype),
     );
     request.files.add(multipartFile);
 

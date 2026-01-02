@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../user/models/user_model.dart';
@@ -7,6 +9,8 @@ part 'comment_model.g.dart';
 
 @freezed
 abstract class CommentModel with _$CommentModel {
+  const CommentModel._();
+
   const factory CommentModel({
     required int id,
     required String description,

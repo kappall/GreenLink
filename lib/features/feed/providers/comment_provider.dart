@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/providers/auth_provider.dart';
@@ -34,9 +35,7 @@ class Comments extends _$Comments {
     final authState = ref.read(authProvider);
     final token = authState.asData?.value.token;
 
-    if (token == null) throw Exception('Autenticazione necessaria');
-
-    return _commentService.fetchComments(contentId: contentId);
+    return _commentService.fetchComments(contentId: contentId, token: token);
   }
 
   List<CommentModel> _sortComments(
@@ -65,5 +64,40 @@ class Comments extends _$Comments {
     );
 
     ref.invalidateSelf();
+  }
+
+  Future<void> voteComment(int commentId, bool hasVoted) async {
+    final authState = ref.read(authProvider).value;
+    if (authState == null || authState.token == null) return;
+
+    final previousState = state;
+    debugPrint('previousState: $previousState');
+
+    if (state.hasValue) {
+      state = AsyncValue.data(
+        state.value!.map((comment) {
+          if (comment.id == commentId) {
+            final isCurrentlyVoted = comment.hasVoted;
+            return comment.copyWith(
+              hasVoted: !isCurrentlyVoted,
+              votesCount: isCurrentlyVoted
+                  ? comment.votesCount - 1
+                  : comment.votesCount + 1,
+            );
+          }
+          return comment;
+        }).toList(),
+      );
+    }
+
+    try {
+      await _commentService.voteComment(
+        token: authState.token!,
+        commentId: commentId,
+        hasVoted: hasVoted,
+      );
+    } catch (e) {
+      state = previousState;
+    }
   }
 }

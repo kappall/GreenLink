@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/comment_model.dart';
@@ -7,11 +8,17 @@ import '../models/comment_model.dart';
 class CommentService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
-  Future<List<CommentModel>> fetchComments({required int contentId}) async {
-    //TODO test quando va backend
+  Future<List<CommentModel>> fetchComments({
+    required int contentId,
+    required String? token,
+  }) async {
+    final headers = {'Accept': 'application/json'};
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
     final response = await http.get(
       Uri.parse('$_baseUrl/comments/$contentId'),
-      headers: {'Accept': 'application/json'},
+      headers: headers,
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -34,6 +41,9 @@ class CommentService {
         'Errore durante il recupero dei commenti: malformattato: $responseBody',
       );
     }
+
+    debugPrint('rawList: $rawList');
+
     return rawList
         .whereType<Map<String, dynamic>>()
         .map(CommentModel.fromJson)
@@ -52,10 +62,7 @@ class CommentService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({
-        'description': description,
-        'content': contentId,
-      }),
+      body: jsonEncode({'description': description, 'content': contentId}),
     );
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);
@@ -76,6 +83,28 @@ class CommentService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);
       throw Exception('Errore durante la segnalazione: $message');
+    }
+  }
+
+  Future<void> voteComment({
+    required String token,
+    required int commentId,
+    required bool hasVoted,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/comment/$commentId/vote');
+    final method = hasVoted ? http.delete : http.post;
+    final response = await method(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      throw Exception('Errore durante la votazione: $message');
     }
   }
 
