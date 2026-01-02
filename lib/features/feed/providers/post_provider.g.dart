@@ -63,39 +63,39 @@ abstract class _$CreatePostNotifier extends $Notifier<CreatePostState> {
   }
 }
 
-@ProviderFor(UserPosts)
-const userPostsProvider = UserPostsFamily._();
+@ProviderFor(Posts)
+const postsProvider = PostsFamily._();
 
-final class UserPostsProvider
-    extends $AsyncNotifierProvider<UserPosts, List<PostModel>> {
-  const UserPostsProvider._({
-    required UserPostsFamily super.from,
+final class PostsProvider
+    extends $AsyncNotifierProvider<Posts, List<PostModel>> {
+  const PostsProvider._({
+    required PostsFamily super.from,
     required int? super.argument,
   }) : super(
          retry: null,
-         name: r'userPostsProvider',
+         name: r'postsProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$userPostsHash();
+  String debugGetCreateSourceHash() => _$postsHash();
 
   @override
   String toString() {
-    return r'userPostsProvider'
+    return r'postsProvider'
         ''
         '($argument)';
   }
 
   @$internal
   @override
-  UserPosts create() => UserPosts();
+  Posts create() => Posts();
 
   @override
   bool operator ==(Object other) {
-    return other is UserPostsProvider && other.argument == argument;
+    return other is PostsProvider && other.argument == argument;
   }
 
   @override
@@ -104,34 +104,34 @@ final class UserPostsProvider
   }
 }
 
-String _$userPostsHash() => r'2ab96ab10cbfb9f1f314985741d7a224580b29bd';
+String _$postsHash() => r'9d2f8bbc41ed027fac922366d6f31d1a6562624f';
 
-final class UserPostsFamily extends $Family
+final class PostsFamily extends $Family
     with
         $ClassFamilyOverride<
-          UserPosts,
+          Posts,
           AsyncValue<List<PostModel>>,
           List<PostModel>,
           FutureOr<List<PostModel>>,
           int?
         > {
-  const UserPostsFamily._()
+  const PostsFamily._()
     : super(
         retry: null,
-        name: r'userPostsProvider',
+        name: r'postsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  UserPostsProvider call(int? userId) =>
-      UserPostsProvider._(argument: userId, from: this);
+  PostsProvider call(int? userId) =>
+      PostsProvider._(argument: userId, from: this);
 
   @override
-  String toString() => r'userPostsProvider';
+  String toString() => r'postsProvider';
 }
 
-abstract class _$UserPosts extends $AsyncNotifier<List<PostModel>> {
+abstract class _$Posts extends $AsyncNotifier<List<PostModel>> {
   late final _$args = ref.$arg as int?;
   int? get userId => _$args;
 

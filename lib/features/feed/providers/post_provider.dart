@@ -264,7 +264,7 @@ class CreatePostNotifier extends _$CreatePostNotifier {
       );
 
       // Refresh user posts and global feed
-      ref.invalidate(userPostsProvider);
+      ref.invalidate(postsProvider);
 
       state = CreatePostState(); // Reset state
       return true;
@@ -276,7 +276,7 @@ class CreatePostNotifier extends _$CreatePostNotifier {
 }
 
 @riverpod
-class UserPosts extends _$UserPosts {
+class Posts extends _$Posts {
   final _postService = PostService();
 
   @override
@@ -330,11 +330,46 @@ class UserPosts extends _$UserPosts {
     await _postService.deletePost(token: token, postId: postId);
     await refresh();
   }
+
+  Future<void> votePost(int postId, bool hasVoted) async {
+    final authState = ref.read(authProvider).value;
+    if (authState == null || authState.token == null) return;
+
+    final previousState = state;
+
+    // Aggiornamento Ottimistico locale
+    if (state.hasValue) {
+      state = AsyncValue.data(
+        state.value!.map((post) {
+          if (post.id == postId) {
+            final isCurrentlyVoted = post.hasVoted;
+            return post.copyWith(
+              hasVoted: !isCurrentlyVoted,
+              votesCount: isCurrentlyVoted
+                  ? post.votesCount - 1
+                  : post.votesCount + 1,
+            );
+          }
+          return post;
+        }).toList(),
+      );
+    }
+
+    try {
+      await _postService.votePost(
+        token: authState.token!,
+        postId: postId,
+        hasVoted: hasVoted,
+      );
+    } catch (e) {
+      state = previousState;
+    }
+  }
 }
 
 // ordine desc automatico
 final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
-  final postsAsync = ref.watch(userPostsProvider(null));
+  final postsAsync = ref.watch(postsProvider(null));
   final criteria = ref.watch(postSortCriteriaProvider);
   final filter = ref.watch(postFilterProvider);
 

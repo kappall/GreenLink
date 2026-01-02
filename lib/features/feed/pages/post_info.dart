@@ -26,7 +26,19 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final post = widget.post;
+    // Rendiamo la pagina reattiva ai cambiamenti del post nel provider (es. upvotes)
+    final postFromProvider =
+        ref.watch(
+          postsProvider(null).select(
+            (value) => value.value?.firstWhere(
+              (p) => p.id == widget.post.id,
+              orElse: () => widget.post,
+            ),
+          ),
+        ) ??
+        widget.post;
+
+    final post = postFromProvider;
     final timestamp = post.createdAt != null
         ? DateFormat('dd MMM yyyy, HH:mm').format(post.createdAt!.toLocal())
         : '';
@@ -113,6 +125,41 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                   ),
 
                   const SizedBox(height: 24),
+                  if (post.media.isNotEmpty) ...[
+                    SizedBox(
+                      height: 300,
+                      child: PageView.builder(
+                        itemCount: post.media.length,
+                        controller: PageController(viewportFraction: 0.9),
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(
+                                post.media[index],
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (post.media.length > 1)
+                      Center(
+                        child: Text(
+                          "Scorri per vedere altre foto (${post.media.length})",
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                  ],
                   const Text(
                     "Posizione",
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -130,57 +177,54 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  if (post.media.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      height: 300,
-                      child: PageView.builder(
-                        itemCount: post.media.length,
-                        controller: PageController(
-                          viewportFraction: 0.9,
-                        ), // Mostra un pezzetto della foto successiva
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
+                  const SizedBox(height: 24),
+                  Semantics(
+                    label: post.hasVoted
+                        ? "Hai votato questo post. Totale voti: ${post.votesCount}"
+                        : "Vota questo post. Attualmente ha ${post.votesCount} voti",
+                    button: true,
+                    onTapHint: "Tocca per votare",
+                    child: InkWell(
+                      onTap: () {
+                        ref
+                            .read(postsProvider(null).notifier)
+                            .votePost(post.id!, post.hasVoted);
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 4.0,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              post.hasVoted
+                                  ? Icons.trending_up
+                                  : Icons.trending_up_outlined,
+                              size: 22,
+                              color: post.hasVoted
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey[600],
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.memory(
-                                post.media[index],
-                                fit: BoxFit.cover,
+                            const SizedBox(width: 8),
+                            Text(
+                              '${post.votesCount} Upvotes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: post.hasVoted
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: post.hasVoted
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.black87,
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    if (post.media.length > 1)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Center(
-                          child: Text(
-                            "Scorri per vedere altre foto (${post.media.length})",
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 12,
-                            ),
-                          ),
+                          ],
                         ),
                       ),
-                  ],
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.trending_up,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text('${post.votesCount} Upvotes'),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   const Divider(),
@@ -295,7 +339,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
       setState(() => _isDeleting = true);
       try {
         await ref
-            .read(userPostsProvider(null).notifier)
+            .read(postsProvider(null).notifier)
             .deletePost(widget.post.id!);
         if (mounted) {
           Navigator.pop(context);
