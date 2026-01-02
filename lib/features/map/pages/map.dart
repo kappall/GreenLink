@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
@@ -17,8 +18,39 @@ class MapPage extends ConsumerStatefulWidget {
 }
 
 class _MapPageState extends ConsumerState<MapPage> {
-  final LatLng _initialCenter = const LatLng(45.4398, 12.3319);
+  final LatLng _fallbackCenter = const LatLng(45.4398, 12.3319); // Venezia
   final MapController _mapController = MapController();
+
+  @override
+  void initState() {
+    super.initState();
+    _determinePosition();
+  }
+
+  Future<void> _determinePosition() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return;
+      }
+
+      if (permission == LocationPermission.deniedForever) return;
+
+      final position = await Geolocator.getCurrentPosition();
+      if (mounted) {
+        _mapController.move(
+          LatLng(position.latitude, position.longitude),
+          12.0,
+        );
+      }
+    } catch (_) {
+      // In caso di errore restiamo dove siamo
+    }
+  }
 
   @override
   void dispose() {
@@ -31,64 +63,104 @@ class _MapPageState extends ConsumerState<MapPage> {
     final postsAsync = ref.watch(userPostsProvider(null));
     final eventsAsync = ref.watch(eventsProvider);
 
+    final posts = postsAsync.value ?? [];
+    final events = eventsAsync.value ?? [];
+
     return Scaffold(
-      body: postsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
-        data: (posts) => eventsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Error: $err')),
-          data: (events) {
-            return FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                initialCenter: _initialCenter,
-                initialZoom: 12.0,
-                minZoom: 10.0,
-                maxZoom: 18.0,
+      body: Stack(
+        children: [
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: _fallbackCenter,
+              initialZoom: 12.0,
+              minZoom: 3.0,
+              maxZoom: 18.0,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.greenlink.app',
               ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.greenlink.app',
-                ),
-                MarkerLayer(
-                  markers: [
-                    ...posts.map((post) => _buildPostMarker(context, post)),
-                    ...events.map((event) => _buildEventMarker(context, event)),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Semantics(
-                      label: "Ricentra la mappa sulla posizione iniziale",
-                      button: true,
-                      child: SizedBox(
-                        width: 60.0,
-                        height: 60.0,
-                        child: FloatingActionButton(
-                          heroTag: "recenter",
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primaryContainer,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          onPressed: () {
-                            _mapController.move(_initialCenter, 12.0);
-                          },
-                          child: const Icon(Icons.my_location, size: 30),
-                        ),
+              MarkerLayer(
+                markers: [
+                  ...posts.map((post) => _buildPostMarker(context, post)),
+                  ...events.map((event) => _buildEventMarker(context, event)),
+                ],
+              ),
+            ],
+          ),
+          // Indicatore di caricamento dati discreto
+          if (postsAsync.isLoading || eventsAsync.isLoading)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 4,
                       ),
-                    ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        "Caricamento segnalazioni...",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ),
+          // Pulsante Recenter
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FloatingActionButton(
+                heroTag: "recenter",
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                onPressed: () async {
+                  try {
+                    final position = await Geolocator.getCurrentPosition();
+                    _mapController.move(
+                      LatLng(position.latitude, position.longitude),
+                      12.0,
+                    );
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Impossibile recuperare la posizione"),
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: const Icon(Icons.my_location),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -98,32 +170,22 @@ class _MapPageState extends ConsumerState<MapPage> {
       point: LatLng(post.latitude, post.longitude),
       width: 40,
       height: 40,
-      child: Semantics(
-        label: "Segnalazione di  ?? 'utente', categoria ${post.category.label}",
-        button: true,
-        enabled: true,
-        child: GestureDetector(
-          onTap: () => _showSummarySheet(context, post: post),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: post.category.color, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Icon(
-              post.category.icon,
-              color: post.category.color,
-              size: 24,
-            ),
+      child: GestureDetector(
+        onTap: () => _showSummarySheet(context, post: post),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: post.category.color, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
+          child: Icon(post.category.icon, color: post.category.color, size: 24),
         ),
       ),
     );
@@ -134,28 +196,22 @@ class _MapPageState extends ConsumerState<MapPage> {
       point: LatLng(event.latitude, event.longitude),
       width: 45,
       height: 45,
-      child: Semantics(
-        label:
-            "Evento ${event.eventType.label}, ${event.description.split('\n').first}",
-        button: true,
-        enabled: true,
-        child: GestureDetector(
-          onTap: () => _showSummarySheet(context, event: event),
-          child: Container(
-            decoration: BoxDecoration(
-              color: event.eventType.color,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Icon(event.eventType.icon, color: Colors.white, size: 26),
+      child: GestureDetector(
+        onTap: () => _showSummarySheet(context, event: event),
+        child: Container(
+          decoration: BoxDecoration(
+            color: event.eventType.color,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
+          child: Icon(event.eventType.icon, color: Colors.white, size: 26),
         ),
       ),
     );
@@ -169,15 +225,15 @@ class _MapPageState extends ConsumerState<MapPage> {
     final isPost = post != null;
     final color = isPost ? post.category.color : event!.eventType.color;
     final title = isPost
-        ? 'Segnalazione'
+        ? "Segnalazione"
         : event!.description.split('\n').first;
     final description = isPost ? post.description : event!.description;
+    final icon = isPost ? post.category.icon : event!.eventType.icon;
 
     final geoKey = isPost
         ? (lat: post.latitude, lng: post.longitude)
         : (lat: event!.latitude, lng: event.longitude);
     final location = ref.watch(placeNameProvider(geoKey)).value;
-    final icon = isPost ? post.category.icon : event!.eventType.icon;
 
     showModalBottomSheet(
       context: context,
@@ -237,7 +293,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                     Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      location ?? '',
+                      location ?? 'Caricamento posizione...',
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                   ],
@@ -252,26 +308,18 @@ class _MapPageState extends ConsumerState<MapPage> {
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
-                  child: Semantics(
-                    label: "Apri la pagina di dettaglio",
-                    button: true,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        style: FilledButton.styleFrom(backgroundColor: color),
-                        onPressed: () {
-                          Navigator.pop(ctx);
-
-                          if (isPost) {
-                            context.go('/post-info', extra: post);
-                          } else {
-                            context.go('/event-details', extra: event);
-                          }
-                        },
-                        icon: const Icon(Icons.arrow_forward),
-                        label: const Text("Vedi Dettagli"),
-                      ),
-                    ),
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(backgroundColor: color),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      if (isPost) {
+                        context.push('/post-info', extra: post);
+                      } else {
+                        context.push('/event-details', extra: event);
+                      }
+                    },
+                    icon: const Icon(Icons.arrow_forward),
+                    label: const Text("Vedi Dettagli"),
                   ),
                 ),
               ],
