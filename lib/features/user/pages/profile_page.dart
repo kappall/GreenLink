@@ -20,9 +20,7 @@ class ProfilePage extends ConsumerWidget {
     );
     final colorScheme = Theme.of(context).colorScheme;
     final currentUserAsync = ref.watch(currentUserProvider);
-    final userPostsAsync = ref.watch(
-      userPostsProvider(currentUserAsync.value?.id),
-    );
+    final userPostsAsync = ref.watch(postsProvider(currentUserAsync.value?.id));
     final userEventsAsync = AsyncValue.data(
       [],
     ); // TODO: quando implemenatto sostituire con userEventsProvider
