@@ -20,6 +20,8 @@ class PostCard extends ConsumerWidget {
     final locationName =
         locationAsync.value ?? "${post.latitude}, ${post.longitude}";
 
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -129,16 +131,16 @@ class PostCard extends ConsumerWidget {
                             : Icons.trending_up_outlined,
                         size: 18,
                         color: post.hasVoted
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.secondary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${post.votesCount} Upvotes',
                         style: TextStyle(
                           color: post.hasVoted
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey[700],
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.secondary,
                           fontWeight: post.hasVoted
                               ? FontWeight.bold
                               : FontWeight.normal,
@@ -150,11 +152,11 @@ class PostCard extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const Icon(Icons.comment, size: 16, color: Colors.grey),
+            Icon(Icons.comment, size: 16, color: theme.colorScheme.primary),
             const SizedBox(width: 4),
             Text(
               "${post.comments.length}",
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: theme.colorScheme.primary),
             ),
           ],
         ),

@@ -15,6 +15,8 @@ class CommentInputField extends ConsumerWidget {
     final target = ref.watch(replyTargetProvider);
     final bool isReplying = target != null;
 
+    final theme = Theme.of(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -24,13 +26,8 @@ class CommentInputField extends ConsumerWidget {
             onCancel: () => ref.read(replyTargetProvider.notifier).reset(),
           ),
         Container(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 8,
-            left: 16,
-            right: 8,
-            top: 8,
-          ),
-          color: Colors.white,
+          padding: EdgeInsets.only(left: 16, right: 8, top: 8),
+          color: theme.colorScheme.secondaryContainer,
           child: Row(
             children: [
               Expanded(
@@ -41,11 +38,17 @@ class CommentInputField extends ConsumerWidget {
                         ? "Rispondi a ${target.$2}..."
                         : "Aggiungi un commento...",
                     border: InputBorder.none,
+                    hintStyle: TextStyle(
+                      color: theme.colorScheme.onSecondaryContainer,
+                    ),
                   ),
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.send, color: Colors.blue),
+                icon: Icon(
+                  Icons.send,
+                  color: theme.colorScheme.onSecondaryContainer,
+                ),
                 onPressed: () async {
                   final text = _controller.text.trim();
                   if (text.isEmpty) return;
