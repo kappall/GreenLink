@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/core/common/widgets/badge.dart';
+import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/widgets/comment_input_field.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/common/widgets/badge.dart';
-import '../../../core/providers/geocoding_provider.dart';
 import '../providers/comment_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/comment_card.dart';
@@ -111,7 +111,47 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                     post.description,
                     style: const TextStyle(fontSize: 18, height: 1.5),
                   ),
-                  const SizedBox(height: 16),
+                  if (post.media.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: 300,
+                      child: PageView.builder(
+                        itemCount: post.media.length,
+                        controller: PageController(
+                          viewportFraction: 0.9,
+                        ), // Mostra un pezzetto della foto successiva
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(
+                                post.media[index],
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (post.media.length > 1)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Center(
+                          child: Text(
+                            "Scorri per vedere altre foto (${post.media.length})",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+
+                  const SizedBox(height: 24),
                   const Text(
                     "Posizione",
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

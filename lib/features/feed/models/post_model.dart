@@ -1,5 +1,7 @@
 // ignore_for_file: invalid_annotation_target
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
@@ -21,6 +23,29 @@ enum PostCategory {
   unknown,
 }
 
+class MediaConverter implements JsonConverter<List<Uint8List>, List<dynamic>?> {
+  const MediaConverter();
+
+  @override
+  List<Uint8List> fromJson(List<dynamic>? json) {
+    if (json == null) return [];
+    return json
+        .map((item) {
+          // Accede a item['data']['data'] che è la lista di int
+          final bufferData = item['data'];
+          if (bufferData != null && bufferData['data'] is List) {
+            return Uint8List.fromList(List<int>.from(bufferData['data']));
+          }
+          return Uint8List(0);
+        })
+        .where((bytes) => bytes.isNotEmpty)
+        .toList();
+  }
+
+  @override
+  List<dynamic> toJson(List<Uint8List> object) => [];
+}
+
 @freezed
 abstract class PostModel with _$PostModel {
   const PostModel._();
@@ -33,6 +58,7 @@ abstract class PostModel with _$PostModel {
     required double latitude,
     required double longitude,
     required UserModel author,
+    @MediaConverter() @Default([]) List<Uint8List> media,
     @JsonKey(name: 'votes_count') @Default(0) int votesCount,
     @Default([]) List<CommentModel> comments,
     @JsonKey(name: 'has_voted') @Default(false) bool hasVoted,

@@ -18,6 +18,9 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
   latitude: (json['latitude'] as num).toDouble(),
   longitude: (json['longitude'] as num).toDouble(),
   author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
+  media: json['media'] == null
+      ? const []
+      : const MediaConverter().fromJson(json['media'] as List?),
   votesCount: (json['votes_count'] as num?)?.toInt() ?? 0,
   comments:
       (json['comments'] as List<dynamic>?)
@@ -41,6 +44,7 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'author': instance.author,
+      'media': const MediaConverter().toJson(instance.media),
       'votes_count': instance.votesCount,
       'comments': instance.comments,
       'has_voted': instance.hasVoted,

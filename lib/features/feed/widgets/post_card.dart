@@ -81,6 +81,18 @@ class PostCard extends ConsumerWidget {
         const SizedBox(height: 12),
         Text(post.description),
         const SizedBox(height: 12),
+        if (post.media.isNotEmpty)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.memory(
+              post.media.first,
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              // cacheWidth/Height per non appesantire la RAM nel feed
+              cacheWidth: 500,
+            ),
+          ),
         Row(
           children: [
             const Icon(Icons.location_on, size: 16, color: Colors.grey),
