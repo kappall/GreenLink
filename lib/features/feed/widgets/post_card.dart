@@ -155,7 +155,7 @@ class PostCard extends ConsumerWidget {
             Icon(Icons.comment, size: 16, color: theme.colorScheme.primary),
             const SizedBox(width: 4),
             Text(
-              "${post.comments.length}",
+              "${post.commentsCount}",
               style: TextStyle(color: theme.colorScheme.primary),
             ),
           ],

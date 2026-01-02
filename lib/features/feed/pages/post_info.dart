@@ -235,6 +235,8 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 4),
+                    Text("${post.commentsCount} Commenti"),
                     const SizedBox(height: 20),
                     const Divider(),
                     const SizedBox(height: 20),

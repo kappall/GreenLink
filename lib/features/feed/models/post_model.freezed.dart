@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PostModel {
 
- int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude; UserModel get author;@MediaConverter() List<Uint8List> get media;@JsonKey(name: 'votes_count') int get votesCount; List<CommentModel> get comments;@JsonKey(name: 'has_voted') bool get hasVoted;@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory get category;
+ int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude; UserModel get author;@MediaConverter() List<Uint8List> get media;@JsonKey(name: 'votes_count') int get votesCount;@JsonKey(name: 'comments_count') int get commentsCount; List<CommentModel> get comments;@JsonKey(name: 'has_voted') bool get hasVoted;@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory get category;
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $PostModelCopyWith<PostModel> get copyWith => _$PostModelCopyWithImpl<PostModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other.media, media)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&const DeepCollectionEquality().equals(other.comments, comments)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.category, category) || other.category == category));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other.media, media)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&(identical(other.commentsCount, commentsCount) || other.commentsCount == commentsCount)&&const DeepCollectionEquality().equals(other.comments, comments)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.category, category) || other.category == category));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,description,createdAt,deletedAt,latitude,longitude,author,const DeepCollectionEquality().hash(media),votesCount,const DeepCollectionEquality().hash(comments),hasVoted,category);
+int get hashCode => Object.hash(runtimeType,id,description,createdAt,deletedAt,latitude,longitude,author,const DeepCollectionEquality().hash(media),votesCount,commentsCount,const DeepCollectionEquality().hash(comments),hasVoted,category);
 
 @override
 String toString() {
-  return 'PostModel(id: $id, description: $description, createdAt: $createdAt, deletedAt: $deletedAt, latitude: $latitude, longitude: $longitude, author: $author, media: $media, votesCount: $votesCount, comments: $comments, hasVoted: $hasVoted, category: $category)';
+  return 'PostModel(id: $id, description: $description, createdAt: $createdAt, deletedAt: $deletedAt, latitude: $latitude, longitude: $longitude, author: $author, media: $media, votesCount: $votesCount, commentsCount: $commentsCount, comments: $comments, hasVoted: $hasVoted, category: $category)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $PostModelCopyWith<$Res>  {
   factory $PostModelCopyWith(PostModel value, $Res Function(PostModel) _then) = _$PostModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'comments_count') int commentsCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
 });
 
 
@@ -65,7 +65,7 @@ class _$PostModelCopyWithImpl<$Res>
 
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = null,Object? media = null,Object? votesCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = null,Object? media = null,Object? votesCount = null,Object? commentsCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -76,6 +76,7 @@ as double,longitude: null == longitude ? _self.longitude : longitude // ignore: 
 as double,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as UserModel,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
 as List<Uint8List>,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
+as int,commentsCount: null == commentsCount ? _self.commentsCount : commentsCount // ignore: cast_nullable_to_non_nullable
 as int,comments: null == comments ? _self.comments : comments // ignore: cast_nullable_to_non_nullable
 as List<CommentModel>,hasVoted: null == hasVoted ? _self.hasVoted : hasVoted // ignore: cast_nullable_to_non_nullable
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
@@ -173,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PostModel() when $default != null:
-return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.comments,_that.hasVoted,_that.category);case _:
+return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.commentsCount,_that.comments,_that.hasVoted,_that.category);case _:
   return orElse();
 
 }
@@ -194,10 +195,10 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)  $default,) {final _that = this;
 switch (_that) {
 case _PostModel():
-return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.comments,_that.hasVoted,_that.category);case _:
+return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.commentsCount,_that.comments,_that.hasVoted,_that.category);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -214,10 +215,10 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,) {final _that = this;
 switch (_that) {
 case _PostModel() when $default != null:
-return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.comments,_that.hasVoted,_that.category);case _:
+return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.commentsCount,_that.comments,_that.hasVoted,_that.category);case _:
   return null;
 
 }
@@ -229,7 +230,7 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 @JsonSerializable()
 
 class _PostModel extends PostModel {
-  const _PostModel({this.id, required this.description, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'deleted_at') this.deletedAt, required this.latitude, required this.longitude, required this.author, @MediaConverter() final  List<Uint8List> media = const [], @JsonKey(name: 'votes_count') this.votesCount = 0, final  List<CommentModel> comments = const [], @JsonKey(name: 'has_voted') this.hasVoted = false, @JsonKey(unknownEnumValue: PostCategory.unknown) required this.category}): _media = media,_comments = comments,super._();
+  const _PostModel({this.id, required this.description, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'deleted_at') this.deletedAt, required this.latitude, required this.longitude, required this.author, @MediaConverter() final  List<Uint8List> media = const [], @JsonKey(name: 'votes_count') this.votesCount = 0, @JsonKey(name: 'comments_count') this.commentsCount = 0, final  List<CommentModel> comments = const [], @JsonKey(name: 'has_voted') this.hasVoted = false, @JsonKey(unknownEnumValue: PostCategory.unknown) required this.category}): _media = media,_comments = comments,super._();
   factory _PostModel.fromJson(Map<String, dynamic> json) => _$PostModelFromJson(json);
 
 @override final  int? id;
@@ -247,6 +248,7 @@ class _PostModel extends PostModel {
 }
 
 @override@JsonKey(name: 'votes_count') final  int votesCount;
+@override@JsonKey(name: 'comments_count') final  int commentsCount;
  final  List<CommentModel> _comments;
 @override@JsonKey() List<CommentModel> get comments {
   if (_comments is EqualUnmodifiableListView) return _comments;
@@ -270,16 +272,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other._media, _media)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&const DeepCollectionEquality().equals(other._comments, _comments)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.category, category) || other.category == category));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other._media, _media)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&(identical(other.commentsCount, commentsCount) || other.commentsCount == commentsCount)&&const DeepCollectionEquality().equals(other._comments, _comments)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.category, category) || other.category == category));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,description,createdAt,deletedAt,latitude,longitude,author,const DeepCollectionEquality().hash(_media),votesCount,const DeepCollectionEquality().hash(_comments),hasVoted,category);
+int get hashCode => Object.hash(runtimeType,id,description,createdAt,deletedAt,latitude,longitude,author,const DeepCollectionEquality().hash(_media),votesCount,commentsCount,const DeepCollectionEquality().hash(_comments),hasVoted,category);
 
 @override
 String toString() {
-  return 'PostModel(id: $id, description: $description, createdAt: $createdAt, deletedAt: $deletedAt, latitude: $latitude, longitude: $longitude, author: $author, media: $media, votesCount: $votesCount, comments: $comments, hasVoted: $hasVoted, category: $category)';
+  return 'PostModel(id: $id, description: $description, createdAt: $createdAt, deletedAt: $deletedAt, latitude: $latitude, longitude: $longitude, author: $author, media: $media, votesCount: $votesCount, commentsCount: $commentsCount, comments: $comments, hasVoted: $hasVoted, category: $category)';
 }
 
 
@@ -290,7 +292,7 @@ abstract mixin class _$PostModelCopyWith<$Res> implements $PostModelCopyWith<$Re
   factory _$PostModelCopyWith(_PostModel value, $Res Function(_PostModel) _then) = __$PostModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'comments_count') int commentsCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
 });
 
 
@@ -307,7 +309,7 @@ class __$PostModelCopyWithImpl<$Res>
 
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = null,Object? media = null,Object? votesCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = null,Object? media = null,Object? votesCount = null,Object? commentsCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
   return _then(_PostModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -318,6 +320,7 @@ as double,longitude: null == longitude ? _self.longitude : longitude // ignore: 
 as double,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as UserModel,media: null == media ? _self._media : media // ignore: cast_nullable_to_non_nullable
 as List<Uint8List>,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
+as int,commentsCount: null == commentsCount ? _self.commentsCount : commentsCount // ignore: cast_nullable_to_non_nullable
 as int,comments: null == comments ? _self._comments : comments // ignore: cast_nullable_to_non_nullable
 as List<CommentModel>,hasVoted: null == hasVoted ? _self.hasVoted : hasVoted // ignore: cast_nullable_to_non_nullable
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable

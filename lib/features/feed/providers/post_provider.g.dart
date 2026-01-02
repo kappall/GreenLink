@@ -42,7 +42,7 @@ final class CreatePostNotifierProvider
 }
 
 String _$createPostNotifierHash() =>
-    r'72bcfa199c5544325ec0f544d4f76505f7fab645';
+    r'9b1c2244a76324f4ff576b414636ec6fa0566f18';
 
 abstract class _$CreatePostNotifier extends $Notifier<CreatePostState> {
   CreatePostState build();
@@ -104,7 +104,7 @@ final class PostsProvider
   }
 }
 
-String _$postsHash() => r'9d2f8bbc41ed027fac922366d6f31d1a6562624f';
+String _$postsHash() => r'96705fa4cb86b8ab3fad91fa7b3dd6240cdfac66';
 
 final class PostsFamily extends $Family
     with

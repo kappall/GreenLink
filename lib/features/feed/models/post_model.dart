@@ -60,6 +60,7 @@ abstract class PostModel with _$PostModel {
     required UserModel author,
     @MediaConverter() @Default([]) List<Uint8List> media,
     @JsonKey(name: 'votes_count') @Default(0) int votesCount,
+    @JsonKey(name: 'comments_count') @Default(0) int commentsCount,
     @Default([]) List<CommentModel> comments,
     @JsonKey(name: 'has_voted') @Default(false) bool hasVoted,
     @JsonKey(unknownEnumValue: PostCategory.unknown)

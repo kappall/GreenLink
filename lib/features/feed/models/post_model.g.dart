@@ -22,6 +22,7 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       ? const []
       : const MediaConverter().fromJson(json['media'] as List?),
   votesCount: (json['votes_count'] as num?)?.toInt() ?? 0,
+  commentsCount: (json['comments_count'] as num?)?.toInt() ?? 0,
   comments:
       (json['comments'] as List<dynamic>?)
           ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
@@ -46,6 +47,7 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'author': instance.author,
       'media': const MediaConverter().toJson(instance.media),
       'votes_count': instance.votesCount,
+      'comments_count': instance.commentsCount,
       'comments': instance.comments,
       'has_voted': instance.hasVoted,
       'category': _$PostCategoryEnumMap[instance.category]!,

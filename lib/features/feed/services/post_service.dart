@@ -52,6 +52,7 @@ class PostService {
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /posts: $rawList');
     }
+    debugPrint(rawList.toString());
 
     return rawList
         .whereType<Map<String, dynamic>>()
