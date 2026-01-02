@@ -14,7 +14,6 @@ abstract class CommentModel with _$CommentModel {
     @Default([]) List<UserModel> votes,
     @JsonKey(name: 'votes_count') required int votesCount,
     @JsonKey(name: 'has_voted') @Default(false) bool hasVoted,
-    required int content,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     @JsonKey(name: 'created_at') required DateTime createdAt,
   }) = _CommentModel;
