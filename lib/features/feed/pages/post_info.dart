@@ -24,6 +24,14 @@ class PostInfoPage extends ConsumerStatefulWidget {
 
 class _PostInfoPageState extends ConsumerState<PostInfoPage> {
   bool _isDeleting = false;
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,38 +141,46 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
 
                     const SizedBox(height: 24),
                     if (post.media.isNotEmpty) ...[
-                      SizedBox(
-                        height: 300,
-                        child: PageView.builder(
-                          itemCount: post.media.length,
-                          controller: PageController(viewportFraction: 0.9),
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.memory(
-                                  post.media[index],
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          },
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          height: 300,
+                          child: PageView.builder(
+                            controller: _pageController,
+                            physics: const PageScrollPhysics(),
+                            itemCount: post.media.length,
+                            onPageChanged: (index) {
+                              setState(() => _currentPage = index);
+                            },
+                            itemBuilder: (context, index) {
+                              return Image.memory(
+                                post.media[index],
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      if (post.media.length > 1)
-                        Center(
-                          child: Text(
-                            "Scorri per vedere altre foto (${post.media.length})",
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 12,
+                      if (post.media.length > 1) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            post.media.length,
+                            (index) => Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _currentPage == index
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.primary.withValues(alpha: 0.25),
+                              ),
                             ),
                           ),
                         ),
+                      ],
                       const SizedBox(height: 20),
                     ],
                     const Text(
