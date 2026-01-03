@@ -224,8 +224,8 @@ return $default(_that.id,_that.description,_that.author,_that.votes,_that.votesC
 /// @nodoc
 @JsonSerializable()
 
-class _CommentModel implements CommentModel {
-  const _CommentModel({required this.id, required this.description, required this.author, final  List<UserModel> votes = const [], @JsonKey(name: 'votes_count') required this.votesCount, @JsonKey(name: 'has_voted') this.hasVoted = false, @JsonKey(name: 'deleted_at') this.deletedAt, @JsonKey(name: 'created_at') required this.createdAt}): _votes = votes;
+class _CommentModel extends CommentModel {
+  const _CommentModel({required this.id, required this.description, required this.author, final  List<UserModel> votes = const [], @JsonKey(name: 'votes_count') required this.votesCount, @JsonKey(name: 'has_voted') this.hasVoted = false, @JsonKey(name: 'deleted_at') this.deletedAt, @JsonKey(name: 'created_at') required this.createdAt}): _votes = votes,super._();
   factory _CommentModel.fromJson(Map<String, dynamic> json) => _$CommentModelFromJson(json);
 
 @override final  int id;

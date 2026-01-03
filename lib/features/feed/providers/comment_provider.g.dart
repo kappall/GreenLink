@@ -103,7 +103,7 @@ final class CommentsProvider
   }
 }
 
-String _$commentsHash() => r'0ae6147a89e83daee77e8148f86c6b25631c72b0';
+String _$commentsHash() => r'4a9aad27bfd828a55c684290b8ab0ac47afe5f4c';
 
 final class CommentsFamily extends $Family
     with

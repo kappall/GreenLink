@@ -2,6 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 
 import '../../feed/models/comment_model.dart';
 import '../../feed/models/post_model.dart';
@@ -28,14 +29,13 @@ abstract class Report with _$Report {
   const factory Report({
     int? id,
     required String reason,
-    required int author,
+    required UserModel author,
     required ReportContent content,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _Report;
 
-  String get reporter =>
-      author.toString(); //TODO: if backend changes change to author.name
+  String get reporter => author.displayName;
   String get timestamp => createdAt?.toIso8601String() ?? '';
 
   String get targetContent => content.when(
@@ -45,12 +45,10 @@ abstract class Report with _$Report {
   );
 
   String get targetId => content.when(
-    post: (data) => data.id?.toString() ?? '',
-    event: (data) => data.id?.toString() ?? '',
-    comment: (data) => data.id?.toString() ?? '',
+    post: (data) => data.id!.toString(),
+    event: (data) => data.id!.toString(),
+    comment: (data) => data.id.toString(),
   );
-
-  String? get details => null; // Campo non più presente nello schema
 
   ReportType get type => content.when(
     post: (_) => ReportType.post,

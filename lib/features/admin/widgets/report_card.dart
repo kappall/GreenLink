@@ -111,16 +111,6 @@ class ReportCard extends StatelessWidget {
             ),
           ),
 
-          if (report.details != null &&
-              report.details != null &&
-              report.details!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              "Note: ${report.details}",
-              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-            ),
-          ],
-
           const SizedBox(height: 16),
           const Divider(height: 1),
           const SizedBox(height: 8),

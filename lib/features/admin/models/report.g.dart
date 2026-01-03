@@ -38,7 +38,7 @@ Map<String, dynamic> _$ReportContentCommentToJson(
 _Report _$ReportFromJson(Map<String, dynamic> json) => _Report(
   id: (json['id'] as num?)?.toInt(),
   reason: json['reason'] as String,
-  author: (json['author'] as num).toInt(),
+  author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
   content: ReportContent.fromJson(json['content'] as Map<String, dynamic>),
   deletedAt: json['deleted_at'] == null
       ? null

@@ -102,11 +102,15 @@ class AdminService {
     required bool approve,
   }) async {
     try {
+      if (report.content == null) {
+        throw Exception('Il contenuto del report è nullo');
+      }
+
       if (approve) {
         String? endpoint;
         int? contentId;
 
-        report.content.when(
+        report.content!.when(
           post: (post) {
             endpoint = 'posts';
             contentId = post.id;
