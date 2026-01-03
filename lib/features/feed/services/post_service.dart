@@ -163,11 +163,10 @@ class PostService {
     }
   }
 
-  Future<void> reportPost({
+  Future<void> reportContent({
     required String token,
-    required PostModel post,
+    required int contentId,
     required String reason,
-    required int currentUserId,
   }) async {
     final uri = Uri.parse('$_baseUrl/report');
     final response = await http.post(
@@ -179,12 +178,7 @@ class PostService {
       },
       body: jsonEncode({
         "reason": reason,
-        "author": {"id": currentUserId},
-        "content": {
-          "id": post.id,
-          "description": post.description,
-          "author": {"id": post.author.id},
-        },
+        "content": {"id": contentId},
       }),
     );
 

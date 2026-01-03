@@ -321,8 +321,8 @@ class Posts extends _$Posts {
     return _postService.fetchAllPosts(token: token);
   }
 
-  Future<void> reportPost({
-    required PostModel post,
+  Future<void> reportContent({
+    required int contentId,
     required String reason,
   }) async {
     final authState = ref.read(authProvider);
@@ -333,11 +333,10 @@ class Posts extends _$Posts {
       throw Exception('Utente non autenticato');
     }
 
-    await _postService.reportPost(
+    await _postService.reportContent(
       token: token,
-      post: post,
+      contentId: contentId,
       reason: reason,
-      currentUserId: currentUserId,
     );
   }
 

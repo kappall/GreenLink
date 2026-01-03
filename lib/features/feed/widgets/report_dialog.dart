@@ -4,6 +4,8 @@ import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 
+import '../models/comment_model.dart';
+
 void showReportDialog(BuildContext context, {required Object item}) {
   showDialog(
     context: context,
@@ -66,13 +68,23 @@ Future<void> _handleReport(
   String reason,
 ) async {
   try {
+    int? id;
+
     if (item is PostModel) {
-      await ref
-          .read(postsProvider(null).notifier)
-          .reportPost(post: item, reason: reason);
+      id = item.id;
     } else if (item is EventModel) {
-      //await ref.read(eventsProvider.notifier).reportEvent(event: item, reason: reason);
+      id = item.id;
+    } else if (item is CommentModel) {
+      id = item.id;
     }
+
+    if (id == null) {
+      throw Exception('Nessun ID trovato per il contenuto da segnalare');
+    }
+
+    await ref
+        .read(postsProvider(null).notifier)
+        .reportContent(contentId: id, reason: reason);
 
     if (context.mounted) {
       Navigator.of(context).pop();

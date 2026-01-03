@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import '../providers/comment_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/comment_card.dart';
+import '../widgets/report_dialog.dart';
 
 class PostInfoPage extends ConsumerStatefulWidget {
   final PostModel post;
@@ -295,7 +296,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                                     // Logica risposta
                                   },
                                   onReport: () {
-                                    // Logica segnalazione
+                                    showReportDialog(context, item: comment);
                                   },
                                 );
                               },

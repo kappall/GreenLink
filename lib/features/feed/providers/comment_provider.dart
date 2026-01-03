@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/providers/auth_provider.dart';
@@ -59,10 +58,18 @@ class Comments extends _$Comments {
 
     await _commentService.postComment(
       token: token,
-      contentId: contentId, //il contentId è passato come parametro al provider
+      contentId: contentId,
       description: description,
     );
 
+    ref.invalidateSelf();
+  }
+
+  Future<void> deleteComment(int commentId) async {
+    final token = ref.read(authProvider).asData?.value.token;
+    if (token == null) return;
+
+    await _commentService.deleteComment(token: token, commentId: commentId);
     ref.invalidateSelf();
   }
 
@@ -71,7 +78,6 @@ class Comments extends _$Comments {
     if (authState == null || authState.token == null) return;
 
     final previousState = state;
-    debugPrint('previousState: $previousState');
 
     if (state.hasValue) {
       state = AsyncValue.data(

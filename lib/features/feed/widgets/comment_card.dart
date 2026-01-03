@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/card.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../user/providers/user_provider.dart';
 import '../models/comment_model.dart';
 import '../providers/comment_provider.dart';
 
@@ -20,6 +22,35 @@ class CommentCard extends ConsumerWidget {
     this.onReport,
   });
 
+  Future<void> _confirmDeleteComment(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Elimina Commento"),
+        content: const Text("Sei sicuro di voler eliminare questo commento?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Annulla"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Elimina", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await ref
+          .read(commentsProvider(postId).notifier)
+          .deleteComment(comment.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final timestamp = DateFormat(
@@ -27,6 +58,10 @@ class CommentCard extends ConsumerWidget {
     ).format(comment.createdAt.toLocal());
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isAdmin = ref.watch(authProvider).value?.isAdmin ?? false;
+    final isAuthor = currentUser?.id == comment.author.id;
 
     return UiCard(
       child: Row(
@@ -84,6 +119,11 @@ class CommentCard extends ConsumerWidget {
                   children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        ref
+                            .read(commentsProvider(postId).notifier)
+                            .voteComment(comment.id, comment.hasVoted);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -103,7 +143,7 @@ class CommentCard extends ConsumerWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '${comment.votesCount} Upvotes',
+                              '${comment.votesCount}',
                               style: TextStyle(
                                 color: comment.hasVoted
                                     ? theme.colorScheme.primary
@@ -116,34 +156,28 @@ class CommentCard extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      onTap: () {
-                        ref
-                            .read(commentsProvider(postId).notifier)
-                            .voteComment(comment.id, comment.hasVoted);
-                      },
                     ),
-                    /*
-                    _CommentActionButton(
-                      icon: Icons.chat_bubble_outline_rounded,
-                      label: "Rispondi",
-                      semanticsLabel: "Rispondi al commento",
-                      color: colorScheme.onSurfaceVariant,
-                      onTap: onReply,
-                    ),*/
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                      onPressed: onReply,
+                    ),
                     const Spacer(),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: onReport,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Icon(
-                            Icons.flag_outlined,
-                            size: 18,
-                            color: colorScheme.outline,
-                          ),
+                    if (isAuthor || isAdmin)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: Colors.red,
                         ),
+                        onPressed: () => _confirmDeleteComment(context, ref),
+                      ),
+                    IconButton(
+                      onPressed: onReport,
+                      icon: Icon(
+                        Icons.flag_outlined,
+                        size: 18,
+                        color: colorScheme.outline,
                       ),
                     ),
                   ],
@@ -152,52 +186,6 @@ class CommentCard extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CommentActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback? onTap;
-  final String? semanticsLabel;
-
-  const _CommentActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    this.onTap,
-    this.semanticsLabel,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: semanticsLabel,
-      button: true,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 18, color: color),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 13,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
