@@ -23,8 +23,8 @@ import 'features/admin/pages/reports_page.dart';
 import 'features/admin/pages/user_detail_page.dart';
 import 'features/admin/pages/users_page.dart';
 import 'features/auth/pages/partner_activation_page.dart';
-import 'features/user/pages/profile_page.dart';
 import 'features/feed/pages/create_post.dart';
+import 'features/user/pages/profile_page.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
   return CustomTransitionPage(
@@ -89,7 +89,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLoggedIn && isAdmin && !isAdminRoute && !isSharedRoute) {
-        return '/admin';
+        return '/admin/reports';
       }
 
       return null;
@@ -162,6 +162,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      GoRoute(path: '/admin', redirect: (context, state) => '/admin/reports'),
       GoRoute(
         path: '/admin/create-partner',
         builder: (context, state) => const CreatePartnerPage(),
