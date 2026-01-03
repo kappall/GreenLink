@@ -15,16 +15,20 @@ ReportContent _$ReportContentFromJson(
   Map<String, dynamic> json
 ) {
         switch (json['type']) {
-                  case 'post':
+                  case 'Post':
           return ReportContentPost.fromJson(
             json
           );
-                case 'event':
+                case 'Event':
           return ReportContentEvent.fromJson(
             json
           );
-                case 'comment':
+                case 'Comment':
           return ReportContentComment.fromJson(
+            json
+          );
+                case 'Unknown':
+          return ReportContentUnknown.fromJson(
             json
           );
         
@@ -42,7 +46,7 @@ ReportContent _$ReportContentFromJson(
 /// @nodoc
 mixin _$ReportContent {
 
- Object get data;
+
 
   /// Serializes this ReportContent to a JSON map.
   Map<String, dynamic> toJson();
@@ -50,16 +54,16 @@ mixin _$ReportContent {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContent&&const DeepCollectionEquality().equals(other.data, data));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContent);
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(data));
+int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'ReportContent(data: $data)';
+  return 'ReportContent()';
 }
 
 
@@ -85,13 +89,14 @@ extension ReportContentPatterns on ReportContent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ReportContentPost value)?  post,TResult Function( ReportContentEvent value)?  event,TResult Function( ReportContentComment value)?  comment,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ReportContentPost value)?  post,TResult Function( ReportContentEvent value)?  event,TResult Function( ReportContentComment value)?  comment,TResult Function( ReportContentUnknown value)?  unknown,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case ReportContentPost() when post != null:
 return post(_that);case ReportContentEvent() when event != null:
 return event(_that);case ReportContentComment() when comment != null:
-return comment(_that);case _:
+return comment(_that);case ReportContentUnknown() when unknown != null:
+return unknown(_that);case _:
   return orElse();
 
 }
@@ -109,13 +114,14 @@ return comment(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ReportContentPost value)  post,required TResult Function( ReportContentEvent value)  event,required TResult Function( ReportContentComment value)  comment,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ReportContentPost value)  post,required TResult Function( ReportContentEvent value)  event,required TResult Function( ReportContentComment value)  comment,required TResult Function( ReportContentUnknown value)  unknown,}){
 final _that = this;
 switch (_that) {
 case ReportContentPost():
 return post(_that);case ReportContentEvent():
 return event(_that);case ReportContentComment():
-return comment(_that);case _:
+return comment(_that);case ReportContentUnknown():
+return unknown(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -132,13 +138,14 @@ return comment(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ReportContentPost value)?  post,TResult? Function( ReportContentEvent value)?  event,TResult? Function( ReportContentComment value)?  comment,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ReportContentPost value)?  post,TResult? Function( ReportContentEvent value)?  event,TResult? Function( ReportContentComment value)?  comment,TResult? Function( ReportContentUnknown value)?  unknown,}){
 final _that = this;
 switch (_that) {
 case ReportContentPost() when post != null:
 return post(_that);case ReportContentEvent() when event != null:
 return event(_that);case ReportContentComment() when comment != null:
-return comment(_that);case _:
+return comment(_that);case ReportContentUnknown() when unknown != null:
+return unknown(_that);case _:
   return null;
 
 }
@@ -155,12 +162,13 @@ return comment(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( PostModel data)?  post,TResult Function( EventModel data)?  event,TResult Function( CommentModel data)?  comment,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( int id,  String description)?  post,TResult Function( int id,  String description)?  event,TResult Function( int id,  String description)?  comment,TResult Function()?  unknown,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ReportContentPost() when post != null:
-return post(_that.data);case ReportContentEvent() when event != null:
-return event(_that.data);case ReportContentComment() when comment != null:
-return comment(_that.data);case _:
+return post(_that.id,_that.description);case ReportContentEvent() when event != null:
+return event(_that.id,_that.description);case ReportContentComment() when comment != null:
+return comment(_that.id,_that.description);case ReportContentUnknown() when unknown != null:
+return unknown();case _:
   return orElse();
 
 }
@@ -178,12 +186,13 @@ return comment(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( PostModel data)  post,required TResult Function( EventModel data)  event,required TResult Function( CommentModel data)  comment,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( int id,  String description)  post,required TResult Function( int id,  String description)  event,required TResult Function( int id,  String description)  comment,required TResult Function()  unknown,}) {final _that = this;
 switch (_that) {
 case ReportContentPost():
-return post(_that.data);case ReportContentEvent():
-return event(_that.data);case ReportContentComment():
-return comment(_that.data);case _:
+return post(_that.id,_that.description);case ReportContentEvent():
+return event(_that.id,_that.description);case ReportContentComment():
+return comment(_that.id,_that.description);case ReportContentUnknown():
+return unknown();case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,12 +209,13 @@ return comment(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( PostModel data)?  post,TResult? Function( EventModel data)?  event,TResult? Function( CommentModel data)?  comment,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( int id,  String description)?  post,TResult? Function( int id,  String description)?  event,TResult? Function( int id,  String description)?  comment,TResult? Function()?  unknown,}) {final _that = this;
 switch (_that) {
 case ReportContentPost() when post != null:
-return post(_that.data);case ReportContentEvent() when event != null:
-return event(_that.data);case ReportContentComment() when comment != null:
-return comment(_that.data);case _:
+return post(_that.id,_that.description);case ReportContentEvent() when event != null:
+return event(_that.id,_that.description);case ReportContentComment() when comment != null:
+return comment(_that.id,_that.description);case ReportContentUnknown() when unknown != null:
+return unknown();case _:
   return null;
 
 }
@@ -217,10 +227,11 @@ return comment(_that.data);case _:
 @JsonSerializable()
 
 class ReportContentPost implements ReportContent {
-  const ReportContentPost(this.data, {final  String? $type}): $type = $type ?? 'post';
+  const ReportContentPost({required this.id, required this.description, final  String? $type}): $type = $type ?? 'Post';
   factory ReportContentPost.fromJson(Map<String, dynamic> json) => _$ReportContentPostFromJson(json);
 
-@override final  PostModel data;
+ final  int id;
+ final  String description;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -239,16 +250,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContentPost&&(identical(other.data, data) || other.data == data));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContentPost&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,data);
+int get hashCode => Object.hash(runtimeType,id,description);
 
 @override
 String toString() {
-  return 'ReportContent.post(data: $data)';
+  return 'ReportContent.post(id: $id, description: $description)';
 }
 
 
@@ -259,11 +270,11 @@ abstract mixin class $ReportContentPostCopyWith<$Res> implements $ReportContentC
   factory $ReportContentPostCopyWith(ReportContentPost value, $Res Function(ReportContentPost) _then) = _$ReportContentPostCopyWithImpl;
 @useResult
 $Res call({
- PostModel data
+ int id, String description
 });
 
 
-$PostModelCopyWith<$Res> get data;
+
 
 }
 /// @nodoc
@@ -276,33 +287,26 @@ class _$ReportContentPostCopyWithImpl<$Res>
 
 /// Create a copy of ReportContent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? data = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? id = null,Object? description = null,}) {
   return _then(ReportContentPost(
-null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as PostModel,
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
-/// Create a copy of ReportContent
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PostModelCopyWith<$Res> get data {
-  
-  return $PostModelCopyWith<$Res>(_self.data, (value) {
-    return _then(_self.copyWith(data: value));
-  });
-}
+
 }
 
 /// @nodoc
 @JsonSerializable()
 
 class ReportContentEvent implements ReportContent {
-  const ReportContentEvent(this.data, {final  String? $type}): $type = $type ?? 'event';
+  const ReportContentEvent({required this.id, required this.description, final  String? $type}): $type = $type ?? 'Event';
   factory ReportContentEvent.fromJson(Map<String, dynamic> json) => _$ReportContentEventFromJson(json);
 
-@override final  EventModel data;
+ final  int id;
+ final  String description;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -321,16 +325,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContentEvent&&(identical(other.data, data) || other.data == data));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContentEvent&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,data);
+int get hashCode => Object.hash(runtimeType,id,description);
 
 @override
 String toString() {
-  return 'ReportContent.event(data: $data)';
+  return 'ReportContent.event(id: $id, description: $description)';
 }
 
 
@@ -341,11 +345,11 @@ abstract mixin class $ReportContentEventCopyWith<$Res> implements $ReportContent
   factory $ReportContentEventCopyWith(ReportContentEvent value, $Res Function(ReportContentEvent) _then) = _$ReportContentEventCopyWithImpl;
 @useResult
 $Res call({
- EventModel data
+ int id, String description
 });
 
 
-$EventModelCopyWith<$Res> get data;
+
 
 }
 /// @nodoc
@@ -358,33 +362,26 @@ class _$ReportContentEventCopyWithImpl<$Res>
 
 /// Create a copy of ReportContent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? data = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? id = null,Object? description = null,}) {
   return _then(ReportContentEvent(
-null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as EventModel,
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
-/// Create a copy of ReportContent
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$EventModelCopyWith<$Res> get data {
-  
-  return $EventModelCopyWith<$Res>(_self.data, (value) {
-    return _then(_self.copyWith(data: value));
-  });
-}
+
 }
 
 /// @nodoc
 @JsonSerializable()
 
 class ReportContentComment implements ReportContent {
-  const ReportContentComment(this.data, {final  String? $type}): $type = $type ?? 'comment';
+  const ReportContentComment({required this.id, required this.description, final  String? $type}): $type = $type ?? 'Comment';
   factory ReportContentComment.fromJson(Map<String, dynamic> json) => _$ReportContentCommentFromJson(json);
 
-@override final  CommentModel data;
+ final  int id;
+ final  String description;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -403,16 +400,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContentComment&&(identical(other.data, data) || other.data == data));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContentComment&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,data);
+int get hashCode => Object.hash(runtimeType,id,description);
 
 @override
 String toString() {
-  return 'ReportContent.comment(data: $data)';
+  return 'ReportContent.comment(id: $id, description: $description)';
 }
 
 
@@ -423,11 +420,11 @@ abstract mixin class $ReportContentCommentCopyWith<$Res> implements $ReportConte
   factory $ReportContentCommentCopyWith(ReportContentComment value, $Res Function(ReportContentComment) _then) = _$ReportContentCommentCopyWithImpl;
 @useResult
 $Res call({
- CommentModel data
+ int id, String description
 });
 
 
-$CommentModelCopyWith<$Res> get data;
+
 
 }
 /// @nodoc
@@ -440,30 +437,61 @@ class _$ReportContentCommentCopyWithImpl<$Res>
 
 /// Create a copy of ReportContent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? data = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? id = null,Object? description = null,}) {
   return _then(ReportContentComment(
-null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as CommentModel,
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
-/// Create a copy of ReportContent
-/// with the given fields replaced by the non-null parameter values.
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class ReportContentUnknown implements ReportContent {
+  const ReportContentUnknown({final  String? $type}): $type = $type ?? 'Unknown';
+  factory ReportContentUnknown.fromJson(Map<String, dynamic> json) => _$ReportContentUnknownFromJson(json);
+
+
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+
 @override
-@pragma('vm:prefer-inline')
-$CommentModelCopyWith<$Res> get data {
-  
-  return $CommentModelCopyWith<$Res>(_self.data, (value) {
-    return _then(_self.copyWith(data: value));
-  });
+Map<String, dynamic> toJson() {
+  return _$ReportContentUnknownToJson(this, );
 }
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportContentUnknown);
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ReportContent.unknown()';
+}
+
+
+}
+
+
+
 
 
 /// @nodoc
 mixin _$Report {
 
- int? get id; String get reason; UserModel get author; ReportContent get content;@JsonKey(name: 'deleted_at') DateTime? get deletedAt;@JsonKey(name: 'created_at') DateTime? get createdAt;
+ int? get id; String get reason; UserModel get author;@ReportContentConverter() ReportContent get content;@JsonKey(name: 'deleted_at') DateTime? get deletedAt;@JsonKey(name: 'created_at') DateTime? get createdAt;
 /// Create a copy of Report
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -496,7 +524,7 @@ abstract mixin class $ReportCopyWith<$Res>  {
   factory $ReportCopyWith(Report value, $Res Function(Report) _then) = _$ReportCopyWithImpl;
 @useResult
 $Res call({
- int? id, String reason, UserModel author, ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
+ int? id, String reason, UserModel author,@ReportContentConverter() ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
 });
 
 
@@ -624,7 +652,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String reason,  UserModel author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String reason,  UserModel author, @ReportContentConverter()  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Report() when $default != null:
 return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt,_that.createdAt);case _:
@@ -645,7 +673,7 @@ return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String reason,  UserModel author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String reason,  UserModel author, @ReportContentConverter()  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _Report():
 return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt,_that.createdAt);case _:
@@ -665,7 +693,7 @@ return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String reason,  UserModel author,  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String reason,  UserModel author, @ReportContentConverter()  ReportContent content, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Report() when $default != null:
 return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt,_that.createdAt);case _:
@@ -680,13 +708,13 @@ return $default(_that.id,_that.reason,_that.author,_that.content,_that.deletedAt
 @JsonSerializable()
 
 class _Report extends Report {
-  const _Report({this.id, required this.reason, required this.author, required this.content, @JsonKey(name: 'deleted_at') this.deletedAt, @JsonKey(name: 'created_at') this.createdAt}): super._();
+  const _Report({this.id, required this.reason, required this.author, @ReportContentConverter() required this.content, @JsonKey(name: 'deleted_at') this.deletedAt, @JsonKey(name: 'created_at') this.createdAt}): super._();
   factory _Report.fromJson(Map<String, dynamic> json) => _$ReportFromJson(json);
 
 @override final  int? id;
 @override final  String reason;
 @override final  UserModel author;
-@override final  ReportContent content;
+@override@ReportContentConverter() final  ReportContent content;
 @override@JsonKey(name: 'deleted_at') final  DateTime? deletedAt;
 @override@JsonKey(name: 'created_at') final  DateTime? createdAt;
 
@@ -723,7 +751,7 @@ abstract mixin class _$ReportCopyWith<$Res> implements $ReportCopyWith<$Res> {
   factory _$ReportCopyWith(_Report value, $Res Function(_Report) _then) = __$ReportCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String reason, UserModel author, ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
+ int? id, String reason, UserModel author,@ReportContentConverter() ReportContent content,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime? createdAt
 });
 
 

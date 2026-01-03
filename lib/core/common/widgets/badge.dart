@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class UiBadge extends StatelessWidget { 
+class UiBadge extends StatelessWidget {
   final String label;
   final IconData? icon;
   final Color color;
@@ -31,17 +31,23 @@ class UiBadge extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 14, color: fgColor),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Icon(icon, size: 14, color: fgColor),
+            ),
             const SizedBox(width: 4),
           ],
-          Text(
-            label,
-            style: TextStyle(
-              color: fgColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: fgColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

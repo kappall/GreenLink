@@ -25,7 +25,7 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-
+        debugPrint(jsonList[0].toString());
         final reports = jsonList
             .map(
               (jsonItem) => Report.fromJson(jsonItem as Map<String, dynamic>),
@@ -102,26 +102,25 @@ class AdminService {
     required bool approve,
   }) async {
     try {
-      if (report.content == null) {
-        throw Exception('Il contenuto del report è nullo');
-      }
-
       if (approve) {
         String? endpoint;
         int? contentId;
 
-        report.content!.when(
-          post: (post) {
-            endpoint = 'posts';
-            contentId = post.id;
+        report.content.when(
+          post: (id, description) {
+            endpoint = 'post';
+            contentId = id;
           },
-          event: (event) {
-            endpoint = 'events';
-            contentId = event.id;
+          event: (id, description) {
+            endpoint = 'event';
+            contentId = id;
           },
-          comment: (comment) {
-            endpoint = 'comments';
-            contentId = comment.id;
+          comment: (id, description) {
+            endpoint = 'comment';
+            contentId = id;
+          },
+          unknown: () {
+            throw Exception('Tipo di contenuto sconosciuto');
           },
         );
 
@@ -134,7 +133,7 @@ class AdminService {
             },
           );
 
-          if (response.statusCode != 200) {
+          if (response.statusCode < 200 || response.statusCode >= 300) {
             throw Exception(
               'Fallimento nella rimozione del contenuto: ${response.statusCode}',
             );
@@ -144,21 +143,21 @@ class AdminService {
 
       if (report.id != null) {
         final response = await http.delete(
-          Uri.parse('$_baseUrl/reports/${report.id}'),
+          Uri.parse('$_baseUrl/report/${report.id}'),
           headers: {
             'Accept': 'application/json',
             'Authorization': 'Bearer $token',
           },
         );
 
-        if (response.statusCode != 200) {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
           throw Exception(
             'Fallimento nella rimozione del report: ${response.statusCode}',
           );
         }
       }
     } catch (e) {
-      throw Exception('Errore di connessione: $e');
+      throw Exception('Errore durante la moderazione: $e');
     }
   }
 

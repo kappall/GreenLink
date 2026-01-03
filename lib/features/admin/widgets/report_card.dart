@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/admin/models/report.dart';
+import 'package:intl/intl.dart';
 
 class ReportCard extends StatelessWidget {
   final Report report;
@@ -34,26 +35,30 @@ class ReportCard extends StatelessWidget {
 
     final content = report.targetContent;
     final reporter = report.reporter;
-    final timestamp = report.timestamp;
+    final String formattedDate = report.createdAt != null
+        ? DateFormat('dd/MM/yy HH:mm').format(report.createdAt!.toLocal())
+        : 'N/A';
 
     return UiCard(
-      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              UiBadge(
-                label: reason.toUpperCase(),
-                color: badgeColor,
-                icon: badgeIcon,
-              ),
               Text(
-                timestamp,
+                formattedDate,
                 style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                overflow: TextOverflow.ellipsis,
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+
+          UiBadge(
+            label: reason.toUpperCase(),
+            color: badgeColor,
+            icon: badgeIcon,
           ),
 
           const SizedBox(height: 12),
@@ -66,11 +71,14 @@ class ReportCard extends StatelessWidget {
                 "Segnalato da ",
                 style: TextStyle(fontSize: 13, color: Colors.grey[600]),
               ),
-              Text(
-                reporter,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  reporter,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
