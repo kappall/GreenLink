@@ -75,6 +75,6 @@ class FeedbackUtils {
     ).show(context);
   }
 
-  static void logDebug(String message) => _logger.d(message);
-  static void logInfo(String message) => _logger.i(message);
+  static void logDebug(dynamic message) => _logger.d(message.toString());
+  static void logInfo(dynamic message) => _logger.i(message.toString());
 }
