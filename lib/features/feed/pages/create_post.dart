@@ -65,6 +65,10 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
     );
   }
 
+  bool get formValid =>
+      _descriptionController.text.trim().isNotEmpty &&
+      ref.read(createPostProvider).canPublish;
+
   @override
   Widget build(BuildContext context) {
     final postState = ref.watch(createPostProvider);
@@ -262,12 +266,13 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                 label: postState.isPublishing
                     ? 'Pubblicazione...'
                     : 'Pubblica Post',
-                onPressed: postState.canPublish
+                onPressed: formValid
                     ? () async {
                         notifier.setDescription;
                         final success = await notifier.publishPost();
                         if (success && mounted) {
                           context.pop();
+                          FeedbackUtils.showSuccess(context, "Post pubblicato");
                         } else if (mounted) {
                           FeedbackUtils.showError(
                             context,

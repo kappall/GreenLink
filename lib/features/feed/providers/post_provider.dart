@@ -161,10 +161,7 @@ class CreatePostState {
   }
 
   bool get canPublish =>
-      category != null &&
-      description.trim().isNotEmpty &&
-      locationLabel != null &&
-      !isPublishing;
+      category != null && locationLabel != null && !isPublishing;
 }
 
 @riverpod
