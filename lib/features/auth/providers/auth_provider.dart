@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
+import 'package:greenlinkapp/features/auth/providers/onboarding_provider.dart';
 import 'package:greenlinkapp/features/auth/services/auth_service.dart';
 import 'package:greenlinkapp/features/auth/utils/auth_validators.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
@@ -150,6 +151,9 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     state = const AsyncLoading();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
+
+    await ref.read(onboardingProvider.notifier).resetOnboarding();
+
     state = AsyncData(AuthState.unauthenticated());
   }
 
@@ -174,6 +178,9 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       await _authService.deleteAccount(userId: userId, token: token);
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_tokenKey);
+
+      await ref.read(onboardingProvider.notifier).resetOnboarding();
+
       state = AsyncData(AuthState.unauthenticated());
     } catch (error, stackTrace) {
       state = AsyncData(currentState);

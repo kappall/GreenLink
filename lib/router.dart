@@ -22,7 +22,9 @@ import 'features/admin/pages/admin_wrapper.dart';
 import 'features/admin/pages/reports_page.dart';
 import 'features/admin/pages/user_detail_page.dart';
 import 'features/admin/pages/users_page.dart';
+import 'features/auth/pages/onboarding_page.dart';
 import 'features/auth/pages/partner_activation_page.dart';
+import 'features/auth/providers/onboarding_provider.dart';
 import 'features/feed/pages/create_post.dart';
 import 'features/user/pages/profile_page.dart';
 
@@ -55,6 +57,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: routerListenable,
     redirect: (context, state) {
       final authState = ref.read(authProvider);
+      final hasCompletedOnboarding = ref.watch(onboardingProvider);
 
       final isLoggedIn = authState.asData?.value.isAuthenticated ?? false;
       final isAdmin = authState.asData?.value.isAdmin ?? false;
@@ -90,6 +93,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (isLoggedIn && isAdmin && !isAdminRoute && !isSharedRoute) {
         return '/admin/reports';
+      }
+
+      if (isLoggedIn &&
+          !isAdmin &&
+          !hasCompletedOnboarding &&
+          state.uri.path != '/onboarding') {
+        return '/onboarding';
+      }
+
+      if (hasCompletedOnboarding && state.uri.path == '/onboarding') {
+        return '/home';
       }
 
       return null;
@@ -187,7 +201,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => noAnimationPage(const LoginPage()),
       ),
-
+      GoRoute(
+        path: '/onboarding',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const OnboardingPage(),
+      ),
       GoRoute(
         path: '/partner-token',
         parentNavigatorKey: _rootNavigatorKey,
