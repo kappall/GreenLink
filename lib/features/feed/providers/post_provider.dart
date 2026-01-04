@@ -162,7 +162,6 @@ class CreatePostState {
 
   bool get canPublish =>
       category != null &&
-      images.isNotEmpty &&
       description.trim().isNotEmpty &&
       locationLabel != null &&
       !isPublishing;
