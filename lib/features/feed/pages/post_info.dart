@@ -367,6 +367,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
         if (mounted) {
           Navigator.pop(context);
         }
+        FeedbackUtils.showSuccess(context, "Post eliminato con successo");
       } catch (e) {
         if (mounted) {
           FeedbackUtils.showError(context, e);

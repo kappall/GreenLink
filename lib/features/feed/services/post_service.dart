@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -183,7 +184,8 @@ class PostService {
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);
-      throw Exception('Errore durante la segnalazione: $message');
+      FeedbackUtils.logDebug(message);
+      throw Exception('Errore durante la segnalazione');
     }
   }
 

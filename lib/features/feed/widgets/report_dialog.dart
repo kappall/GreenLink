@@ -93,7 +93,7 @@ Future<void> _handleReport(
     }
   } catch (e) {
     if (context.mounted) {
-      FeedbackUtils.showError(context, "Errore durante la segnalazione: $e");
+      FeedbackUtils.showError(context, e);
     }
   }
 }
