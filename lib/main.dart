@@ -4,13 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/providers/theme_provider.dart';
 import 'package:greenlinkapp/router.dart';
 
+import 'core/utils/provider_observer.dart';
 import 'theme/app_theme.dart';
 
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    ProviderScope(observers: [AppProviderObserver()], child: const MyApp()),
+  );
 }
 
 class MyApp extends ConsumerWidget {

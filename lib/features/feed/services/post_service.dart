@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -90,7 +89,6 @@ class PostService {
     }
 
     final decoded = jsonDecode(response.body);
-    debugPrint(decoded.toString());
     final postId = decoded['id'] as int;
 
     if (media.isNotEmpty) {

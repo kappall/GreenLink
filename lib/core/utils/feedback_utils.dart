@@ -1,8 +1,20 @@
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class FeedbackUtils {
+  static final Logger _logger = Logger(
+    printer: PrettyPrinter(
+      methodCount: 2,
+      errorMethodCount: 8,
+      lineLength: 120,
+      colors: true,
+      printEmojis: true,
+    ),
+  );
+
   /// Mostra un messaggio di successo in alto
   static void showSuccess(
     BuildContext context,
@@ -22,7 +34,15 @@ class FeedbackUtils {
   }
 
   /// Mostra un messaggio di errore in alto, pulendo automaticamente il testo
-  static void showError(BuildContext context, dynamic error, {String? title}) {
+  static void showError(
+    BuildContext context,
+    dynamic error, {
+    StackTrace? stackTrace,
+    String? title,
+  }) {
+    if (kDebugMode) {
+      _logger.e("Errore rilevato: $error", stackTrace: stackTrace);
+    }
     final String message = error
         .toString()
         .replaceAll('Exception: ', '')
@@ -54,4 +74,7 @@ class FeedbackUtils {
       description: Text(message),
     ).show(context);
   }
+
+  static void logDebug(String message) => _logger.d(message);
+  static void logInfo(String message) => _logger.i(message);
 }

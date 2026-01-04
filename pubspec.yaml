@@ -27,6 +27,7 @@ dependencies:
   riverpod_annotation: ^3.0.3
   image_picker: ^1.2.1
   elegant_notification: ^2.5.1
+  logger: ^2.6.2
 
 dev_dependencies:
   flutter_test:

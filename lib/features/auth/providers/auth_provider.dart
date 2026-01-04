@@ -152,8 +152,6 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
 
-    await ref.read(onboardingProvider.notifier).resetOnboarding();
-
     state = AsyncData(AuthState.unauthenticated());
   }
 

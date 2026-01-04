@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../auth/utils/role_parser.dart';
@@ -25,7 +24,6 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        debugPrint(jsonList[0].toString());
         final reports = jsonList
             .map(
               (jsonItem) => Report.fromJson(jsonItem as Map<String, dynamic>),
@@ -197,9 +195,6 @@ class AdminService {
         },
         body: jsonEncode(payload),
       );
-      debugPrint(response.request.toString());
-      debugPrint(token);
-      debugPrint(jsonEncode(payload));
       if (response.statusCode != 200) {
         throw Exception(
           'Fallimento nella creazione partner: ${response.statusCode}',

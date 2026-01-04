@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/comment_model.dart';
@@ -41,8 +40,6 @@ class CommentService {
         'Errore durante il recupero dei commenti: malformattato: $responseBody',
       );
     }
-
-    debugPrint('rawList: $rawList');
 
     return rawList
         .whereType<Map<String, dynamic>>()
