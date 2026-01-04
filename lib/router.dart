@@ -39,14 +39,23 @@ CustomTransitionPage noAnimationPage(Widget child) {
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final routerProvider = Provider<GoRouter>((ref) {
-  final routerListenable = ValueNotifier<bool>(true);
-
+  // Ascolta authProvider per rimuovere la splash screen
   ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
     if (!next.isLoading) {
       FlutterNativeSplash.remove();
     }
-    routerListenable.value = !routerListenable.value;
   });
+
+  // Listener per forzare il refresh del router quando cambia l'auth o l'onboarding
+  final routerListenable = ValueNotifier<bool>(true);
+  ref.listen(
+    authProvider,
+    (_, __) => routerListenable.value = !routerListenable.value,
+  );
+  ref.listen(
+    onboardingProvider,
+    (_, __) => routerListenable.value = !routerListenable.value,
+  );
 
   ref.onDispose(() => routerListenable.dispose());
 
@@ -56,53 +65,62 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/home',
     refreshListenable: routerListenable,
     redirect: (context, state) {
-      final authState = ref.read(authProvider);
-      final hasCompletedOnboarding = ref.watch(onboardingProvider);
+      final authAsync = ref.read(authProvider);
+      final hasCompletedOnboarding = ref.read(onboardingProvider);
 
-      final isLoggedIn = authState.asData?.value.isAuthenticated ?? false;
-      final isAdmin = authState.asData?.value.isAdmin ?? false;
+      // Se sta caricando l'autenticazione, non fare nulla (resta sulla splash)
+      if (authAsync.isLoading) return null;
 
-      final isLoggingIn = state.uri.path == '/login';
-      final isRegistering = state.uri.path == '/register';
-      final isPartnerActivation = state.uri.path == '/partner-token';
-      final isAdminRoute = state.uri.path.startsWith('/admin');
+      // Se c'è un errore, forza il login
+      if (authAsync.hasError) return '/login';
+
+      final authState = authAsync.value;
+      final isLoggedIn = authState?.isAuthenticated ?? false;
+      final isAdmin = authState?.isAdmin ?? false;
+
+      final path = state.uri.path;
+      final isLoggingIn = path == '/login';
+      final isRegistering = path == '/register';
+      final isPartnerActivation = path == '/partner-token';
+      final isIntro = path == '/onboarding';
+      final isAdminRoute = path.startsWith('/admin');
 
       final isSharedRoute = [
         '/profile',
         '/settings',
         '/post-info',
         '/event-info',
-      ].contains(state.uri.path);
+      ].contains(path);
 
-      if (authState.isLoading) return null;
-
-      if (!isLoggedIn &&
-          !isLoggingIn &&
-          !isRegistering &&
-          !isPartnerActivation) {
+      // 1. UTENTE NON AUTENTICATO
+      if (!isLoggedIn) {
+        if (isLoggingIn || isRegistering || isPartnerActivation) return null;
         return '/login';
       }
 
-      if (isLoggedIn && (isLoggingIn || isRegistering || isPartnerActivation)) {
-        return isAdmin ? '/admin/reports' : '/home';
+      // 2. UTENTE AUTENTICATO - GESTIONE ADMIN
+      if (isAdmin) {
+        if (isLoggingIn ||
+            isRegistering ||
+            isPartnerActivation ||
+            !isAdminRoute && !isSharedRoute) {
+          return '/admin/reports';
+        }
+        return null;
       }
 
-      if (isLoggedIn && !isAdmin && isAdminRoute) {
-        return '/home';
-      }
-
-      if (isLoggedIn && isAdmin && !isAdminRoute && !isSharedRoute) {
-        return '/admin/reports';
-      }
-
-      if (isLoggedIn &&
-          !isAdmin &&
-          !hasCompletedOnboarding &&
-          state.uri.path != '/onboarding') {
+      // 3. UTENTE AUTENTICATO - GESTIONE ONBOARDING (Solo per non-admin)
+      if (!hasCompletedOnboarding) {
+        if (isIntro) return null;
         return '/onboarding';
       }
 
-      if (hasCompletedOnboarding && state.uri.path == '/onboarding') {
+      // 4. UTENTE AUTENTICATO - GESTIONE ROTTE STANDARD
+      if (isLoggingIn ||
+          isRegistering ||
+          isPartnerActivation ||
+          isIntro ||
+          isAdminRoute) {
         return '/home';
       }
 
@@ -143,9 +161,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          return AdminWrapper(
-            navigationShell: navigationShell,
-          ); // Wrapper Admin
+          return AdminWrapper(navigationShell: navigationShell);
         },
         branches: [
           StatefulShellBranch(
@@ -212,7 +228,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             noAnimationPage(const PartnerActivationPage()),
       ),
-
       GoRoute(
         path: '/post-info',
         parentNavigatorKey: _rootNavigatorKey,
@@ -221,7 +236,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           return PostInfoPage(post: post);
         },
       ),
-
       GoRoute(
         path: '/event-info',
         parentNavigatorKey: _rootNavigatorKey,
@@ -230,7 +244,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           return EventInfoPage(event: event);
         },
       ),
-
       GoRoute(
         path: '/create-post',
         parentNavigatorKey: _rootNavigatorKey,
