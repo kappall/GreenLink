@@ -196,7 +196,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onChanged: notifier.setDescription,
               ),
               const Divider(height: 32),
               Column(
@@ -265,6 +264,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                     : 'Pubblica Post',
                 onPressed: postState.canPublish
                     ? () async {
+                        notifier.setDescription;
                         final success = await notifier.publishPost();
                         if (success && mounted) {
                           context.pop();
