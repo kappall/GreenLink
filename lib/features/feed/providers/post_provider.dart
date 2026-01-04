@@ -310,9 +310,8 @@ class Posts extends _$Posts {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    if (token == null) throw Exception('Token richiesto');
-    if (uId != null && uId > 0) {
-      return _postService.fetchPosts(token: token, userId: uId);
+    if (uId != null && uId > 0 && token != null) {
+      return _postService.fetchUserPosts(token: token, userId: uId);
     }
     return _postService.fetchAllPosts(token: token);
   }

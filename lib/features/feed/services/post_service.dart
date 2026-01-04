@@ -14,15 +14,13 @@ class PostService {
     return _requestPosts(uri: uri, token: token);
   }
 
-  Future<List<PostModel>> fetchPosts({
+  Future<List<PostModel>> fetchUserPosts({
     required String token,
-    int? userId,
+    required int userId,
   }) async {
-    final uri = Uri.parse('$_baseUrl/posts').replace(
-      queryParameters: {
-        if (userId != null && userId > 0) 'user': userId.toString(),
-      },
-    );
+    final uri = Uri.parse(
+      '$_baseUrl/posts',
+    ).replace(queryParameters: {'user': userId.toString()});
 
     return _requestPosts(uri: uri, token: token);
   }
@@ -35,7 +33,8 @@ class PostService {
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }
-
+    FeedbackUtils.logInfo("uri= $uri");
+    FeedbackUtils.logInfo("headers= $headers");
     final response = await http.get(uri, headers: headers);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
