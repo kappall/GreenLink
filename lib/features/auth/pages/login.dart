@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
+import 'package:greenlinkapp/features/auth/widgets/joinbutton.dart';
 import 'package:greenlinkapp/features/auth/widgets/textfield.dart';
 
 import '../../../core/utils/feedback_utils.dart';
@@ -40,97 +41,88 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              const AppLogo(),
-              const SizedBox(height: 16),
-              const Text(
-                "GreenLink",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+      body: Stack(
+        children: [
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  const AppLogo(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "GreenLink",
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 48),
+
+                  UiCard(
+                    child: Column(
+                      children: [
+                        AuthTextField(controller: _emailController, hint: "Email"),
+                        const SizedBox(height: 16),
+                        AuthTextField(
+                          controller: _passwordController,
+                          hint: "Password",
+                          obscure: true,
+                        ),
+
+                        TextButton(
+                          onPressed: () => context.replace('/register'),
+                          child: const Text(
+                            "Non hai un account? Registrati cliccando qui.",
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        JoinButton(
+                          onPressed: () {
+                            ref
+                                .read(authProvider.notifier)
+                                .login(
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
+                          },
+                          isLoading: authState.isLoading,
+                          label: "Accedi",
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        JoinButton(
+                          onPressed: () =>
+                              ref.read(authProvider.notifier).loginAnonymous(),
+                          label: "Continua come Anonimo",
+                          invert: true,
+                        ),
+                         
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 48),
-
-              UiCard(
-                child: Column(
-                  children: [
-                    AuthTextField(controller: _emailController, hint: "Email"),
-                    const SizedBox(height: 16),
-                    AuthTextField(
-                      controller: _passwordController,
-                      hint: "Password",
-                      obscure: true,
-                    ),
-                    const SizedBox(height: 24),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: authState.isLoading
-                            ? null
-                            : () {
-                                ref
-                                    .read(authProvider.notifier)
-                                    .login(
-                                      _emailController.text,
-                                      _passwordController.text,
-                                    );
-                              },
-                        child: authState.isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text("Accedi"),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () => context.replace('/register'),
-                      child: const Text(
-                        "Non hai un account? Registrati cliccando qui.",
-                      ),
-                    ),
-
-                    const Divider(height: 32),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () =>
-                            ref.read(authProvider.notifier).loginAnonymous(),
-                        child: const Text("Continua come Anonimo"),
-                      ),
-                    ),
-
-                    const Divider(height: 32),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.blue),
-                        ),
-                        onPressed: () => context.replace('/partner-token'),
-                        child: const Text(
-                          "Accedi come Partner",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                    ),
-                  ],
+            ),
+          ),
+          // Place on top of the stack so it stays clickable
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8, right: 24),
+                child: IconButton(
+                  icon: const Icon(Icons.vpn_key, color: Colors.white),
+                  tooltip: 'Attiva account partner',
+                  onPressed: () => context.push('/partner-token'),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

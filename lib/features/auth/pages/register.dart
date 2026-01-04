@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
+import 'package:greenlinkapp/features/auth/widgets/joinbutton.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 import '../widgets/textfield.dart';
@@ -45,83 +46,93 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
       );
     });
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const AppLogo(),
-              const SizedBox(height: 16),
-              const Text(
-                "GreenLink",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+      body: Stack(
+        children: [
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  const AppLogo(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "GreenLink",
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 48),
+                  UiCard(
+                    child: Column(
+                      children: [
+                        AuthTextField(
+                          hint: 'Username',
+                          controller: _usernameController,
+                          obscure: false,
+                        ),
+                        const SizedBox(height: 16),
+                        AuthTextField(
+                          hint: 'Email',
+                          controller: _emailController,
+                          obscure: false,
+                        ),
+                        const SizedBox(height: 16),
+                        AuthTextField(
+                          hint: 'Password',
+                          controller: _passwordController,
+                          obscure: true,
+                        ),
+                        const SizedBox(height: 16),
+                        AuthTextField(
+                          hint: 'Conferma Password',
+                          controller: _confirmPasswordController,
+                          obscure: true,
+                        ),
+                        const SizedBox(height: 24),
+                        JoinButton(
+                          onPressed: () {
+                            ref
+                                .read(authProvider.notifier)
+                                .register(
+                                  _usernameController.text,
+                                  _emailController.text,
+                                  _passwordController.text,
+                                  _confirmPasswordController.text,
+                                );
+                          },
+                          isLoading: authState.isLoading,
+                          label: "Registrati",
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () => context.replace('/login'),
+                          child: const Text(
+                            "Gia registrato? Accedi cliccando qui.",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 48),
-              UiCard(
-                child: Column(
-                  children: [
-                    AuthTextField(
-                      hint: 'Username',
-                      controller: _usernameController,
-                      obscure: false,
-                    ),
-                    const SizedBox(height: 16),
-                    AuthTextField(
-                      hint: 'Email',
-                      controller: _emailController,
-                      obscure: false,
-                    ),
-                    const SizedBox(height: 16),
-                    AuthTextField(
-                      hint: 'Password',
-                      controller: _passwordController,
-                      obscure: true,
-                    ),
-                    const SizedBox(height: 16),
-                    AuthTextField(
-                      hint: 'Conferma Password',
-                      controller: _confirmPasswordController,
-                      obscure: true,
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: authState.isLoading
-                            ? null
-                            : () {
-                                ref
-                                    .read(authProvider.notifier)
-                                    .register(
-                                      _usernameController.text,
-                                      _emailController.text,
-                                      _passwordController.text,
-                                      _confirmPasswordController.text,
-                                    );
-                              },
-                        child: authState.isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text("Registrati"),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () => context.replace('/login'),
-                      child: const Text("Torna al login cliccando qui"),
-                    ),
-                  ],
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8, right: 24),
+                child: IconButton(
+                  icon: const Icon(Icons.vpn_key, color: Colors.white),
+                  tooltip: 'Attiva account partner',
+                  onPressed: () => context.push('/partner-token'),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

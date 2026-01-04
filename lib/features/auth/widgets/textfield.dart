@@ -5,6 +5,7 @@ class AuthTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool obscure;
   final Color? backgroundColor;
+  final String? Function(String?)? validator;
 
   const AuthTextField({
     super.key,
@@ -12,13 +13,15 @@ class AuthTextField extends StatelessWidget {
     required this.controller,
     this.obscure = false,
     this.backgroundColor,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: obscure,
+      validator: validator,
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
