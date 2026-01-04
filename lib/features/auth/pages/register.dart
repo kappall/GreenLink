@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
+
+import '../../../core/utils/feedback_utils.dart';
 import '../widgets/textfield.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -38,9 +40,7 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
       next.whenOrNull(
         error: (error, _) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error.toString())),
-          );
+          FeedbackUtils.showError(context, error);
         },
       );
     });

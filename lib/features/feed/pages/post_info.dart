@@ -8,6 +8,7 @@ import 'package:greenlinkapp/features/feed/widgets/comment_input_field.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/utils/feedback_utils.dart';
 import '../providers/comment_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/comment_card.dart';
@@ -175,7 +176,9 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                                 shape: BoxShape.circle,
                                 color: _currentPage == index
                                     ? theme.colorScheme.primary
-                                    : theme.colorScheme.primary.withValues(alpha: 0.25),
+                                    : theme.colorScheme.primary.withValues(
+                                        alpha: 0.25,
+                                      ),
                               ),
                             ),
                           ),
@@ -366,9 +369,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Errore durante l'eliminazione: $e")),
-          );
+          FeedbackUtils.showError(context, e);
         }
       } finally {
         if (mounted) {

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/badge.dart';
 import '../../../core/providers/geocoding_provider.dart';
+import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class EventInfoPage extends ConsumerStatefulWidget {
@@ -176,9 +177,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Errore durante l'eliminazione: $e")),
-          );
+          FeedbackUtils.showError(context, e);
         }
       } finally {
         if (mounted) {

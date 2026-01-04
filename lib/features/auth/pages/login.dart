@@ -6,6 +6,8 @@ import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/auth/widgets/textfield.dart';
 
+import '../../../core/utils/feedback_utils.dart';
+
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -32,9 +34,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       next.whenOrNull(
         error: (error, _) {
           if (!mounted) return;
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(error.toString())));
+          FeedbackUtils.showError(context, error);
         },
       );
     });

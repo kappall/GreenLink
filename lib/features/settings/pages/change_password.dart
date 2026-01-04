@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/feedback_utils.dart';
+
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
 
@@ -29,10 +31,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       // TODO: aspetto che tom implementi controller
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Password cambiata con successo")),
-          );
           Navigator.of(context).pop();
+          FeedbackUtils.showSuccess(context, "Password cambiata con successo");
         }
       });
     }

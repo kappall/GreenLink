@@ -5,6 +5,7 @@ import 'package:greenlinkapp/features/event/widgets/event_feed.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_feed.dart';
 
+import '../../../core/utils/feedback_utils.dart';
 import '../models/report.dart';
 import '../providers/admin_provider.dart';
 import '../widgets/report_card.dart';
@@ -25,16 +26,11 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         .moderateReport(report: report, approve: isApprove);
 
     if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isApprove ? "Contenuto rimosso" : "Segnalazione respinta",
-        ),
-        backgroundColor: isApprove ? Colors.red : Colors.grey,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    if (isApprove) {
+      FeedbackUtils.showSuccess(context, "Contenuto rimosso");
+    } else {
+      FeedbackUtils.showError(context, "Segnalazione respinta");
+    }
   }
 
   @override

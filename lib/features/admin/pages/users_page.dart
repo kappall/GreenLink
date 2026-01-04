@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
+import '../../../core/utils/feedback_utils.dart';
 import '../providers/admin_provider.dart';
 
 class UsersPage extends ConsumerWidget {
@@ -189,14 +190,9 @@ class _UserList extends ConsumerWidget {
                   Navigator.pop(ctx);
                   await ref.read(usersProvider.notifier).blockUser(user.id);
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          user.isBlocked
-                              ? "Utente sbloccato"
-                              : "Utente bloccato",
-                        ),
-                      ),
+                    FeedbackUtils.showSuccess(
+                      context,
+                      user.isBlocked ? "Utente sbloccato" : "Utente bloccato",
                     );
                   }
                 },

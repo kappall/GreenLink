@@ -7,6 +7,7 @@ import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 
+import '../../../core/utils/feedback_utils.dart';
 import '../widgets/button.dart';
 
 class CreatePostPage extends ConsumerStatefulWidget {
@@ -54,9 +55,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                   .setManualLocation(address);
 
               if (!success && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Indirizzo non trovato")),
-                );
+                FeedbackUtils.showError(context, "Indirizzo non trovato");
               }
             },
             child: const Text("Cerca"),
@@ -270,10 +269,9 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         if (success && mounted) {
                           context.pop();
                         } else if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Errore durante la pubblicazione"),
-                            ),
+                          FeedbackUtils.showError(
+                            context,
+                            "Errore durante la pubblicazione",
                           );
                         }
                       }

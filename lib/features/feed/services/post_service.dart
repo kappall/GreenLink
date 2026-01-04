@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
@@ -197,7 +198,8 @@ class PostService {
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);
-      throw Exception('Errore durante la segnalazione: $message');
+      log(message);
+      throw Exception('Errore durante la cancellazione del post');
     }
   }
 

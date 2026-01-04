@@ -4,6 +4,7 @@ import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 
+import '../../../core/utils/feedback_utils.dart';
 import '../models/comment_model.dart';
 
 void showReportDialog(BuildContext context, {required Object item}) {
@@ -88,15 +89,11 @@ Future<void> _handleReport(
 
     if (context.mounted) {
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Segnalazione inviata con successo')),
-      );
+      FeedbackUtils.showSuccess(context, "Segnalazione inviata con successo");
     }
   } catch (e) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore durante la segnalazione: $e')),
-      );
+      FeedbackUtils.showError(context, "Errore durante la segnalazione: $e");
     }
   }
 }

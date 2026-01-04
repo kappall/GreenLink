@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/admin/providers/admin_provider.dart';
 
+import '../../../core/utils/feedback_utils.dart';
+
 class CreatePartnerPage extends ConsumerStatefulWidget {
   const CreatePartnerPage({super.key});
 
@@ -44,12 +46,7 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Errore: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        FeedbackUtils.showError(context, e);
       }
     } finally {
       if (mounted) {
@@ -102,11 +99,10 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
             TextButton.icon(
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: token));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Token copiato negli appunti!"),
-                    duration: Duration(seconds: 2),
-                  ),
+
+                FeedbackUtils.showSuccess(
+                  context,
+                  "Token copiato negli appunti",
                 );
               },
               icon: const Icon(Icons.copy),

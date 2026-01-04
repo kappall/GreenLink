@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/providers/theme_provider.dart';
 
+import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'change_password.dart';
 
@@ -231,8 +232,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -259,19 +258,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     try {
                       await ref.read(authProvider.notifier).deleteAccount();
                       if (!mounted) return;
-                      scaffoldMessenger.showSnackBar(
-                        const SnackBar(
-                          content: Text("Account eliminato con successo"),
-                        ),
+                      FeedbackUtils.showSuccess(
+                        context,
+                        "Account eliminato con successo",
                       );
                     } catch (error) {
                       if (!mounted) return;
-                      scaffoldMessenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            "Errore durante l'eliminazione dell'account: $error",
-                          ),
-                        ),
+                      FeedbackUtils.showError(
+                        context,
+                        "Errore durante l'eliminazione dell'account: $error",
                       );
                     } finally {
                       if (mounted) {

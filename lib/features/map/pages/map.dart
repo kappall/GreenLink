@@ -10,6 +10,8 @@ import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../core/utils/feedback_utils.dart';
+
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
 
@@ -148,10 +150,9 @@ class _MapPageState extends ConsumerState<MapPage> {
                     );
                   } catch (e) {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Impossibile recuperare la posizione"),
-                        ),
+                      FeedbackUtils.showSuccess(
+                        context,
+                        "Impossibile recuperare la posizione",
                       );
                     }
                   }
