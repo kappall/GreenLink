@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PostModel {
 
- int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude; UserModel get author;@MediaConverter() List<Uint8List> get media;@JsonKey(name: 'votes_count') int get votesCount;@JsonKey(name: 'comments_count') int get commentsCount; List<CommentModel> get comments;@JsonKey(name: 'has_voted') bool get hasVoted;@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory get category;
+ int? get id; String get description;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'deleted_at') DateTime? get deletedAt; double get latitude; double get longitude; UserModel? get author;@MediaConverter() List<Uint8List> get media;@JsonKey(name: 'votes_count') int get votesCount;@JsonKey(name: 'comments_count') int get commentsCount; List<CommentModel> get comments;@JsonKey(name: 'has_voted') bool get hasVoted;@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory get category;
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,11 +48,11 @@ abstract mixin class $PostModelCopyWith<$Res>  {
   factory $PostModelCopyWith(PostModel value, $Res Function(PostModel) _then) = _$PostModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'comments_count') int commentsCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel? author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'comments_count') int commentsCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
 });
 
 
-$UserModelCopyWith<$Res> get author;
+$UserModelCopyWith<$Res>? get author;
 
 }
 /// @nodoc
@@ -65,7 +65,7 @@ class _$PostModelCopyWithImpl<$Res>
 
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = null,Object? media = null,Object? votesCount = null,Object? commentsCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = freezed,Object? media = null,Object? votesCount = null,Object? commentsCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -73,8 +73,8 @@ as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignor
 as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as UserModel,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
+as double,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserModel?,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
 as List<Uint8List>,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
 as int,commentsCount: null == commentsCount ? _self.commentsCount : commentsCount // ignore: cast_nullable_to_non_nullable
 as int,comments: null == comments ? _self.comments : comments // ignore: cast_nullable_to_non_nullable
@@ -87,9 +87,12 @@ as PostCategory,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$UserModelCopyWith<$Res> get author {
-  
-  return $UserModelCopyWith<$Res>(_self.author, (value) {
+$UserModelCopyWith<$Res>? get author {
+    if (_self.author == null) {
+    return null;
+  }
+
+  return $UserModelCopyWith<$Res>(_self.author!, (value) {
     return _then(_self.copyWith(author: value));
   });
 }
@@ -174,7 +177,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel? author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PostModel() when $default != null:
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.commentsCount,_that.comments,_that.hasVoted,_that.category);case _:
@@ -195,7 +198,7 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel? author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)  $default,) {final _that = this;
 switch (_that) {
 case _PostModel():
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.commentsCount,_that.comments,_that.hasVoted,_that.category);case _:
@@ -215,7 +218,7 @@ return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String description, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'deleted_at')  DateTime? deletedAt,  double latitude,  double longitude,  UserModel? author, @MediaConverter()  List<Uint8List> media, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'comments_count')  int commentsCount,  List<CommentModel> comments, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(unknownEnumValue: PostCategory.unknown)  PostCategory category)?  $default,) {final _that = this;
 switch (_that) {
 case _PostModel() when $default != null:
 return $default(_that.id,_that.description,_that.createdAt,_that.deletedAt,_that.latitude,_that.longitude,_that.author,_that.media,_that.votesCount,_that.commentsCount,_that.comments,_that.hasVoted,_that.category);case _:
@@ -239,7 +242,7 @@ class _PostModel extends PostModel {
 @override@JsonKey(name: 'deleted_at') final  DateTime? deletedAt;
 @override final  double latitude;
 @override final  double longitude;
-@override final  UserModel author;
+@override final  UserModel? author;
  final  List<Uint8List> _media;
 @override@JsonKey()@MediaConverter() List<Uint8List> get media {
   if (_media is EqualUnmodifiableListView) return _media;
@@ -292,11 +295,11 @@ abstract mixin class _$PostModelCopyWith<$Res> implements $PostModelCopyWith<$Re
   factory _$PostModelCopyWith(_PostModel value, $Res Function(_PostModel) _then) = __$PostModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'comments_count') int commentsCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
+ int? id, String description,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'deleted_at') DateTime? deletedAt, double latitude, double longitude, UserModel? author,@MediaConverter() List<Uint8List> media,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'comments_count') int commentsCount, List<CommentModel> comments,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(unknownEnumValue: PostCategory.unknown) PostCategory category
 });
 
 
-@override $UserModelCopyWith<$Res> get author;
+@override $UserModelCopyWith<$Res>? get author;
 
 }
 /// @nodoc
@@ -309,7 +312,7 @@ class __$PostModelCopyWithImpl<$Res>
 
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = null,Object? media = null,Object? votesCount = null,Object? commentsCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? description = null,Object? createdAt = freezed,Object? deletedAt = freezed,Object? latitude = null,Object? longitude = null,Object? author = freezed,Object? media = null,Object? votesCount = null,Object? commentsCount = null,Object? comments = null,Object? hasVoted = null,Object? category = null,}) {
   return _then(_PostModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -317,8 +320,8 @@ as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignor
 as DateTime?,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as UserModel,media: null == media ? _self._media : media // ignore: cast_nullable_to_non_nullable
+as double,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as UserModel?,media: null == media ? _self._media : media // ignore: cast_nullable_to_non_nullable
 as List<Uint8List>,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
 as int,commentsCount: null == commentsCount ? _self.commentsCount : commentsCount // ignore: cast_nullable_to_non_nullable
 as int,comments: null == comments ? _self._comments : comments // ignore: cast_nullable_to_non_nullable
@@ -332,9 +335,12 @@ as PostCategory,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$UserModelCopyWith<$Res> get author {
-  
-  return $UserModelCopyWith<$Res>(_self.author, (value) {
+$UserModelCopyWith<$Res>? get author {
+    if (_self.author == null) {
+    return null;
+  }
+
+  return $UserModelCopyWith<$Res>(_self.author!, (value) {
     return _then(_self.copyWith(author: value));
   });
 }

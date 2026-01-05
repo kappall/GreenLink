@@ -316,7 +316,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                       if (isPost) {
                         context.push('/post-info', extra: post);
                       } else {
-                        context.push('/event-details', extra: event);
+                        context.push('/event-info', extra: event);
                       }
                     },
                     icon: const Icon(Icons.arrow_forward),

@@ -57,7 +57,7 @@ abstract class PostModel with _$PostModel {
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     required double latitude,
     required double longitude,
-    required UserModel author,
+    required UserModel? author,
     @MediaConverter() @Default([]) List<Uint8List> media,
     @JsonKey(name: 'votes_count') @Default(0) int votesCount,
     @JsonKey(name: 'comments_count') @Default(0) int commentsCount,

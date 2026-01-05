@@ -14,6 +14,7 @@ enum EventType { cleaning, planting, emergency, learning, other, unknown }
 
 @freezed
 abstract class EventModel with _$EventModel {
+  //TODO: add title field
   const EventModel._();
 
   const factory EventModel({

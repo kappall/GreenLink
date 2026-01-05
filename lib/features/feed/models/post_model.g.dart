@@ -17,7 +17,9 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       : DateTime.parse(json['deleted_at'] as String),
   latitude: (json['latitude'] as num).toDouble(),
   longitude: (json['longitude'] as num).toDouble(),
-  author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
+  author: json['author'] == null
+      ? null
+      : UserModel.fromJson(json['author'] as Map<String, dynamic>),
   media: json['media'] == null
       ? const []
       : const MediaConverter().fromJson(json['media'] as List?),

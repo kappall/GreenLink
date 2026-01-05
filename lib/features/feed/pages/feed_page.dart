@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/features/feed/widgets/filterdialog.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_feed.dart';
@@ -20,8 +19,6 @@ class FeedPage extends ConsumerWidget {
     final criteria = ref.watch(postSortCriteriaProvider);
     final filter = ref.watch(postFilterProvider);
     final colorScheme = Theme.of(context).colorScheme;
-
-    FeedbackUtils.logInfo("token= ${authState?.token}");
 
     return Scaffold(
       body: RefreshIndicator(
