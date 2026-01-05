@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 class FeedbackUtils {
   static final Logger _logger = Logger(
     printer: PrettyPrinter(
-      methodCount: 2,
+      methodCount: 5,
       errorMethodCount: 8,
       lineLength: 120,
       colors: true,
@@ -76,5 +76,6 @@ class FeedbackUtils {
   }
 
   static void logDebug(dynamic message) => _logger.d(message.toString());
+  static void logError(dynamic message) => _logger.e(message.toString());
   static void logInfo(dynamic message) => _logger.i(message.toString());
 }

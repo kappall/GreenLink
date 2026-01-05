@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -33,26 +34,40 @@ class EventService {
       headers['Authorization'] = 'Bearer $token';
     }
 
-    final response = await http.get(uri, headers: headers);
+    try {
+      final response = await http.get(uri, headers: headers);
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      throw Exception('Errore durante il recupero degli eventi: $message');
-    }
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final message = _errorMessage(response);
+        FeedbackUtils.logError(
+          "GET $uri failed (${response.statusCode}): $message",
+        );
+        throw Exception(
+          'Si è verificato un errore nel caricamento degli eventi. Riprova più tardi.',
+        );
+      }
 
-    final decoded = jsonDecode(response.body);
-    final dynamic rawList = switch (decoded) {
-      final Map<String, dynamic> map => map['events'] ?? map['data'] ?? map,
-      final List<dynamic> list => list,
-      _ => decoded,
-    };
-    if (rawList is! List) {
-      throw Exception('Risposta inattesa da /events: $rawList');
+      final decoded = jsonDecode(response.body);
+      final dynamic rawList = switch (decoded) {
+        final Map<String, dynamic> map => map['events'] ?? map['data'] ?? map,
+        final List<dynamic> list => list,
+        _ => decoded,
+      };
+
+      if (rawList is! List) {
+        FeedbackUtils.logError("Unexpected format from $uri: ${response.body}");
+        throw Exception('Errore nel formato dei dati riceveuti.');
+      }
+
+      return rawList
+          .whereType<Map<String, dynamic>>()
+          .map(EventModel.fromJson)
+          .toList();
+    } catch (e) {
+      if (e is Exception) rethrow;
+      FeedbackUtils.logError("Connection error on $uri: $e");
+      throw Exception('Controlla la tua connessione internet e riprova.');
     }
-    return rawList
-        .whereType<Map<String, dynamic>>()
-        .map(EventModel.fromJson)
-        .toList();
   }
 
   Future<EventModel> createEvent({
@@ -65,40 +80,83 @@ class EventService {
     required DateTime startDate,
     required DateTime endDate,
   }) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/event'),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({
-        'description': description,
-        'latitude': latitude,
-        'longitude': longitude,
-        'event_type': eventType.name,
-        'max_participants': maxParticipants,
-        'start_date': startDate.toIso8601String(),
-        'end_date': endDate.toIso8601String(),
-      }),
-    );
+    final uri = Uri.parse('$_baseUrl/event');
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'description': description,
+          'latitude': latitude,
+          'longitude': longitude,
+          'event_type': eventType.name,
+          'max_participants': maxParticipants,
+          'start_date': startDate.toIso8601String(),
+          'end_date': endDate.toIso8601String(),
+        }),
+      );
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      throw Exception('Errore durante la creazione dell\'evento: $message');
-    }
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final message = _errorMessage(response);
+        FeedbackUtils.logError(
+          "POST $uri failed (${response.statusCode}): $message",
+        );
+        throw Exception(
+          'Non è stato possibile creare l\'evento. Verifica i dati inseriti.',
+        );
+      }
 
-    final decoded = jsonDecode(response.body);
-    final rawEvent = decoded is Map<String, dynamic>
-        ? decoded['event'] ?? decoded
-        : decoded;
-    if (rawEvent is! Map<String, dynamic>) {
+      final decoded = jsonDecode(response.body);
+      final rawEvent = decoded is Map<String, dynamic>
+          ? decoded['event'] ?? decoded
+          : decoded;
+
+      if (rawEvent is! Map<String, dynamic>) {
+        FeedbackUtils.logError("Invalid event response: ${response.body}");
+        throw Exception('Errore nella risposta del server.');
+      }
+
+      return EventModel.fromJson(rawEvent);
+    } catch (e) {
+      if (e is Exception) rethrow;
+      FeedbackUtils.logError("Exception during createEvent: $e");
       throw Exception(
-        'Risposta inattesa dalla creazione evento: ${response.body}',
+        'Si è verificato un errore imprevisto durante la creazione.',
       );
     }
+  }
 
-    return EventModel.fromJson(rawEvent);
+  Future<void> participate({
+    required String token,
+    required int eventId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/event/$eventId/participation');
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final message = _errorMessage(response);
+        FeedbackUtils.logError(
+          "Participation failed for event $eventId: $message",
+        );
+        throw Exception(
+          'Non è stato possibile registrarti all\'evento. Riprova tra poco.',
+        );
+      }
+    } catch (e) {
+      FeedbackUtils.logError("Exception in participate: $e");
+      throw Exception('Errore durante l\'iscrizione all\'evento.');
+    }
   }
 
   String _errorMessage(http.Response response) {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -133,11 +135,10 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
               width: double.infinity,
               height: 54,
               child: FilledButton(
-                onPressed: () {
-                  // TODO: implement participation
-                },
-                child: const Text(
-                  "PARTECIPA ALL'EVENTO",
+                onPressed: () => _participateEvent(context, ref),
+                child: Text(
+                  "PARTECIPA ALL'EVENTO", //TODO se utente partecipa allora non deve poterlo fare
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
@@ -146,6 +147,18 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _participateEvent(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref
+          .read(eventsProvider.notifier)
+          .participate(eventId: widget.event.id!);
+      context.pop();
+      FeedbackUtils.showSuccess(context, "Partecipi all'evento");
+    } catch (e) {
+      FeedbackUtils.showError(context, e);
+    }
   }
 
   Future<void> _confirmDelete(BuildContext context) async {

@@ -70,6 +70,17 @@ class EventsNotifier extends AsyncNotifier<List<EventModel>> {
 
     return _eventService.fetchAllEvents(token: token);
   }
+
+  Future<void> participate({required int eventId}) async {
+    final authState = ref.read(authProvider);
+    final token = authState.asData?.value.token;
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Utente non autenticato');
+    }
+
+    return _eventService.participate(token: token, eventId: eventId);
+  }
 }
 
 final eventsProvider = AsyncNotifierProvider<EventsNotifier, List<EventModel>>(
