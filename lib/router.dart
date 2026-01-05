@@ -25,6 +25,7 @@ import 'features/admin/pages/users_page.dart';
 import 'features/auth/pages/onboarding_page.dart';
 import 'features/auth/pages/partner_activation_page.dart';
 import 'features/auth/providers/onboarding_provider.dart';
+import 'features/event/pages/create_event_page.dart';
 import 'features/feed/pages/create_post.dart';
 import 'features/user/pages/profile_page.dart';
 
@@ -248,6 +249,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/create-post',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const CreatePostPage(),
+      ),
+      GoRoute(
+        path: '/create-event',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CreateEventPage(),
       ),
     ],
   );
