@@ -110,20 +110,13 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                   _buildInfoRow(
                     Icons.people_outline,
                     "Partecipanti",
-                    "${event.participants_count} / ${event.maxParticipants}",
+                    "${event.participantsCount} / ${event.maxParticipants}",
                   ),
                   const SizedBox(height: 12),
                   _buildInfoRow(
                     Icons.location_on_outlined,
                     "Posizione",
                     locationName,
-                  ),
-                  const SizedBox(height: 40),
-                  Center(
-                    child: Text(
-                      "ID Evento: ${event.id}",
-                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
-                    ),
                   ),
                 ],
               ),
@@ -135,9 +128,18 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
               width: double.infinity,
               height: 54,
               child: FilledButton(
-                onPressed: () => _participateEvent(context, ref),
+                style: FilledButton.styleFrom(
+                  backgroundColor: event.isParticipating
+                      ? Colors.grey[400]
+                      : Theme.of(context).colorScheme.primary,
+                ),
+                onPressed: () => event.isParticipating
+                    ? null
+                    : _participateEvent(context, ref),
                 child: Text(
-                  "PARTECIPA ALL'EVENTO", //TODO se utente partecipa allora non deve poterlo fare
+                  event.isParticipating
+                      ? "SEI ISCRITTO"
+                      : "PARTECIPA ALL'EVENTO",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),

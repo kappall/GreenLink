@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
+import '../../../core/common/widgets/bool_converter.dart';
+
 part 'event_model.freezed.dart';
 part 'event_model.g.dart';
 
@@ -24,9 +26,12 @@ abstract class EventModel with _$EventModel {
     @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)
     required EventType eventType,
     required UserModel author,
-    @Default(0) int votes_count,
-    @Default(0) int participants_count,
-    //@Default(<UserModel>[]) List<UserModel> participants,
+    @JsonKey(name: 'votes_count') @Default(0) int votesCount,
+    @JsonKey(name: 'participants_count') @Default(0) int participantsCount,
+    @BoolConverter()
+    @JsonKey(name: 'is_participating')
+    @Default(false)
+    bool isParticipating,
     @JsonKey(name: 'max_participants') required int maxParticipants,
     @JsonKey(name: 'start_date') required DateTime startDate,
     @JsonKey(name: 'end_date') required DateTime endDate,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/event/widgets/button.dart';
@@ -61,7 +62,7 @@ class VolunteeringFeedPage extends ConsumerWidget {
                         ButtonWidget(
                           label: 'Nuovo Evento',
                           onPressed: () {
-                            // context.push('/create-event');
+                            context.push('/create-event');
                           },
                           icon: Icon(Icons.add, color: colorScheme.onSecondary),
                         ),

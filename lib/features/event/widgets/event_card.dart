@@ -19,6 +19,8 @@ class EventCard extends ConsumerWidget {
     final locationName =
         locationAsync.value ?? "${event.latitude}, ${event.longitude}";
 
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -37,6 +39,16 @@ class EventCard extends ConsumerWidget {
                 maxLines: 1,
               ),
             ),
+            if (event.isParticipating)
+              const Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: UiBadge(
+                  label: "ISCRITTO",
+                  icon: Icons.check_circle,
+                  color: Colors.green,
+                ),
+              ),
+            const SizedBox(width: 8),
             UiBadge(
               label: event.eventType.name,
               icon: Icons.event,
@@ -114,7 +126,15 @@ class EventCard extends ConsumerWidget {
             const Icon(Icons.group, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
             Text(
-              '${event.participants_count} / ${event.maxParticipants} Partecipanti',
+              '${event.participantsCount} / ${event.maxParticipants} Partecipanti',
+              style: TextStyle(
+                color: event.participantsCount >= event.maxParticipants
+                    ? Colors.red
+                    : null,
+                fontWeight: event.participantsCount >= event.maxParticipants
+                    ? FontWeight.bold
+                    : null,
+              ),
             ),
           ],
         ),
@@ -131,7 +151,16 @@ class EventCard extends ConsumerWidget {
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
-          child: FilledButton(onPressed: onTap, child: const Text('Dettagli')),
+          child: FilledButton(
+            onPressed: onTap,
+            style: event.isParticipating
+                ? FilledButton.styleFrom(
+                    backgroundColor: theme.colorScheme.secondaryContainer,
+                    foregroundColor: theme.colorScheme.onSecondaryContainer,
+                  )
+                : null,
+            child: Text('Dettagli'),
+          ),
         ),
       ],
     );

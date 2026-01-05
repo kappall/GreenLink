@@ -15,7 +15,7 @@ class EventFeed extends ConsumerWidget {
     return eventsAsync.when(
       data: (events) => events.isEmpty
           ? const SliverFillRemaining(
-              child: Center(child: Text("Nessun post da visualizzare.")),
+              child: Center(child: Text("Nessun evento da visualizzare.")),
             )
           : SliverPadding(
               padding: const EdgeInsets.all(16.0),
