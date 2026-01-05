@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +10,10 @@ class PostService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
   Future<List<PostModel>> fetchAllPosts({required String? token}) {
-    final uri = Uri.parse('$_baseUrl/posts');
+    final uri = Uri.parse(
+      '$_baseUrl/posts',
+    ).replace(queryParameters: {'sort': 'id', 'order': 'desc'});
+    ;
     return _requestPosts(uri: uri, token: token);
   }
 
@@ -19,9 +21,13 @@ class PostService {
     required String token,
     required int userId,
   }) async {
-    final uri = Uri.parse(
-      '$_baseUrl/posts',
-    ).replace(queryParameters: {'user': userId.toString()});
+    final uri = Uri.parse('$_baseUrl/posts').replace(
+      queryParameters: {
+        'user': userId.toString(),
+        'sort': 'id',
+        'order': 'desc',
+      },
+    );
 
     return _requestPosts(uri: uri, token: token);
   }
@@ -31,8 +37,6 @@ class PostService {
     required Uri uri,
     required String? token,
   }) async {
-    uri = uri.replace(queryParameters: {'sort': 'id', 'order': 'desc'});
-    debugPrint("uri= $uri");
     final headers = {'Accept': 'application/json'};
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
