@@ -37,8 +37,6 @@ class PostService {
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }
-    FeedbackUtils.logInfo("uri= $uri");
-    FeedbackUtils.logInfo("headers= $headers");
     final response = await http.get(uri, headers: headers);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
