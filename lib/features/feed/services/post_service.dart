@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
@@ -26,9 +27,12 @@ class PostService {
   }
 
   Future<List<PostModel>> _requestPosts({
+    //TODO: set limit e skip
     required Uri uri,
     required String? token,
   }) async {
+    uri = uri.replace(queryParameters: {'sort': 'id', 'order': 'desc'});
+    debugPrint("uri= $uri");
     final headers = {'Accept': 'application/json'};
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
