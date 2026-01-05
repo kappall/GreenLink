@@ -16,6 +16,7 @@ abstract class AuthState with _$AuthState {
   }) = _AuthState;
 
   // funziona ma non sono sicuro del suo funzionamente o se sia lo standard corretto
+  bool get isLoggedIn => user != null; // quetso anche per user anonimo
   bool get isAuthenticated =>
       user != null && (token != null && token!.isNotEmpty);
   bool get hasValidToken => token != null && token!.isNotEmpty;

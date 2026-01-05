@@ -75,7 +75,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (authAsync.hasError) return '/login';
 
       final authState = authAsync.value;
-      final isLoggedIn = authState?.isAuthenticated ?? false;
+      final isLoggedIn = authState?.isLoggedIn ?? false;
       final isAdmin = authState?.isAdmin ?? false;
 
       final path = state.uri.path;
