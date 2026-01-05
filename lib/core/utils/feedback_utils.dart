@@ -1,6 +1,5 @@
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -40,9 +39,6 @@ class FeedbackUtils {
     StackTrace? stackTrace,
     String? title,
   }) {
-    if (kDebugMode) {
-      _logger.e("Errore rilevato: $error", stackTrace: stackTrace);
-    }
     final String message = error
         .toString()
         .replaceAll('Exception: ', '')
