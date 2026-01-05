@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +6,8 @@ import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/auth/widgets/joinbutton.dart';
-import 'package:greenlinkapp/features/legal/pages/legal_document_page.dart';
+import 'package:greenlinkapp/features/legal/pages/privacy_policy_page.dart';
+import 'package:greenlinkapp/features/legal/pages/terms_and_conditions_page.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 import '../widgets/textfield.dart';
@@ -87,27 +89,61 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                           controller: _confirmPasswordController,
                           obscure: true,
                         ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: [
-                            TextButton(
-                              onPressed: () => _openLegal(
-                                "Privacy Policy",
-                                "https://greenlink.tommasodeste.it/privacy-policy.html",
+                        const SizedBox(height: 24),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 13,
                               ),
-                              child: const Text("Privacy Policy"),
+                              children: [
+                                const TextSpan(
+                                  text: "Registrandoti, accetti i nostri ",
+                                ),
+                                TextSpan(
+                                  text: "Termini e Condizioni",
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const TermsAndConditionsPage(),
+                                        ),
+                                      );
+                                    },
+                                ),
+                                const TextSpan(text: " e la nostra "),
+                                TextSpan(
+                                  text: "Privacy Policy",
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const PrivacyPolicyPage(),
+                                        ),
+                                      );
+                                    },
+                                ),
+                                const TextSpan(text: "."),
+                              ],
                             ),
-                            TextButton(
-                              onPressed: () => _openLegal(
-                                "Termini e Condizioni",
-                                "https://greenlink.tommasodeste.it/terms-conditions.html",
-                              ),
-                              child: const Text("Termini e Condizioni"),
-                            ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: 24),
                         JoinButton(
@@ -168,14 +204,6 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _openLegal(String title, String url) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LegalDocumentPage(title: title, url: url),
       ),
     );
   }
