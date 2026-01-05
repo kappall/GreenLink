@@ -70,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final hasCompletedOnboarding = ref.read(onboardingProvider);
 
       // Se sta caricando l'autenticazione, non fare nulla (resta sulla splash)
-      if (authAsync.isLoading) return null; //TODO: accesso anonimo non funzia
+      if (authAsync.isLoading) return null;
 
       final authState = authAsync.value;
       final isLoggedIn = authState?.isLoggedIn ?? false;
@@ -93,11 +93,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // 1. UTENTE NON AUTENTICATO (Anonimo o non loggato)
       if (!isAuthenticated) {
-        // Se sta cercando di andare in pagine di auth, lo lasciamo fare sempre
-        if (isLoggingIn || isRegistering || isPartnerActivation) return null;
+        // Se è anonimo (isLoggedIn), può navigare nelle sezioni principali
+        if (isLoggedIn) {
+          // Se è già "loggato" come anonimo e prova ad andare su auth, mandalo a home
+          if (isLoggingIn || isRegistering || isPartnerActivation) {
+            return '/home';
+          }
+          return null;
+        }
 
-        // Se è anonimo, può navigare nelle sezioni principali
-        if (isLoggedIn) return null;
+        // Se non è nemmeno anonimo e sta cercando di andare in pagine di auth, lo lasciamo fare
+        if (isLoggingIn || isRegistering || isPartnerActivation) return null;
 
         // Altrimenti forza il login
         return '/login';
