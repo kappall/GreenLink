@@ -22,6 +22,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   final _maxParticipantsController = TextEditingController();
+  final _titleController = TextEditingController();
 
   EventType _selectedType = EventType.cleaning;
   DateTime _startDate = DateTime.now().add(const Duration(days: 1));
@@ -37,6 +38,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   void dispose() {
     _descriptionController.dispose();
     _maxParticipantsController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -191,7 +193,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
 
     setState(() => _isPublishing = true);
     try {
-      await ref
+      await ref //TODO: aggiungi titolo
           .read(eventsProvider.notifier)
           .createEvent(
             description: _descriptionController.text,
@@ -247,12 +249,23 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
             ),
             const SizedBox(height: 20),
             TextFormField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: "Titolo",
+                border: OutlineInputBorder(),
+              ),
+              maxLength: 200,
+              validator: (v) => v!.isEmpty ? "Inserisci un titolo" : null,
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(
                 labelText: "Descrizione",
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
+              maxLength: 2000,
               validator: (v) => v!.isEmpty ? "Inserisci una descrizione" : null,
             ),
             const SizedBox(height: 20),

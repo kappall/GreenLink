@@ -33,6 +33,7 @@ class CommentInputField extends ConsumerWidget {
               Expanded(
                 child: TextField(
                   controller: _controller,
+                  maxLength: 2000,
                   decoration: InputDecoration(
                     hintText: isReplying
                         ? "Rispondi a ${target.$2}..."

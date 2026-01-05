@@ -192,8 +192,8 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: _descriptionController,
-                maxLength: 300,
-                maxLines: 5,
+                maxLength: 2000,
+                maxLines: 10,
                 decoration: InputDecoration(
                   hintText: 'Descrivi la situazione...',
                   border: OutlineInputBorder(
