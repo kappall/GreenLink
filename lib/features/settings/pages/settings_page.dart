@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/providers/theme_provider.dart';
+import 'package:greenlinkapp/features/legal/pages/legal_document_page.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -93,16 +94,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   title: "Privacy Policy",
                   icon: Icons.description_outlined,
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  onTap: () =>
-                      _showTextDialog(context, "Privacy Policy", "testo"),
+                  onTap: () => _openLegal(
+                    "Privacy Policy",
+                    "https://greenlink.tommasodeste.it/privacy-policy.html",
+                  ),
                 ),
                 _buildSettingsItem(
                   context,
                   title: "Termini e Condizioni",
                   icon: Icons.gavel_outlined,
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  onTap: () =>
-                      _showTextDialog(context, "Termini e Condizioni", "testo"),
+                  onTap: () => _openLegal(
+                    "Termini e Condizioni",
+                    "https://greenlink.tommasodeste.it/terms-conditions.html",
+                  ),
                 ),
                 const Divider(height: 1),
                 _buildSettingsItem(
@@ -215,18 +220,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  void _showTextDialog(BuildContext context, String title, String content) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: SingleChildScrollView(child: Text(content)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Chiudi"),
-          ),
-        ],
+  void _openLegal(String title, String url) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LegalDocumentPage(title: title, url: url),
       ),
     );
   }

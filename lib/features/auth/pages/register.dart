@@ -5,6 +5,7 @@ import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/common/widgets/logo.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/auth/widgets/joinbutton.dart';
+import 'package:greenlinkapp/features/legal/pages/legal_document_page.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 import '../widgets/textfield.dart';
@@ -86,6 +87,28 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                           controller: _confirmPasswordController,
                           obscure: true,
                         ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            TextButton(
+                              onPressed: () => _openLegal(
+                                "Privacy Policy",
+                                "https://greenlink.tommasodeste.it/privacy-policy.html",
+                              ),
+                              child: const Text("Privacy Policy"),
+                            ),
+                            TextButton(
+                              onPressed: () => _openLegal(
+                                "Termini e Condizioni",
+                                "https://greenlink.tommasodeste.it/terms-conditions.html",
+                              ),
+                              child: const Text("Termini e Condizioni"),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 24),
                         JoinButton(
                           onPressed: () {
@@ -145,6 +168,14 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openLegal(String title, String url) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LegalDocumentPage(title: title, url: url),
       ),
     );
   }
