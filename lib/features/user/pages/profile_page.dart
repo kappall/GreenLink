@@ -241,14 +241,17 @@ class ProfilePage extends ConsumerWidget {
                             : ListView.separated(
                                 padding: const EdgeInsets.all(16),
                                 itemCount: posts.length,
-                                separatorBuilder: (_, __) =>
-                                    const SizedBox(height: 16),
-                                itemBuilder: (context, index) => PostCard(
-                                  post: posts[index],
+                                separatorBuilder: (_, __) => const Divider(
+                                  height: 32,
+                                  thickness: 1,
+                                ),
+                                itemBuilder: (context, index) => GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
                                   onTap: () => context.push(
                                     '/post-info',
                                     extra: posts[index],
                                   ),
+                                  child: PostCard(post: posts[index]),
                                 ),
                               ),
                         loading: () =>
