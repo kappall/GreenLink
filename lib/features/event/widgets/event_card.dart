@@ -6,6 +6,8 @@ import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/feed/widgets/report_dialog.dart';
 import 'package:intl/intl.dart';
 
+import '../../user/providers/user_provider.dart';
+
 class EventCard extends ConsumerWidget {
   final EventModel event;
   final VoidCallback? onTap;
@@ -20,6 +22,8 @@ class EventCard extends ConsumerWidget {
         locationAsync.value ?? "${event.latitude}, ${event.longitude}";
 
     final theme = Theme.of(context);
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isAuthor = currentUser?.id == event.author.id;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +43,7 @@ class EventCard extends ConsumerWidget {
                 maxLines: 1,
               ),
             ),
-            if (event.isParticipating)
+            if (event.isParticipating && !isAuthor)
               const Padding(
                 padding: EdgeInsets.only(left: 8.0),
                 child: UiBadge(
@@ -49,6 +53,12 @@ class EventCard extends ConsumerWidget {
                 ),
               ),
             const SizedBox(width: 8),
+            if (isAuthor)
+              const UiBadge(
+                label: "Creato da te",
+                color: Colors.orange,
+                icon: Icons.star,
+              ),
             UiBadge(
               label: event.eventType.name,
               icon: Icons.event,
@@ -151,16 +161,7 @@ class EventCard extends ConsumerWidget {
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
-          child: FilledButton(
-            onPressed: onTap,
-            style: event.isParticipating
-                ? FilledButton.styleFrom(
-                    backgroundColor: theme.colorScheme.secondaryContainer,
-                    foregroundColor: theme.colorScheme.onSecondaryContainer,
-                  )
-                : null,
-            child: Text('Dettagli'),
-          ),
+          child: FilledButton(onPressed: onTap, child: Text('Dettagli')),
         ),
       ],
     );

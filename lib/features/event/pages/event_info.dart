@@ -81,16 +81,29 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "Organizzato da ${event.author.displayName}",
+                              isAuthor
+                                  ? "Organizzato da te"
+                                  : "Organizzato da ${event.author.displayName}",
                               style: TextStyle(color: Colors.grey[600]),
                             ),
                           ],
                         ),
                       ),
-                      UiBadge(
-                        label: "Evento",
-                        color: Colors.blue,
-                        icon: Icons.event,
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          if (isAuthor)
+                            const UiBadge(
+                              label: "Creato da te",
+                              color: Colors.orange,
+                              icon: Icons.star,
+                            ),
+                          const UiBadge(
+                            label: "Evento",
+                            color: Colors.blue,
+                            icon: Icons.event,
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -131,16 +144,19 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
               height: 54,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: (event.isParticipating || isExpired)
+                  backgroundColor:
+                      (event.isParticipating || isExpired || isAuthor)
                       ? Colors.grey[400]
                       : Theme.of(context).colorScheme.primary,
                 ),
-                onPressed: (event.isParticipating || isExpired)
+                onPressed: (event.isParticipating || isExpired || isAuthor)
                     ? null
                     : () => _participateEvent(context, ref),
                 child: Text(
                   isExpired
                       ? "EVENTO SCADUTO"
+                      : isAuthor
+                      ? "HAI CREATO QUESTO EVENTO"
                       : event.isParticipating
                       ? "SEI ISCRITTO"
                       : "PARTECIPA ALL'EVENTO",
