@@ -61,7 +61,9 @@ Map<String, dynamic> _$ReportContentUnknownToJson(
 _Report _$ReportFromJson(Map<String, dynamic> json) => _Report(
   id: (json['id'] as num?)?.toInt(),
   reason: json['reason'] as String,
-  author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
+  author: json['author'] == null
+      ? null
+      : UserModel.fromJson(json['author'] as Map<String, dynamic>),
   content: const ReportContentConverter().fromJson(
     json['content'] as Map<String, dynamic>,
   ),

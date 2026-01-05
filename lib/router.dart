@@ -70,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final hasCompletedOnboarding = ref.read(onboardingProvider);
 
       // Se sta caricando l'autenticazione, non fare nulla (resta sulla splash)
-      if (authAsync.isLoading) return null;
+      if (authAsync.isLoading) return null; //TODO: accesso anonimo non funzia
 
       final authState = authAsync.value;
       final isLoggedIn = authState?.isLoggedIn ?? false;

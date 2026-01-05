@@ -58,13 +58,13 @@ abstract class Report with _$Report {
   const factory Report({
     int? id,
     required String reason,
-    required UserModel author,
+    required UserModel? author,
     @ReportContentConverter() required ReportContent content,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _Report;
 
-  String get reporter => author.displayName;
+  String get reporter => author?.displayName ?? "[DELETED]";
   String get timestamp => createdAt?.toIso8601String() ?? '';
 
   String get targetContent => content.when(
