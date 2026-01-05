@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/widgets/button.dart';
 import 'package:greenlinkapp/features/feed/widgets/filterdialog.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_feed.dart';
@@ -14,12 +15,13 @@ class FeedPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-    final loggedIn = authState.asData?.value.hasValidToken ?? false;
+    final authState = ref.watch(authProvider).value;
     final postsAsync = ref.watch(sortedPostsProvider);
     final criteria = ref.watch(postSortCriteriaProvider);
     final filter = ref.watch(postFilterProvider);
     final colorScheme = Theme.of(context).colorScheme;
+
+    FeedbackUtils.logInfo("token= ${authState?.token}");
 
     return Scaffold(
       body: RefreshIndicator(
@@ -36,7 +38,7 @@ class FeedPage extends ConsumerWidget {
                     "Bacheca Emergenze",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  if (loggedIn)
+                  if (authState?.isAuthenticated ?? false)
                     ButtonWidget(
                       label: 'Nuovo Post',
                       onPressed: () => context.push('/create-post'),
