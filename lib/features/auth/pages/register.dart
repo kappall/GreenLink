@@ -120,13 +120,25 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
               alignment: Alignment.topRight,
               child: Padding(
                 padding: const EdgeInsets.only(top: 8, right: 24),
-                child: IconButton(
-                  icon: const Icon(Icons.vpn_key, color: Colors.white),
-                  tooltip: 'Attiva account partner',
+                child: TextButton.icon(
                   onPressed: () => context.push('/partner-token'),
-                  style: IconButton.styleFrom(
+                  icon: const Icon(Icons.vpn_key, color: Colors.white),
+                  label: const Text(
+                    "Partner",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
               ),

@@ -59,7 +59,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   UiCard(
                     child: Column(
                       children: [
-                        AuthTextField(controller: _emailController, hint: "Email"),
+                        AuthTextField(
+                          controller: _emailController,
+                          hint: "Email",
+                        ),
                         const SizedBox(height: 16),
                         AuthTextField(
                           controller: _passwordController,
@@ -96,7 +99,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           label: "Continua come Anonimo",
                           invert: true,
                         ),
-                         
                       ],
                     ),
                   ),
@@ -104,19 +106,31 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
             ),
           ),
-          // Place on top of the stack so it stays clickable
+          // Botton Activation Partner con label chiara
           SafeArea(
             child: Align(
               alignment: Alignment.topRight,
               child: Padding(
                 padding: const EdgeInsets.only(top: 8, right: 24),
-                child: IconButton(
-                  icon: const Icon(Icons.vpn_key, color: Colors.white),
-                  tooltip: 'Attiva account partner',
+                child: TextButton.icon(
                   onPressed: () => context.push('/partner-token'),
-                  style: IconButton.styleFrom(
+                  icon: const Icon(Icons.vpn_key, color: Colors.white),
+                  label: const Text(
+                    "Partner",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
               ),
