@@ -39,6 +39,8 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
     final currentUser = ref.watch(currentUserProvider).value;
     final isAuthor = currentUser?.id == event.author.id;
 
+    final bool isExpired = event.startDate.isBefore(DateTime.now());
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dettaglio Evento"),
@@ -129,19 +131,24 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
               height: 54,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: event.isParticipating
+                  backgroundColor: (event.isParticipating || isExpired)
                       ? Colors.grey[400]
                       : Theme.of(context).colorScheme.primary,
                 ),
-                onPressed: () => event.isParticipating
+                onPressed: (event.isParticipating || isExpired)
                     ? null
-                    : _participateEvent(context, ref),
+                    : () => _participateEvent(context, ref),
                 child: Text(
-                  event.isParticipating
+                  isExpired
+                      ? "EVENTO SCADUTO"
+                      : event.isParticipating
                       ? "SEI ISCRITTO"
                       : "PARTECIPA ALL'EVENTO",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
