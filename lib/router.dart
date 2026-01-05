@@ -8,6 +8,7 @@ import 'package:greenlinkapp/features/auth/pages/login.dart';
 import 'package:greenlinkapp/features/auth/pages/register.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/event/pages/create_event_page.dart';
 import 'package:greenlinkapp/features/event/pages/event_info.dart';
 import 'package:greenlinkapp/features/event/pages/volunteering_feed_page.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
@@ -25,7 +26,6 @@ import 'features/admin/pages/users_page.dart';
 import 'features/auth/pages/onboarding_page.dart';
 import 'features/auth/pages/partner_activation_page.dart';
 import 'features/auth/providers/onboarding_provider.dart';
-import 'features/event/pages/create_event_page.dart';
 import 'features/feed/pages/create_post.dart';
 import 'features/user/pages/profile_page.dart';
 
@@ -72,11 +72,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Se sta caricando l'autenticazione, non fare nulla (resta sulla splash)
       if (authAsync.isLoading) return null;
 
-      // Se c'è un errore, forza il login
-      if (authAsync.hasError) return '/login';
-
       final authState = authAsync.value;
       final isLoggedIn = authState?.isLoggedIn ?? false;
+      final isAuthenticated = authState?.isAuthenticated ?? false;
       final isAdmin = authState?.isAdmin ?? false;
 
       final path = state.uri.path;
@@ -93,9 +91,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/event-info',
       ].contains(path);
 
-      // 1. UTENTE NON AUTENTICATO
-      if (!isLoggedIn) {
+      // 1. UTENTE NON AUTENTICATO (Anonimo o non loggato)
+      if (!isAuthenticated) {
+        // Se sta cercando di andare in pagine di auth, lo lasciamo fare sempre
         if (isLoggingIn || isRegistering || isPartnerActivation) return null;
+
+        // Se è anonimo, può navigare nelle sezioni principali
+        if (isLoggedIn) return null;
+
+        // Altrimenti forza il login
         return '/login';
       }
 
@@ -104,19 +108,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         if (isLoggingIn ||
             isRegistering ||
             isPartnerActivation ||
-            !isAdminRoute && !isSharedRoute) {
+            (!isAdminRoute && !isSharedRoute)) {
           return '/admin/reports';
         }
         return null;
       }
 
-      // 3. UTENTE AUTENTICATO - GESTIONE ONBOARDING (Solo per non-admin)
+      // 3. UTENTE AUTENTICATO - GESTIONE ONBOARDING (Solo per chi ha un account reale)
       if (!hasCompletedOnboarding) {
         if (isIntro) return null;
         return '/onboarding';
       }
 
-      // 4. UTENTE AUTENTICATO - GESTIONE ROTTE STANDARD
+      // 4. UTENTE AUTENTICATO - PREVIENI RITORNO AD AUTH/ONBOARDING
       if (isLoggingIn ||
           isRegistering ||
           isPartnerActivation ||
