@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/providers/theme_provider.dart';
-import 'package:greenlinkapp/features/legal/pages/legal_document_page.dart';
+import 'package:greenlinkapp/features/legal/pages/privacy_policy_page.dart';
+import 'package:greenlinkapp/features/legal/pages/terms_and_conditions_page.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -94,20 +95,26 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   title: "Privacy Policy",
                   icon: Icons.description_outlined,
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  onTap: () => _openLegal(
-                    "Privacy Policy",
-                    "https://greenlink.tommasodeste.it/privacy-policy.html",
-                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PrivacyPolicyPage(),
+                      ),
+                    );
+                  },
                 ),
                 _buildSettingsItem(
                   context,
                   title: "Termini e Condizioni",
                   icon: Icons.gavel_outlined,
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                  onTap: () => _openLegal(
-                    "Termini e Condizioni",
-                    "https://greenlink.tommasodeste.it/terms-conditions.html",
-                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const TermsAndConditionsPage(),
+                      ),
+                    );
+                  },
                 ),
                 const Divider(height: 1),
                 _buildSettingsItem(
@@ -216,14 +223,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             if (trailing != null) trailing,
           ],
         ),
-      ),
-    );
-  }
-
-  void _openLegal(String title, String url) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LegalDocumentPage(title: title, url: url),
       ),
     );
   }
