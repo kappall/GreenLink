@@ -15,7 +15,9 @@ abstract class AuthState with _$AuthState {
     AuthRole? derivedRole,
   }) = _AuthState;
 
-  bool get isAuthenticated => user != null || token != null;
+  // funziona ma non sono sicuro del suo funzionamente o se sia lo standard corretto
+  bool get isAuthenticated => user != null || (token != null && token!.isNotEmpty);
+  bool get hasValidToken => token != null && token!.isNotEmpty;
   bool get isAdmin => derivedRole == AuthRole.admin;
   bool get isPartner => derivedRole == AuthRole.partner;
   bool get isUser => derivedRole == AuthRole.user;

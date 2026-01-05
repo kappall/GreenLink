@@ -32,7 +32,7 @@ class PostCard extends ConsumerWidget {
               radius: 26,
               backgroundColor: Colors.grey[200],
               child: Text(
-                post.author.displayName[0],
+                post.author.displayName[0].toUpperCase(),
                 style: TextStyle(fontSize: 24, color: Colors.black54),
               ),
             ),
@@ -90,6 +90,7 @@ class PostCard extends ConsumerWidget {
               cacheWidth: 500,
             ),
           ),
+          const SizedBox(height: 8),
         Row(
           children: [
             const Icon(Icons.location_on, size: 16, color: Colors.grey),

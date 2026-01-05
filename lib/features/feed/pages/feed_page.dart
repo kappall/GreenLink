@@ -15,7 +15,7 @@ class FeedPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
-    final loggedIn = authState.asData?.value.isAuthenticated ?? false;
+    final loggedIn = authState.asData?.value.hasValidToken ?? false;
     final postsAsync = ref.watch(sortedPostsProvider);
     final criteria = ref.watch(postSortCriteriaProvider);
     final filter = ref.watch(postFilterProvider);
