@@ -268,7 +268,9 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                     : 'Pubblica Post',
                 onPressed: formValid
                     ? () async {
-                        notifier.setDescription;
+                        notifier.setDescription(
+                          _descriptionController.text.trim(),
+                        );
                         final success = await notifier.publishPost();
                         if (success && mounted) {
                           context.pop();
