@@ -4,6 +4,7 @@ import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/providers/theme_provider.dart';
 import 'package:greenlinkapp/features/legal/pages/privacy_policy_page.dart';
 import 'package:greenlinkapp/features/legal/pages/terms_and_conditions_page.dart';
+import 'package:greenlinkapp/features/settings/pages/change_location_page.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -68,6 +69,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               title: "Impostazioni Applicazione",
               icon: Icons.settings_outlined,
               children: [
+                _buildSettingsItem(
+                  context,
+                  title: "Cambia Posizione",
+                  icon: Icons.location_on_outlined,
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ChangeLocationPage(),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
                 _buildSettingsItem(
                   context,
                   title: "Tema Scuro",

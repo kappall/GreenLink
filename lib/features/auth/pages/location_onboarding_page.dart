@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:greenlinkapp/features/location/models/user_location.dart';
+import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 
@@ -65,7 +67,12 @@ class _LocationOnboardingPageState
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
         setState(() {
-          _selectedAddress = "${p.street}, ${p.locality}, ${p.country}";
+          _selectedAddress = [
+            p.street,
+            p.locality,
+            p.administrativeArea,
+            p.country,
+          ].where((s) => s != null && s.isNotEmpty).join(', ');
         });
       } else {
         setState(() {
@@ -82,8 +89,8 @@ class _LocationOnboardingPageState
   }
 
   Future<void> _searchAddress() async {
-    final address = _addressController.text.trim();
-    if (address.isEmpty) return;
+    final inputAddress = _addressController.text.trim();
+    if (inputAddress.isEmpty) return;
 
     setState(() {
       _isLocating = true;
@@ -92,14 +99,33 @@ class _LocationOnboardingPageState
       _currentLng = null;
     });
     try {
-      List<Location> locations = await locationFromAddress(address);
+      List<Location> locations = await locationFromAddress(inputAddress);
       if (locations.isNotEmpty) {
         final loc = locations.first;
         _currentLat = loc.latitude;
         _currentLng = loc.longitude;
-        setState(() {
-          _selectedAddress = address;
-        });
+
+        // Eseguiamo il reverse geocoding per ottenere il nome normalizzato
+        final placemarks = await placemarkFromCoordinates(
+          loc.latitude,
+          loc.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          setState(() {
+            _selectedAddress = [
+              p.street,
+              p.locality,
+              p.administrativeArea,
+              p.country,
+            ].where((s) => s != null && s.isNotEmpty).join(', ');
+          });
+        } else {
+          setState(() {
+            _selectedAddress = inputAddress;
+          });
+        }
       } else {
         if (mounted) FeedbackUtils.showError(context, "Indirizzo non trovato");
       }
@@ -176,6 +202,15 @@ class _LocationOnboardingPageState
                 child: FloatingActionButton.extended(
                   onPressed: () {
                     if (_currentLat != null && _currentLng != null) {
+                      ref
+                          .read(userLocationProvider.notifier)
+                          .setLocation(
+                            UserLocation(
+                              latitude: _currentLat!,
+                              longitude: _currentLng!,
+                              address: _selectedAddress,
+                            ),
+                          );
                       widget.onLocationConfirmed(_currentLat!, _currentLng!);
                     }
                   },
@@ -199,19 +234,36 @@ class _LocationOnboardingPageState
               const SizedBox(height: 16),
               const Text("oppure inserisci un indirizzo"),
               const SizedBox(height: 8),
-              TextField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  hintText: "Città, Via...",
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _addressController,
+                      decoration: InputDecoration(
+                        hintText: "Città, Via...",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      onSubmitted: (_) => _searchAddress(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton.filled(
                     onPressed: _searchAddress,
+                    icon: const Icon(Icons.search),
+                    style: IconButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(14),
+                    ),
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onSubmitted: (_) => _searchAddress(),
+                ],
               ),
             ],
           ],

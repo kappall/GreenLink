@@ -4,7 +4,6 @@ import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 
 import '../../../core/services/socket_service.dart';
-import '../../location/providers/location_provider.dart';
 import '../providers/onboarding_provider.dart';
 import 'location_onboarding_page.dart';
 
@@ -90,11 +89,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   } else {
                     return LocationOnboardingPage(
                       onLocationConfirmed: (double lat, double lng) {
-                        ref.read(userLocationProvider.notifier).state = (
-                          lat: lat,
-                          lng: lng,
-                        );
-
                         ref
                             .read(socketServiceProvider)
                             .updateLocation(lat, lng);
