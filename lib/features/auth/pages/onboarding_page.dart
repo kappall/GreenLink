@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 
+import '../../../core/services/socket_service.dart';
+import '../../location/providers/location_provider.dart';
 import '../providers/onboarding_provider.dart';
+import 'location_onboarding_page.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -67,7 +70,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       authProvider.select((auth) => auth.value?.role ?? AuthRole.user),
     );
     final isPartner = role == AuthRole.partner;
-    final pages = isPartner ? [..._userPages, _partnerPage] : _userPages;
+    final infoPages = isPartner ? [..._userPages, _partnerPage] : _userPages;
+
+    final totalPages = infoPages.length + 1;
+    final isLastPage = _currentPage == totalPages - 1;
 
     return Scaffold(
       body: SafeArea(
@@ -76,10 +82,29 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: pages.length,
+                itemCount: totalPages,
                 onPageChanged: (index) => setState(() => _currentPage = index),
                 itemBuilder: (context, index) {
-                  return _buildPage(pages[index]);
+                  if (index < infoPages.length) {
+                    return _buildPage(infoPages[index]);
+                  } else {
+                    return LocationOnboardingPage(
+                      onLocationConfirmed: (double lat, double lng) {
+                        ref.read(userLocationProvider.notifier).state = (
+                          lat: lat,
+                          lng: lng,
+                        );
+
+                        ref
+                            .read(socketServiceProvider)
+                            .updateLocation(lat, lng);
+
+                        ref
+                            .read(onboardingProvider.notifier)
+                            .completeOnboarding();
+                      },
+                    );
+                  }
                 },
               ),
             ),
@@ -88,39 +113,30 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Indicatori
                   Row(
                     children: List.generate(
-                      pages.length,
+                      totalPages,
                       (index) => _buildIndicator(index == _currentPage),
                     ),
                   ),
-                  // Pulsante Avanti/Fine
-                  FloatingActionButton.extended(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    onPressed: () {
-                      if (_currentPage < pages.length - 1) {
+                  if (!isLastPage)
+                    FloatingActionButton.extended(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      onPressed: () {
                         _pageController.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
-                      } else {
-                        ref
-                            .read(onboardingProvider.notifier)
-                            .completeOnboarding();
-                      }
-                    },
-                    label: Text(
-                      _currentPage == pages.length - 1 ? "Inizia" : "Avanti",
-                      style: const TextStyle(color: Colors.white),
+                      },
+                      label: const Text(
+                        "Avanti",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      icon: const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                      ),
                     ),
-                    icon: Icon(
-                      _currentPage == pages.length - 1
-                          ? Icons.check
-                          : Icons.arrow_forward,
-                      color: Colors.white,
-                    ),
-                  ),
                 ],
               ),
             ),
