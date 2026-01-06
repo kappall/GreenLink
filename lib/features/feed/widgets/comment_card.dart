@@ -158,10 +158,7 @@ class CommentCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                      onPressed: onReply,
-                    ),
+                      
                     const Spacer(),
                     if (isAuthor || isAdmin)
                       IconButton(

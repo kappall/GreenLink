@@ -61,7 +61,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
     final authState = ref.watch(authProvider);
     final isAdmin = authState.asData?.value.isAdmin ?? false;
     final currentUser = ref.watch(currentUserProvider).value;
-    final isAuthor = currentUser?.id == post.author?.id ?? false;
+    final isAuthor = currentUser?.id == post.author?.id;
 
     final theme = Theme.of(context);
 
@@ -269,9 +269,9 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                           selected:
                               ref.watch(commentSortProvider) ==
                               CommentSortCriteria.recent,
-                          onSelected: (val) =>
-                              ref.read(commentSortProvider.notifier).state =
-                                  CommentSortCriteria.recent,
+                          onSelected: (val) => ref
+                              .read(commentSortProvider.notifier)
+                              .setCriteria(CommentSortCriteria.recent),
                         ),
                         const SizedBox(width: 8),
                         ChoiceChip(
@@ -279,9 +279,9 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                           selected:
                               ref.watch(commentSortProvider) ==
                               CommentSortCriteria.mostLiked,
-                          onSelected: (val) =>
-                              ref.read(commentSortProvider.notifier).state =
-                                  CommentSortCriteria.mostLiked,
+                          onSelected: (val) => ref
+                              .read(commentSortProvider.notifier)
+                              .setCriteria(CommentSortCriteria.mostLiked),
                         ),
                       ],
                     ),
@@ -329,10 +329,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: SafeArea(
-                  top: false,
-                  child: CommentInputField(postId: post.id!),
-                ),
+                child: CommentInputField(postId: post.id!),
               ),
             ],
           ),

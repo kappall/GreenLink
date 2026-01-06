@@ -1,96 +1,139 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/feedback_utils.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../providers/comment_provider.dart';
-import '../providers/reply_target_provider.dart';
 
-class CommentInputField extends ConsumerWidget {
-  final int postId;
-  final _controller = TextEditingController();
+class CommentInputField extends ConsumerStatefulWidget {
+	const CommentInputField({
+		super.key,
+		required this.postId,
+	});
 
-  CommentInputField({super.key, required this.postId});
+	final int postId;
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final target = ref.watch(replyTargetProvider);
-    final bool isReplying = target != null;
+	@override
+	ConsumerState<CommentInputField> createState() => _CommentInputFieldState();
+}
 
-    final theme = Theme.of(context);
+class _CommentInputFieldState extends ConsumerState<CommentInputField> {
+	final TextEditingController _controller = TextEditingController();
+	bool _isSending = false;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (isReplying)
-          _ReplyHeader(
-            userName: target.$2!,
-            onCancel: () => ref.read(replyTargetProvider.notifier).reset(),
-          ),
-        Container(
-          padding: EdgeInsets.only(left: 16, right: 8, top: 8),
-          color: theme.colorScheme.secondaryContainer,
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  maxLength: 2000,
-                  decoration: InputDecoration(
-                    hintText: isReplying
-                        ? "Rispondi a ${target.$2}..."
-                        : "Aggiungi un commento...",
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(
-                      color: theme.colorScheme.onSecondaryContainer,
-                    ),
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.send,
-                  color: theme.colorScheme.onSecondaryContainer,
-                ),
-                onPressed: () async {
-                  final text = _controller.text.trim();
-                  if (text.isEmpty) return;
+	@override
+	void dispose() {
+		_controller.dispose();
+		super.dispose();
+	}
 
-                  // Invia con parentId se presente nel target
-                  await ref
-                      .read(commentsProvider(postId).notifier)
-                      .addComment(text, target?.$1);
+	Future<void> _submit() async {
+		if (_isSending) return;
 
-                  _controller.clear();
-                  ref.read(replyTargetProvider.notifier).reset();
-                  FocusScope.of(context).unfocus();
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+		final text = _controller.text.trim();
+		if (text.isEmpty) return;
 
-  Widget _ReplyHeader({
-    required String userName,
-    required VoidCallback onCancel,
-  }) {
-    return Container(
-      color: Colors.grey[100],
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Text(
-            "Risposta a @$userName",
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-          const Spacer(),
-          GestureDetector(
-            onTap: onCancel,
-            child: const Icon(Icons.close, size: 16),
-          ),
-        ],
-      ),
-    );
-  }
+		final authState = ref.read(authProvider).value;
+		if (authState == null || authState.token == null) {
+			FeedbackUtils.showError(context, "Devi accedere per commentare");
+			return;
+		}
+
+		setState(() => _isSending = true);
+		try {
+			await ref
+					.read(commentsProvider(widget.postId).notifier)
+					.addComment(text, null);
+			_controller.clear();
+			FocusScope.of(context).unfocus();
+		} catch (e) {
+			FeedbackUtils.showError(context, e);
+		} finally {
+			if (mounted) {
+				setState(() => _isSending = false);
+			}
+		}
+	}
+
+	@override
+	Widget build(BuildContext context) {
+		final theme = Theme.of(context);
+		final authState = ref.watch(authProvider);
+		final isLoggedIn = authState.asData?.value.token != null;
+
+		return Material(
+			color: theme.colorScheme.surface,
+			elevation: 8,
+			child: SafeArea(
+				minimum: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+				child: Row(
+					children: [
+						Expanded(
+							child: TextField(
+								controller: _controller,
+								enabled: isLoggedIn && !_isSending,
+								minLines: 1,
+								maxLines: 4,
+								textInputAction: TextInputAction.newline,
+								decoration: InputDecoration(
+									hintText:
+											isLoggedIn ? "Scrivi un commento..." : "Accedi per commentare",
+									filled: true,
+									fillColor: theme.colorScheme.surfaceVariant,
+									contentPadding:
+											const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+									border: OutlineInputBorder(
+										borderRadius: BorderRadius.circular(14),
+										borderSide: BorderSide(color: theme.colorScheme.outline),
+									),
+									enabledBorder: OutlineInputBorder(
+										borderRadius: BorderRadius.circular(14),
+										borderSide: BorderSide(color: theme.colorScheme.outline),
+									),
+									focusedBorder: OutlineInputBorder(
+										borderRadius: BorderRadius.circular(14),
+										borderSide: BorderSide(color: theme.colorScheme.primary),
+									),
+								),
+								onSubmitted: (_) => _submit(),
+							),
+						),
+						const SizedBox(width: 10),
+						SizedBox(
+							height: 44,
+							width: 44,
+							child: ElevatedButton(
+								style: ElevatedButton.styleFrom(
+									padding: EdgeInsets.zero,
+									shape: const CircleBorder(),
+									backgroundColor: isLoggedIn
+											? theme.colorScheme.primary
+									    : theme.colorScheme.surfaceVariant,
+								),
+								onPressed: (!isLoggedIn || _isSending) ? null : _submit,
+								child: _isSending
+										? SizedBox(
+												width: 18,
+												height: 18,
+												child: CircularProgressIndicator(
+													strokeWidth: 2,
+													valueColor: AlwaysStoppedAnimation<Color>(
+														theme.colorScheme.onPrimary,
+													),
+												),
+											)
+										: Icon(
+												Icons.send_rounded,
+												size: 18,
+												color: isLoggedIn
+														? theme.colorScheme.onPrimary
+														: theme.colorScheme.onSurfaceVariant,
+											),
+							),
+						),
+					],
+				),
+			),
+		);
+	}
 }
