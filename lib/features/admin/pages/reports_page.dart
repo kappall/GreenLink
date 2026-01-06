@@ -41,7 +41,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         actions: [
           Row(
             children: [
-              const Text("Solo segnalati", style: TextStyle(fontSize: 12)),
+              const Text("Solo segnalazioni", style: TextStyle(fontSize: 12)),
               Switch(
                 value: _showOnlyReported,
                 onChanged: (val) => setState(() => _showOnlyReported = val),
