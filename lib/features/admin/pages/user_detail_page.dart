@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
+import 'package:greenlinkapp/features/feed/providers/comment_provider.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
@@ -19,16 +20,19 @@ class UserDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final userPostsPage = ref.watch(postsProvider(user.id));
-    final userEvents = ref.watch(eventsProvider);
-    final userComments = ref.watch(userCommentProvider);
+    final userEvents = ref.watch(eventsByUserIdProvider(user.id));
+    final userComments = ref.watch(commentsByUserIdProvider(user.id));
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
-        title: Text("Dettagli Utente", style: TextStyle(color: Colors.white)),
+        title: const Text(
+          "Dettagli Utente",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: colorScheme.primary,
         actions: [
           IconButton(
@@ -44,10 +48,9 @@ class UserDetailPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildUserInfoCard(context, user),
-
             const SizedBox(height: 20),
             Text(
-              "Metriche Attività ",
+              "Metriche Attività",
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
@@ -55,11 +58,11 @@ class UserDetailPage extends ConsumerWidget {
               user,
               userPostsPage.asData?.value.posts.length ?? 0,
               userEvents.asData?.value.length ?? 0,
-              userComments.where((c) => c.author.id == user.id).length,
+              userComments.asData?.value.length ?? 0,
             ),
             const SizedBox(height: 20),
             Text(
-              "Contenuti Pubblicati ",
+              "Contenuti Pubblicati",
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
@@ -67,7 +70,7 @@ class UserDetailPage extends ConsumerWidget {
               data: (page) {
                 final posts = page.posts;
                 if (posts.isEmpty) {
-                  return const Text("Nessun post pubblicato. ");
+                  return const Text("Nessun post pubblicato.");
                 }
                 return ListView.separated(
                   shrinkWrap: true,
@@ -79,37 +82,69 @@ class UserDetailPage extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text("Errore: $e "),
+              error: (e, _) => Text("Errore: $e"),
             ),
             if (user.role == AuthRole.partner) ...[
               const SizedBox(height: 20),
               Text(
-                "Eventi Creati ",
+                "Eventi Creati",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 12),
               userEvents.when(
                 data: (events) {
-                  final eventsByUser = events
-                      .where((e) => e.author.id == user.id)
-                      .toList();
-                  if (eventsByUser.isEmpty) {
-                    return const Text("Nessun evento creato. ");
+                  if (events.isEmpty) {
+                    return const Text("Nessun evento creato.");
                   }
                   return ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: eventsByUser.length,
-                    itemBuilder: (context, index) =>
-                        Text(eventsByUser[index].description),
+                    itemCount: events.length,
+                    itemBuilder: (context, index) => Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(events[index].description),
+                      ),
+                    ),
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Text("Errore: $e "),
+                error: (e, _) => Text("Errore: $e"),
               ),
             ],
+            const SizedBox(height: 20),
+            Text(
+              "Commenti Pubblicati",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            userComments.when(
+              data: (comments) {
+                if (comments.isEmpty) {
+                  return const Text("Nessun commento pubblicato.");
+                }
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: comments.length,
+                  itemBuilder: (context, index) {
+                    final comment = comments[index];
+                    return Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(comment.description),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Text("Errore: $e"),
+            ),
           ],
         ),
       ),
@@ -143,7 +178,7 @@ class UserDetailPage extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.8),
+                color: colorScheme.primary.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: colorScheme.primary),
               ),
@@ -173,25 +208,25 @@ class UserDetailPage extends ConsumerWidget {
       childAspectRatio: 2.5,
       children: [
         _StatItem(
-          label: "Post Totali ",
+          label: "Post Totali",
           value: postCount.toString(),
           color: Colors.green,
         ),
         _StatItem(
-          label: "Eventi Creati ",
+          label: "Eventi Creati",
           value: eventCount.toString(),
           color: Colors.blue,
         ),
         _StatItem(
-          label: "Commenti ",
+          label: "Commenti",
           value: commentCount.toString(),
           color: Colors.orange,
         ),
         _StatItem(
-          label: "Data Iscrizione ",
+          label: "Data Iscrizione",
           value: user.createdAt != null
-              ? "${user.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year} "
-              : "N/A ",
+              ? "${user.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year}"
+              : "N/A",
           color: Colors.blueGrey,
         ),
       ],
@@ -202,14 +237,14 @@ class UserDetailPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Bloccare Utente? "),
+        title: const Text("Bloccare Utente?"),
         content: const Text(
-          "Questo utente perderà l'accesso all'app e non potrà creare contenuti. ",
+          "Questo utente perderà l'accesso all'app e non potrà creare contenuti.",
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Annulla "),
+            child: const Text("Annulla"),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -218,7 +253,7 @@ class UserDetailPage extends ConsumerWidget {
               ref.read(adminServiceProvider).blockUser(user.id);
               ref.invalidate(usersProvider);
             },
-            child: const Text("Blocca "),
+            child: const Text("Blocca"),
           ),
         ],
       ),

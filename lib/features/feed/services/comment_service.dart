@@ -10,6 +10,26 @@ class CommentService {
 
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
+  Future<List<CommentModel>> fetchCommentsByUserId({
+    required int userId,
+    required String? token,
+  }) async {
+    final headers = {'Accept': 'application/json'};
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    final response = await http.get(
+      Uri.parse('$_baseUrl/comments?user=$userId'),
+      headers: headers,
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      throw Exception('Errore durante il recupero dei commenti: $message');
+    }
+    return _parseComments(response.body);
+  }
+
   Future<List<CommentModel>> fetchComments({
     required int contentId,
     required String? token,

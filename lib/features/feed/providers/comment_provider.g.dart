@@ -103,7 +103,7 @@ final class CommentsProvider
   }
 }
 
-String _$commentsHash() => r'4a9aad27bfd828a55c684290b8ab0ac47afe5f4c';
+String _$commentsHash() => r'b644f73a4bbd0400b065a69f0ed592975564b5fe';
 
 final class CommentsFamily extends $Family
     with
@@ -151,4 +151,81 @@ abstract class _$Comments extends $AsyncNotifier<List<CommentModel>> {
             >;
     element.handleValue(ref, created);
   }
+}
+
+@ProviderFor(commentsByUserId)
+const commentsByUserIdProvider = CommentsByUserIdFamily._();
+
+final class CommentsByUserIdProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<CommentModel>>,
+          List<CommentModel>,
+          FutureOr<List<CommentModel>>
+        >
+    with
+        $FutureModifier<List<CommentModel>>,
+        $FutureProvider<List<CommentModel>> {
+  const CommentsByUserIdProvider._({
+    required CommentsByUserIdFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'commentsByUserIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$commentsByUserIdHash();
+
+  @override
+  String toString() {
+    return r'commentsByUserIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<CommentModel>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<CommentModel>> create(Ref ref) {
+    final argument = this.argument as int;
+    return commentsByUserId(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CommentsByUserIdProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$commentsByUserIdHash() => r'406a63611921cd36baa5bd7d53c3dccd18d73244';
+
+final class CommentsByUserIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<CommentModel>>, int> {
+  const CommentsByUserIdFamily._()
+    : super(
+        retry: null,
+        name: r'commentsByUserIdProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  CommentsByUserIdProvider call(int userId) =>
+      CommentsByUserIdProvider._(argument: userId, from: this);
+
+  @override
+  String toString() => r'commentsByUserIdProvider';
 }

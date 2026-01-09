@@ -42,7 +42,7 @@ final class CreatePostNotifierProvider
 }
 
 String _$createPostNotifierHash() =>
-    r'9b1c2244a76324f4ff576b414636ec6fa0566f18';
+    r'7b35933233dd51b9ba4a54a350628b2c4fc11c9f';
 
 abstract class _$CreatePostNotifier extends $Notifier<CreatePostState> {
   CreatePostState build();
@@ -104,7 +104,7 @@ final class PostsProvider
   }
 }
 
-String _$postsHash() => r'8572cdc318743d877b21bd538b7cbc78943ff252';
+String _$postsHash() => r'cbbb0a3fec3d083e44381e3a34f3ff7383806b2f';
 
 final class PostsFamily extends $Family
     with
@@ -177,7 +177,7 @@ final class PostsByDistanceProvider
   PostsByDistance create() => PostsByDistance();
 }
 
-String _$postsByDistanceHash() => r'3db9b7eed7e73330d8046dd68820f06a5277ccbb';
+String _$postsByDistanceHash() => r'1b9dab68585303af4cd5f4f04c26b2964f2e7b64';
 
 abstract class _$PostsByDistance extends $AsyncNotifier<PaginatedPosts> {
   FutureOr<PaginatedPosts> build();
@@ -235,4 +235,4 @@ final class MapPostsProvider
   }
 }
 
-String _$mapPostsHash() => r'250d219694e6e01a3d18402d5be2cd525352ed07';
+String _$mapPostsHash() => r'c6608eb34a62d4296f0535201e7477d5452aef06';

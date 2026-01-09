@@ -107,3 +107,14 @@ class Comments extends _$Comments {
     }
   }
 }
+
+@riverpod
+Future<List<CommentModel>> commentsByUserId(Ref ref, int userId) async {
+  final authState = ref.watch(authProvider);
+  final token = authState.asData?.value.token;
+
+  return CommentService.instance.fetchCommentsByUserId(
+    userId: userId,
+    token: token,
+  );
+}
