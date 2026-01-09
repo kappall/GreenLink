@@ -167,7 +167,7 @@ class CreatePostState {
 
 @riverpod
 class CreatePostNotifier extends _$CreatePostNotifier {
-  final _postService = PostService();
+  final _postService = PostService.instance;
   final _picker = ImagePicker();
 
   @override
@@ -310,7 +310,7 @@ class PaginatedPosts {
 
 @riverpod
 class Posts extends _$Posts {
-  final _postService = PostService();
+  final _postService = PostService.instance;
   static const _pageSize = 20;
   bool _isLoadingMore = false;
 
@@ -448,7 +448,7 @@ class Posts extends _$Posts {
 
 @riverpod
 class PostsByDistance extends _$PostsByDistance {
-  final _postService = PostService();
+  final _postService = PostService.instance;
   static const _pageSize = 20;
   bool _isLoadingMore = false;
 
@@ -556,7 +556,7 @@ Future<List<PostModel>> mapPosts(Ref ref) async {
       if (userLocation == null) {
         return [];
       }
-      final service = PostService();
+      final service = PostService.instance;
       final authState = ref.watch(authProvider);
       final token = authState.asData?.value.token;
 

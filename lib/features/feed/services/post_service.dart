@@ -7,7 +7,15 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class PostService {
+  PostService._();
+  static final PostService instance = PostService._();
+
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
+  final Map<String, List<PostModel>> _cache = {};
+
+  void _clearCache() {
+    _cache.clear();
+  }
 
   Future<List<PostModel>> fetchAllPosts({
     required String? token,
@@ -85,6 +93,14 @@ class PostService {
     required Uri uri,
     required String? token,
   }) async {
+    final cacheKey = uri.toString();
+    FeedbackUtils.logDebug("cacheKey is $cacheKey");
+    if (_cache.containsKey(cacheKey)) {
+      FeedbackUtils.logDebug("cache hit");
+      return _cache[cacheKey]!;
+    }
+    FeedbackUtils.logDebug("cache miss");
+
     final headers = {'Accept': 'application/json'};
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
@@ -106,10 +122,12 @@ class PostService {
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /posts: $rawList');
     }
-    return rawList
+    final posts = rawList
         .whereType<Map<String, dynamic>>()
         .map(PostModel.fromJson)
         .toList();
+    _cache[cacheKey] = posts;
+    return posts;
   }
 
   Future<int> createPost({
@@ -151,7 +169,7 @@ class PostService {
         await uploadMedia(token: token, postId: postId, file: file);
       }
     }
-
+    _clearCache();
     return postId;
   }
 
@@ -192,6 +210,7 @@ class PostService {
       final message = _errorMessage(response);
       throw Exception('Errore durante il caricamento del media: $message');
     }
+    _clearCache();
   }
 
   Future<void> votePost({
@@ -214,6 +233,7 @@ class PostService {
       final message = _errorMessage(response);
       throw Exception('Errore durante la votazione: $message');
     }
+    _clearCache();
   }
 
   Future<void> reportContent({
@@ -240,6 +260,7 @@ class PostService {
       FeedbackUtils.logDebug(message);
       throw Exception('Errore durante la segnalazione');
     }
+    _clearCache();
   }
 
   Future<void> deletePost({required String token, required int postId}) async {
@@ -254,6 +275,7 @@ class PostService {
       log(message);
       throw Exception('Errore durante la cancellazione del post');
     }
+    _clearCache();
   }
 
   String _errorMessage(http.Response response) {
