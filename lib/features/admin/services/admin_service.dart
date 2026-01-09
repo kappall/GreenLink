@@ -1,10 +1,17 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 
 import '../../auth/utils/role_parser.dart';
 import '../../user/models/user_model.dart';
 import '../models/report.dart';
+
+final adminServiceProvider = Provider<AdminService>((ref) {
+  final token = ref.watch(authProvider).asData?.value.token ?? '';
+  return AdminService(token: token);
+});
 
 class AdminService {
   final String token;

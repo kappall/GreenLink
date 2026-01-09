@@ -20,7 +20,7 @@ class CommentSort extends _$CommentSort {
 
 @riverpod
 class Comments extends _$Comments {
-  final _commentService = CommentService();
+  final _commentService = CommentService.instance;
   @override
   FutureOr<List<CommentModel>> build(int contentId) async {
     final criteria = ref.watch(commentSortProvider);

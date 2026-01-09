@@ -8,6 +8,8 @@ import '../../user/models/user_model.dart';
 
 class AuthService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
+  AuthService._();
+  static final AuthService instance = AuthService._();
 
   Future<AuthResult> login({
     required String email,
@@ -30,7 +32,9 @@ class AuthService {
         return _parseAuthResponse(response.body);
       }
 
-      FeedbackUtils.logError("Login failed (${response.statusCode}): ${response.body}");
+      FeedbackUtils.logError(
+        "Login failed (${response.statusCode}): ${response.body}",
+      );
       throw Exception('Email o password non corrette. Riprova.');
     } catch (e) {
       if (e is Exception) rethrow;
@@ -65,8 +69,12 @@ class AuthService {
         return _parseAuthResponse(response.body);
       }
 
-      FeedbackUtils.logError("Registration failed (${response.statusCode}): ${response.body}");
-      throw Exception('Impossibile creare l\'account. L\'email o lo username potrebbero essere già in uso.');
+      FeedbackUtils.logError(
+        "Registration failed (${response.statusCode}): ${response.body}",
+      );
+      throw Exception(
+        'Impossibile creare l\'account. L\'email o lo username potrebbero essere già in uso.',
+      );
     } catch (e) {
       if (e is Exception) rethrow;
       FeedbackUtils.logError("Connection error during registration: $e");
@@ -94,7 +102,9 @@ class AuthService {
         return _parseAuthResponse(response.body);
       }
 
-      FeedbackUtils.logError("Partner activation failed (${response.statusCode}): ${response.body}");
+      FeedbackUtils.logError(
+        "Partner activation failed (${response.statusCode}): ${response.body}",
+      );
       throw Exception('Il codice di attivazione non è valido o è scaduto.');
     } catch (e) {
       if (e is Exception) rethrow;
@@ -108,7 +118,10 @@ class AuthService {
     try {
       final response = await http.get(
         uri,
-        headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -120,7 +133,9 @@ class AuthService {
         return UserModel.fromJson(rawUser);
       }
 
-      FeedbackUtils.logError("Fetch current user failed (${response.statusCode}): ${response.body}");
+      FeedbackUtils.logError(
+        "Fetch current user failed (${response.statusCode}): ${response.body}",
+      );
       throw Exception('Sessione non valida. Effettua di nuovo l\'accesso.');
     } catch (e) {
       if (e is Exception) rethrow;
@@ -136,13 +151,20 @@ class AuthService {
     try {
       final response = await http.delete(
         uri,
-        headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) return;
 
-      FeedbackUtils.logError("Delete account failed (${response.statusCode}): ${response.body}");
-      throw Exception('Non è stato possibile eliminare l\'account. Riprova più tardi.');
+      FeedbackUtils.logError(
+        "Delete account failed (${response.statusCode}): ${response.body}",
+      );
+      throw Exception(
+        'Non è stato possibile eliminare l\'account. Riprova più tardi.',
+      );
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Errore durante l\'eliminazione.');

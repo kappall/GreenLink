@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import '../models/comment_model.dart';
 
 class CommentService {
+  CommentService._();
+  static final CommentService instance = CommentService._();
+
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
   Future<List<CommentModel>> fetchComments({

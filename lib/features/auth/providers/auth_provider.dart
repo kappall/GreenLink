@@ -10,7 +10,7 @@ import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthState> {
-  final AuthService _authService = AuthService();
+  final AuthService _authService = AuthService.instance;
   static const String _tokenKey = 'auth_token';
 
   @override

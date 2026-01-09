@@ -5,6 +5,9 @@ import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:http/http.dart' as http;
 
 class EventService {
+  EventService._();
+  static final EventService instance = EventService._();
+
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
   Future<List<EventModel>> fetchAllEvents({required String? token}) {

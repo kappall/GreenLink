@@ -9,7 +9,7 @@ final currentUserProvider =
     });
 
 class CurrentUserNotifier extends AsyncNotifier<UserModel?> {
-  final AuthService _authService = AuthService();
+  final AuthService _authService = AuthService.instance;
 
   @override
   Future<UserModel?> build() async {

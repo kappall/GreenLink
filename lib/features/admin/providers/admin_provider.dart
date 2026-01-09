@@ -26,23 +26,16 @@ class ReportsNotifier extends AsyncNotifier<List<Report>> {
       return <Report>[];
     }
 
-    return AdminService(token: token).getReports();
+    return ref.read(adminServiceProvider).getReports();
   }
 
   Future<void> moderateReport({
     required Report report,
     required bool approve,
   }) async {
-    final authState = ref.read(authProvider);
-    final token = authState.asData?.value.token;
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Utente non autenticato');
-    }
-
-    await AdminService(
-      token: token,
-    ).moderateReport(report: report, approve: approve);
+    await ref
+        .read(adminServiceProvider)
+        .moderateReport(report: report, approve: approve);
 
     await refresh();
   }
@@ -71,7 +64,7 @@ class UsersNotifier extends AsyncNotifier<List<UserModel>> {
       return <UserModel>[];
     }
 
-    final adminService = AdminService(token: token);
+    final adminService = ref.read(adminServiceProvider);
     final users = await adminService.getUsers();
     final partners = await adminService.getPartners();
 
@@ -79,14 +72,7 @@ class UsersNotifier extends AsyncNotifier<List<UserModel>> {
   }
 
   Future<void> blockUser(int userId) async {
-    final authState = ref.read(authProvider);
-    final token = authState.asData?.value.token;
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Utente non autenticato');
-    }
-
-    await AdminService(token: token).blockUser(userId);
+    await ref.read(adminServiceProvider).blockUser(userId);
     await refresh();
   }
 
@@ -94,16 +80,9 @@ class UsersNotifier extends AsyncNotifier<List<UserModel>> {
     required String email,
     required String username,
   }) async {
-    final authState = ref.read(authProvider);
-    final token = authState.asData?.value.token;
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Utente non autenticato');
-    }
-
-    final partnerToken = await AdminService(
-      token: token,
-    ).createPartner(email: email, username: username);
+    final partnerToken = await ref
+        .read(adminServiceProvider)
+        .createPartner(email: email, username: username);
     await refresh();
     return partnerToken;
   }
@@ -199,11 +178,9 @@ final blockedFilteredUsersProvider = Provider<List<UserModel>>((ref) {
   return users.where((user) => user.isBlocked).toList();
 });
 
-// Alias per compatibilità con UI esistente
 final reportsListProvider = reportsProvider;
 final usersListProvider = usersProvider;
 
-// Provider del servizio admin per compatibilità
 final adminServiceProvider = Provider<AdminService>((ref) {
   final authState = ref.watch(authProvider);
   final token = authState.asData?.value.token;

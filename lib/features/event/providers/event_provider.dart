@@ -5,7 +5,7 @@ import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/services/event_service.dart';
 
 class EventsNotifier extends AsyncNotifier<List<EventModel>> {
-  final EventService _eventService = EventService();
+  final EventService _eventService = EventService.instance;
   int? _partnerId;
 
   @override
