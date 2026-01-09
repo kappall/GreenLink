@@ -51,8 +51,6 @@ class PostService {
       },
     );
 
-    FeedbackUtils.logDebug(uri);
-
     return _requestPosts(uri: uri, token: token);
   }
 
@@ -94,12 +92,9 @@ class PostService {
     required String? token,
   }) async {
     final cacheKey = uri.toString();
-    FeedbackUtils.logDebug("cacheKey is $cacheKey");
     if (_cache.containsKey(cacheKey)) {
-      FeedbackUtils.logDebug("cache hit");
       return _cache[cacheKey]!;
     }
-    FeedbackUtils.logDebug("cache miss");
 
     final headers = {'Accept': 'application/json'};
     if (token != null && token.isNotEmpty) {
@@ -118,7 +113,6 @@ class PostService {
       final List<dynamic> list => list,
       _ => decoded,
     };
-    FeedbackUtils.logDebug(rawList);
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /posts: $rawList');
     }
@@ -257,7 +251,7 @@ class PostService {
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final message = _errorMessage(response);
-      FeedbackUtils.logDebug(message);
+      FeedbackUtils.logError(message);
       throw Exception('Errore durante la segnalazione');
     }
     _clearCache();
