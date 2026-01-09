@@ -15,6 +15,18 @@ class EventService {
     return _requestEvents(uri: uri, token: token);
   }
 
+  Future<List<EventModel>> fetchEventsByUserId({
+    required String? token,
+    required int userId,
+  }) {
+    final uri = Uri.parse('$_baseUrl/events').replace(
+      queryParameters: {
+        'user': userId.toString(),
+      },
+    );
+    return _requestEvents(uri: uri, token: token);
+  }
+
   Future<List<EventModel>> fetchEvents({
     required String token,
     int? partnerId,

@@ -7,6 +7,7 @@ import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 
 import '../../auth/providers/auth_provider.dart';
+import '../../event/providers/event_provider.dart';
 import '../../event/widgets/event_card.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -21,9 +22,9 @@ class ProfilePage extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final currentUserAsync = ref.watch(currentUserProvider);
     final userPostsAsync = ref.watch(postsProvider(currentUserAsync.value?.id));
-    final userEventsAsync = AsyncValue.data(
-      [],
-    ); // TODO: quando implemenatto sostituire con userEventsProvider
+    final userEventsAsync = ref.watch(
+      eventsByUserIdProvider(currentUserAsync.value!.id),
+    );
 
     return authState.when(
       loading: () =>

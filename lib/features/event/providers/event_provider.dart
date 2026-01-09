@@ -89,6 +89,18 @@ final eventsProvider = AsyncNotifierProvider<EventsNotifier, List<EventModel>>(
   },
 );
 
+final eventsByUserIdProvider = FutureProvider.family<List<EventModel>, int>((
+  ref,
+  userId,
+) async {
+  final authState = ref.watch(authProvider);
+  final token = authState.asData?.value.token;
+  return EventService.instance.fetchEventsByUserId(
+    token: token,
+    userId: userId,
+  );
+});
+
 class EventsSearchQueryNotifier extends Notifier<String> {
   @override
   String build() => '';
