@@ -18,7 +18,7 @@ class UserDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final userPosts = ref.watch(postsProvider(user.id));
+    final userPostsPage = ref.watch(postsProvider(user.id));
     final userEvents = ref.watch(eventsProvider);
     final userComments = ref.watch(userCommentProvider);
 
@@ -53,7 +53,7 @@ class UserDetailPage extends ConsumerWidget {
             const SizedBox(height: 12),
             _buildStatsGrid(
               user,
-              userPosts.asData?.value.length ?? 0,
+              userPostsPage.asData?.value.posts.length ?? 0,
               userEvents.asData?.value.length ?? 0,
               userComments.where((c) => c.author.id == user.id).length,
             ),
@@ -63,8 +63,9 @@ class UserDetailPage extends ConsumerWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
-            userPosts.when(
-              data: (posts) {
+            userPostsPage.when(
+              data: (page) {
+                final posts = page.posts;
                 if (posts.isEmpty) {
                   return const Text("Nessun post pubblicato. ");
                 }

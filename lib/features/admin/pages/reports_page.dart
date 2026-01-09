@@ -137,7 +137,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
 
   Widget _buildAllPostsList() {
     final postsAsync = ref.watch(postsProvider(null));
-    return CustomScrollView(slivers: [PostFeed(postsAsync: postsAsync)]);
+    return CustomScrollView(slivers: [PostFeed(postPageAsync: postsAsync)]);
   }
 
   Widget _buildAllEventsList() {

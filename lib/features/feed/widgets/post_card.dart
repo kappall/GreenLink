@@ -31,10 +31,12 @@ class PostCard extends ConsumerWidget {
             CircleAvatar(
               radius: 26,
               backgroundColor: Colors.grey[200],
-              child: post.author != null ? Text(
-                post.author!.displayName[0].toUpperCase(),
-                style: TextStyle(fontSize: 24, color: Colors.black54),
-              ) : Icon( Icons.person_off, size: 28, color: Colors.black54),
+              child: post.author != null
+                  ? Text(
+                      post.author!.displayName[0].toUpperCase(),
+                      style: TextStyle(fontSize: 24, color: Colors.black54),
+                    )
+                  : Icon(Icons.person_off, size: 28, color: Colors.black54),
             ),
             const SizedBox(width: 12),
             Expanded(

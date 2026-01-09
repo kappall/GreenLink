@@ -9,11 +9,38 @@ import 'package:greenlinkapp/features/feed/widgets/sortdropdown.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/post_provider.dart';
 
-class FeedPage extends ConsumerWidget {
+class FeedPage extends ConsumerStatefulWidget {
   const FeedPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FeedPage> createState() => _FeedPageState();
+}
+
+class _FeedPageState extends ConsumerState<FeedPage> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
+      ref.read(postsProvider(null).notifier).loadMore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authProvider).value;
     final postsAsync = ref.watch(sortedPostsProvider);
     final criteria = ref.watch(postSortCriteriaProvider);
@@ -22,8 +49,9 @@ class FeedPage extends ConsumerWidget {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(postsProvider(null).notifier).refresh(),
+        onRefresh: () => ref.refresh(postsProvider(null).future),
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverAppBar(
               floating: true,
@@ -75,7 +103,20 @@ class FeedPage extends ConsumerWidget {
                 ),
               ),
             ),
-            PostFeed(postsAsync: postsAsync),
+            PostFeed(postPageAsync: postsAsync),
+            SliverToBoxAdapter(
+              child: postsAsync.maybeWhen(
+                data: (paginated) => paginated.hasMore
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                orElse: () => const SizedBox.shrink(),
+              ),
+            ),
           ],
         ),
       ),

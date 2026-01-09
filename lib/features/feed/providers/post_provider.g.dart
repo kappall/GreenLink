@@ -67,7 +67,7 @@ abstract class _$CreatePostNotifier extends $Notifier<CreatePostState> {
 const postsProvider = PostsFamily._();
 
 final class PostsProvider
-    extends $AsyncNotifierProvider<Posts, List<PostModel>> {
+    extends $AsyncNotifierProvider<Posts, PaginatedPosts> {
   const PostsProvider._({
     required PostsFamily super.from,
     required int? super.argument,
@@ -104,15 +104,15 @@ final class PostsProvider
   }
 }
 
-String _$postsHash() => r'090822bf9bef92a4b0b2828c2ecfb576c2d636cb';
+String _$postsHash() => r'5e6b7f70ac23b48985127a33a3cbac5770299619';
 
 final class PostsFamily extends $Family
     with
         $ClassFamilyOverride<
           Posts,
-          AsyncValue<List<PostModel>>,
-          List<PostModel>,
-          FutureOr<List<PostModel>>,
+          AsyncValue<PaginatedPosts>,
+          PaginatedPosts,
+          FutureOr<PaginatedPosts>,
           int?
         > {
   const PostsFamily._()
@@ -131,21 +131,21 @@ final class PostsFamily extends $Family
   String toString() => r'postsProvider';
 }
 
-abstract class _$Posts extends $AsyncNotifier<List<PostModel>> {
+abstract class _$Posts extends $AsyncNotifier<PaginatedPosts> {
   late final _$args = ref.$arg as int?;
   int? get userId => _$args;
 
-  FutureOr<List<PostModel>> build(int? userId);
+  FutureOr<PaginatedPosts> build(int? userId);
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref = this.ref as $Ref<AsyncValue<List<PostModel>>, List<PostModel>>;
+    final ref = this.ref as $Ref<AsyncValue<PaginatedPosts>, PaginatedPosts>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<PostModel>>, List<PostModel>>,
-              AsyncValue<List<PostModel>>,
+              AnyNotifier<AsyncValue<PaginatedPosts>, PaginatedPosts>,
+              AsyncValue<PaginatedPosts>,
               Object?,
               Object?
             >;

@@ -9,11 +9,20 @@ import 'package:image_picker/image_picker.dart';
 class PostService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
-  Future<List<PostModel>> fetchAllPosts({required String? token}) {
-    final uri = Uri.parse(
-      '$_baseUrl/posts',
-    ).replace(queryParameters: {'sort': 'id', 'order': 'desc'});
-    ;
+  Future<List<PostModel>> fetchAllPosts({
+    required String? token,
+    int? skip,
+    int? limit,
+  }) {
+    final uri = Uri.parse('$_baseUrl/posts').replace(
+      queryParameters: {
+        'sort': 'id',
+        'order': 'desc',
+        'skip': '$skip',
+        'limit': '$limit',
+      },
+    );
+
     return _requestPosts(uri: uri, token: token);
   }
 
@@ -51,7 +60,6 @@ class PostService {
   }
 
   Future<List<PostModel>> _requestPosts({
-    //TODO: set limit e skip
     required Uri uri,
     required String? token,
   }) async {
@@ -72,6 +80,7 @@ class PostService {
       final List<dynamic> list => list,
       _ => decoded,
     };
+    FeedbackUtils.logDebug(rawList);
     if (rawList is! List) {
       throw Exception('Risposta inattesa da /posts: $rawList');
     }

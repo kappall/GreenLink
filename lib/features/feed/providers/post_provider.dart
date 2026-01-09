@@ -280,10 +280,9 @@ class CreatePostNotifier extends _$CreatePostNotifier {
         media: state.images,
       );
 
-      // Refresh user posts and global feed
       ref.invalidate(postsProvider);
 
-      state = CreatePostState(); // Reset state
+      state = CreatePostState();
       return true;
     } catch (_) {
       state = state.copyWith(isPublishing: false);
@@ -292,28 +291,71 @@ class CreatePostNotifier extends _$CreatePostNotifier {
   }
 }
 
+class PaginatedPosts {
+  final List<PostModel> posts;
+  final int page;
+  final bool hasMore;
+
+  PaginatedPosts({this.posts = const [], this.page = 1, this.hasMore = true});
+
+  PaginatedPosts copyWith({List<PostModel>? posts, int? page, bool? hasMore}) {
+    return PaginatedPosts(
+      posts: posts ?? this.posts,
+      page: page ?? this.page,
+      hasMore: hasMore ?? this.hasMore,
+    );
+  }
+}
+
 @riverpod
 class Posts extends _$Posts {
   final _postService = PostService();
+  static const _pageSize = 20;
+  bool _isLoadingMore = false;
 
   @override
-  FutureOr<List<PostModel>> build(int? userId) async {
-    return _fetchPosts(uId: userId);
+  FutureOr<PaginatedPosts> build(int? userId) async {
+    return _fetchPage(1);
   }
 
-  Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _fetchPosts(uId: userId));
-  }
-
-  Future<List<PostModel>> _fetchPosts({int? uId}) async {
+  Future<PaginatedPosts> _fetchPage(int page) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    if (uId != null && uId > 0 && token != null) {
-      return _postService.fetchUserPosts(token: token, userId: uId);
+    final posts = await _postService.fetchAllPosts(
+      token: token,
+      skip: (page - 1) * _pageSize,
+      limit: _pageSize,
+    );
+
+    return PaginatedPosts(
+      posts: posts,
+      page: page,
+      hasMore: posts.length == _pageSize,
+    );
+  }
+
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !state.value!.hasMore) return;
+    _isLoadingMore = true;
+
+    try {
+      final nextPage = state.value!.page + 1;
+      final newPage = await _fetchPage(nextPage);
+      final currentPosts = state.value?.posts ?? [];
+      final allPosts = [...currentPosts, ...newPage.posts];
+      final uniquePosts = allPosts.toSet().toList(); // Rimuovi duplicati
+
+      state = AsyncValue.data(
+        state.value!.copyWith(
+          posts: uniquePosts,
+          page: nextPage,
+          hasMore: newPage.hasMore,
+        ),
+      );
+    } finally {
+      _isLoadingMore = false;
     }
-    return _postService.fetchAllPosts(token: token);
   }
 
   Future<PostModel> fetchPostById(String postId) async {
@@ -363,7 +405,7 @@ class Posts extends _$Posts {
     }
 
     await _postService.deletePost(token: token, postId: postId);
-    await refresh();
+    ref.invalidate(postsProvider);
   }
 
   Future<void> votePost(int postId, bool hasVoted) async {
@@ -372,21 +414,22 @@ class Posts extends _$Posts {
 
     final previousState = state;
 
-    // Aggiornamento Ottimistico locale
     if (state.hasValue) {
       state = AsyncValue.data(
-        state.value!.map((post) {
-          if (post.id == postId) {
-            final isCurrentlyVoted = post.hasVoted;
-            return post.copyWith(
-              hasVoted: !isCurrentlyVoted,
-              votesCount: isCurrentlyVoted
-                  ? post.votesCount - 1
-                  : post.votesCount + 1,
-            );
-          }
-          return post;
-        }).toList(),
+        state.value!.copyWith(
+          posts: state.value!.posts.map((post) {
+            if (post.id == postId) {
+              final isCurrentlyVoted = post.hasVoted;
+              return post.copyWith(
+                hasVoted: !isCurrentlyVoted,
+                votesCount: isCurrentlyVoted
+                    ? post.votesCount - 1
+                    : post.votesCount + 1,
+              );
+            }
+            return post;
+          }).toList(),
+        ),
       );
     }
 
@@ -402,14 +445,15 @@ class Posts extends _$Posts {
   }
 }
 
-// ordine desc automatico
-final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
+final sortedPostsProvider = Provider.autoDispose<AsyncValue<PaginatedPosts>>((
+  ref,
+) {
   final postsAsync = ref.watch(postsProvider(null));
   final criteria = ref.watch(postSortCriteriaProvider);
   final filter = ref.watch(postFilterProvider);
 
-  return postsAsync.whenData((posts) {
-    var filtered = posts.where((post) {
+  return postsAsync.whenData((paginated) {
+    final filteredPosts = paginated.posts.where((post) {
       final matchesVotes = post.votesCount >= filter.minVotes;
       final matchesDate =
           filter.startDate == null ||
@@ -419,7 +463,7 @@ final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
     }).toList();
 
     final distance = const Distance();
-    filtered.sort((a, b) {
+    filteredPosts.sort((a, b) {
       switch (criteria) {
         case PostSortCriteria.date:
           final dateA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -439,10 +483,10 @@ final sortedPostsProvider = Provider<AsyncValue<List<PostModel>>>((ref) {
             filter.resolvedLocation!,
             LatLng(b.latitude, b.longitude),
           );
-          return distA.compareTo(distB); // ASC, quello più vicino
+          return distA.compareTo(distB);
       }
     });
 
-    return filtered;
+    return paginated.copyWith(posts: filteredPosts);
   });
 });

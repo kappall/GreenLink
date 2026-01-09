@@ -187,9 +187,9 @@ class ProfilePage extends ConsumerWidget {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         userPostsAsync.when(
-                                          data: (posts) => _buildStatItem(
+                                          data: (page) => _buildStatItem(
                                             "Post",
-                                            posts.length.toString(),
+                                            page.posts.length.toString(),
                                           ),
                                           loading: () =>
                                               _buildStatItem("Post", "-"),
@@ -234,25 +234,24 @@ class ProfilePage extends ConsumerWidget {
                   body: TabBarView(
                     children: [
                       userPostsAsync.when(
-                        data: (posts) => posts.isEmpty
+                        data: (page) => page.posts.isEmpty
                             ? const Center(
                                 child: Text("Nessun post pubblicato"),
                               )
                             : ListView.separated(
                                 padding: const EdgeInsets.all(16),
-                                itemCount: posts.length,
-                                separatorBuilder: (_, __) => const Divider(
-                                  height: 32,
-                                  thickness: 1,
-                                ),
-                                itemBuilder: (context, index) => GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () => context.push(
-                                    '/post-info',
-                                    extra: posts[index],
-                                  ),
-                                  child: PostCard(post: posts[index]),
-                                ),
+                                itemCount: page.posts.length,
+                                separatorBuilder: (_, __) =>
+                                    const Divider(height: 32, thickness: 1),
+                                itemBuilder: (context, index) =>
+                                    GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () => context.push(
+                                        '/post-info',
+                                        extra: page.posts[index],
+                                      ),
+                                      child: PostCard(post: page.posts[index]),
+                                    ),
                               ),
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),

@@ -65,7 +65,7 @@ class _MapPageState extends ConsumerState<MapPage> {
     final postsAsync = ref.watch(postsProvider(null));
     final eventsAsync = ref.watch(eventsProvider);
 
-    final posts = postsAsync.value ?? [];
+    final posts = postsAsync.value?.posts ?? [];
     final events = eventsAsync.value ?? [];
 
     return Scaffold(
