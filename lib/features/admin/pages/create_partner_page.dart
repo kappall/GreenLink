@@ -32,7 +32,7 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
 
     try {
       final token = await ref
-          .read(usersProvider.notifier)
+          .read(partnerProvider.notifier)
           .createPartner(
             email: _emailController.text.trim(),
             username: _usernameController.text.trim(),

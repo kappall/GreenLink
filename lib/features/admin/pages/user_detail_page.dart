@@ -216,7 +216,7 @@ class UserDetailPage extends ConsumerWidget {
             onPressed: () {
               Navigator.pop(ctx);
               ref.read(adminServiceProvider).blockUser(user.id);
-              ref.invalidate(usersListProvider);
+              ref.invalidate(usersProvider);
             },
             child: const Text("Blocca "),
           ),

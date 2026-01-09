@@ -7,26 +7,28 @@ import '../../feed/models/comment_model.dart';
 import '../models/report.dart';
 import '../services/admin_service.dart';
 
+final adminServiceProvider = Provider<AdminService>((ref) {
+  final authState = ref.watch(authProvider);
+  final token = authState.asData?.value.token;
+
+  if (token == null || token.isEmpty) {
+    throw Exception('Utente non autenticato');
+  }
+
+  return AdminService(token: token);
+});
+
 class ReportsNotifier extends AsyncNotifier<List<Report>> {
   @override
   Future<List<Report>> build() async {
-    return _fetchReports();
+    return ref.read(adminServiceProvider).getReports();
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _fetchReports());
-  }
-
-  Future<List<Report>> _fetchReports() async {
-    final authState = ref.watch(authProvider);
-    final token = authState.asData?.value.token;
-
-    if (token == null || token.isEmpty) {
-      return <Report>[];
-    }
-
-    return ref.read(adminServiceProvider).getReports();
+    state = await AsyncValue.guard(
+      () => ref.read(adminServiceProvider).getReports(),
+    );
   }
 
   Future<void> moderateReport({
@@ -36,7 +38,6 @@ class ReportsNotifier extends AsyncNotifier<List<Report>> {
     await ref
         .read(adminServiceProvider)
         .moderateReport(report: report, approve: approve);
-
     await refresh();
   }
 }
@@ -48,43 +49,20 @@ final reportsProvider = AsyncNotifierProvider<ReportsNotifier, List<Report>>(
 class UsersNotifier extends AsyncNotifier<List<UserModel>> {
   @override
   Future<List<UserModel>> build() async {
-    return _fetchUsers();
+    final adminService = ref.read(adminServiceProvider);
+    final users = await adminService.getUsers();
+    final partners = await adminService.getPartners();
+    return [...users, ...partners];
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _fetchUsers());
-  }
-
-  Future<List<UserModel>> _fetchUsers() async {
-    final authState = ref.watch(authProvider);
-    final token = authState.asData?.value.token;
-
-    if (token == null || token.isEmpty) {
-      return <UserModel>[];
-    }
-
-    final adminService = ref.read(adminServiceProvider);
-    final users = await adminService.getUsers();
-    final partners = await adminService.getPartners();
-
-    return [...users, ...partners];
-  }
-
-  Future<void> blockUser(int userId) async {
-    await ref.read(adminServiceProvider).blockUser(userId);
-    await refresh();
-  }
-
-  Future<String> createPartner({
-    required String email,
-    required String username,
-  }) async {
-    final partnerToken = await ref
-        .read(adminServiceProvider)
-        .createPartner(email: email, username: username);
-    await refresh();
-    return partnerToken;
+    state = await AsyncValue.guard(() async {
+      final adminService = ref.read(adminServiceProvider);
+      final users = await adminService.getUsers();
+      final partners = await adminService.getPartners();
+      return [...users, ...partners];
+    });
   }
 }
 
@@ -92,13 +70,48 @@ final usersProvider = AsyncNotifierProvider<UsersNotifier, List<UserModel>>(
   UsersNotifier.new,
 );
 
-// Search Query Notifier
+class UserActionsNotifier extends Notifier<void> {
+  @override
+  void build() {}
+
+  Future<void> blockUser(int userId) async {
+    await ref.read(adminServiceProvider).blockUser(userId);
+    ref.invalidate(usersProvider);
+  }
+}
+
+final userActionsProvider = NotifierProvider<UserActionsNotifier, void>(
+  UserActionsNotifier.new,
+);
+
+class PartnerNotifier extends Notifier<void> {
+  @override
+  void build() {}
+
+  Future<String> createPartner({
+    required String email,
+    required String username,
+  }) async {
+    final token = await ref
+        .read(adminServiceProvider)
+        .createPartner(email: email, username: username);
+    ref.invalidate(usersProvider);
+    return token;
+  }
+}
+
+final partnerProvider = NotifierProvider<PartnerNotifier, void>(
+  PartnerNotifier.new,
+);
+
+// Search and Filter Notifiers
 class UsersSearchQueryNotifier extends Notifier<String> {
   @override
   String build() => '';
 
-  @override
-  set state(String value) => super.state = value;
+  void setSearchQuery(String query) {
+    state = query;
+  }
 }
 
 final usersSearchQueryProvider =
@@ -106,13 +119,13 @@ final usersSearchQueryProvider =
       UsersSearchQueryNotifier.new,
     );
 
-// Role Filter Notifier
 class UserRoleFilterNotifier extends Notifier<AuthRole?> {
   @override
   AuthRole? build() => null;
 
-  @override
-  set state(AuthRole? value) => super.state = value;
+  void setRoleFilter(AuthRole? role) {
+    state = role;
+  }
 }
 
 final userRoleFilterProvider =
@@ -120,23 +133,7 @@ final userRoleFilterProvider =
       UserRoleFilterNotifier.new,
     );
 
-// TODO: Provider temporaneo per compatibilità - da collegare a vero backend
-final userCommentProvider = Provider<List<CommentModel>>((ref) => const []);
-
-// Derived providers
-final usersCountProvider = Provider<int>((ref) {
-  final usersAsync = ref.watch(usersProvider);
-  return usersAsync.maybeWhen(data: (users) => users.length, orElse: () => 0);
-});
-
-final reportsCountProvider = Provider<int>((ref) {
-  final reportsAsync = ref.watch(reportsProvider);
-  return reportsAsync.maybeWhen(
-    data: (reports) => reports.length,
-    orElse: () => 0,
-  );
-});
-
+// Derived Providers
 final filteredUsersProvider = Provider<List<UserModel>>((ref) {
   final usersAsync = ref.watch(usersProvider);
   final query = ref.watch(usersSearchQueryProvider).toLowerCase();
@@ -164,7 +161,7 @@ final filteredUsersProvider = Provider<List<UserModel>>((ref) {
           )
           .toList();
     },
-    orElse: () => const [],
+    orElse: () => [],
   );
 });
 
@@ -178,16 +175,5 @@ final blockedFilteredUsersProvider = Provider<List<UserModel>>((ref) {
   return users.where((user) => user.isBlocked).toList();
 });
 
-final reportsListProvider = reportsProvider;
-final usersListProvider = usersProvider;
-
-final adminServiceProvider = Provider<AdminService>((ref) {
-  final authState = ref.watch(authProvider);
-  final token = authState.asData?.value.token;
-
-  if (token == null || token.isEmpty) {
-    throw Exception('Utente non autenticato');
-  }
-
-  return AdminService(token: token);
-});
+// Temporary provider for compatibility
+final userCommentProvider = Provider<List<CommentModel>>((ref) => const []);

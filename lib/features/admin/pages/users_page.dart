@@ -12,7 +12,7 @@ class UsersPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final usersAsync = ref.watch(usersListProvider);
+    final usersAsync = ref.watch(usersProvider);
     final selectedRole = ref.watch(userRoleFilterProvider);
 
     return DefaultTabController(
@@ -41,8 +41,9 @@ class UsersPage extends ConsumerWidget {
               child: Column(
                 children: [
                   TextField(
-                    onChanged: (val) =>
-                        ref.read(usersSearchQueryProvider.notifier).state = val,
+                    onChanged: (val) => ref
+                        .read(usersSearchQueryProvider.notifier)
+                        .setSearchQuery(val),
                     decoration: InputDecoration(
                       hintText: "Cerca per nome o email...",
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -63,25 +64,25 @@ class UsersPage extends ConsumerWidget {
                         FilterChip(
                           label: const Text("Tutti"),
                           selected: selectedRole == null,
-                          onSelected: (_) =>
-                              ref.read(userRoleFilterProvider.notifier).state =
-                                  null,
+                          onSelected: (_) => ref
+                              .read(userRoleFilterProvider.notifier)
+                              .setRoleFilter(null),
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
                           label: const Text("Utenti"),
                           selected: selectedRole == AuthRole.user,
-                          onSelected: (_) =>
-                              ref.read(userRoleFilterProvider.notifier).state =
-                                  AuthRole.user,
+                          onSelected: (_) => ref
+                              .read(userRoleFilterProvider.notifier)
+                              .setRoleFilter(AuthRole.user),
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
                           label: const Text("Partner"),
                           selected: selectedRole == AuthRole.partner,
-                          onSelected: (_) =>
-                              ref.read(userRoleFilterProvider.notifier).state =
-                                  AuthRole.partner,
+                          onSelected: (_) => ref
+                              .read(userRoleFilterProvider.notifier)
+                              .setRoleFilter(AuthRole.partner),
                         ),
                       ],
                     ),
@@ -188,7 +189,9 @@ class _UserList extends ConsumerWidget {
                 ),
                 onTap: () async {
                   Navigator.pop(ctx);
-                  await ref.read(usersProvider.notifier).blockUser(user.id);
+                  await ref
+                      .read(userActionsProvider.notifier)
+                      .blockUser(user.id);
                   if (context.mounted) {
                     FeedbackUtils.showSuccess(
                       context,
