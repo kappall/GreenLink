@@ -325,6 +325,7 @@ class Posts extends _$Posts {
 
     final posts = await _postService.fetchAllPosts(
       token: token,
+      userId: this.userId,
       skip: (page - 1) * _pageSize,
       limit: _pageSize,
     );
@@ -344,12 +345,10 @@ class Posts extends _$Posts {
       final nextPage = state.value!.page + 1;
       final newPage = await _fetchPage(nextPage);
       final currentPosts = state.value?.posts ?? [];
-      final allPosts = [...currentPosts, ...newPage.posts];
-      final uniquePosts = allPosts.toSet().toList(); // Rimuovi duplicati
 
       state = AsyncValue.data(
         state.value!.copyWith(
-          posts: uniquePosts,
+          posts: currentPosts,
           page: nextPage,
           hasMore: newPage.hasMore,
         ),

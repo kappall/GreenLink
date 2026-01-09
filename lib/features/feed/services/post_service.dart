@@ -19,11 +19,13 @@ class PostService {
 
   Future<List<PostModel>> fetchAllPosts({
     required String? token,
+    required int? userId,
     int? skip,
     int? limit,
   }) {
     final uri = Uri.parse('$_baseUrl/posts').replace(
       queryParameters: {
+        'user': userId?.toString() ?? '',
         'sort': 'id',
         'order': 'desc',
         'skip': skip?.toString() ?? '0',
