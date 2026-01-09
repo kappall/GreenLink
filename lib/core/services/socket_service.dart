@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -19,22 +20,31 @@ final socketServiceProvider = Provider<SocketService>((ref) {
   final service = SocketService(socket);
   ref.onDispose(service.dispose);
 
-  FeedbackUtils.logDebug('Socket: provider inizializzato');
-  service.connect();
+  ref.listen(authProvider, (_, next) {
+    final isAuthenticated = next.asData?.value.isAuthenticated ?? false;
+    if (isAuthenticated) {
+      service.connect();
+    } else {
+      service.disconnect();
+    }
+  });
 
   ref.listen(userLocationProvider, (previous, next) {
     if (next == null) {
-      FeedbackUtils.logDebug('Socket: location non disponibile');
       return;
     }
-    FeedbackUtils.logDebug(
-      'Socket: location aggiornata lat=${next.latitude} lng=${next.longitude}',
-    );
     service.updateLocation(next.latitude, next.longitude);
   }, fireImmediately: true);
 
   return service;
 });
+
+/// Provider per esporre lo stream di notifiche alla UI
+final notificationStreamProvider =
+    StreamProvider.autoDispose<Map<String, dynamic>>((ref) {
+      final socketService = ref.watch(socketServiceProvider);
+      return socketService.notifications;
+    });
 
 class SocketService {
   static const String locationUpdateEvent = 'listen';
@@ -55,29 +65,20 @@ class SocketService {
 
   void connect() {
     if (!_socket.connected) {
-      FeedbackUtils.logDebug('Socket: avvio connessione');
       _socket.connect();
-    } else {
-      FeedbackUtils.logDebug('Socket: già connesso');
     }
   }
 
   void updateLocation(double lat, double lng) {
-    FeedbackUtils.logDebug('Socket: updateLocation lat=$lat lng=$lng');
     if (_lastLat == lat && _lastLng == lng && _socket.connected) {
-      FeedbackUtils.logDebug('Socket: posizione invariata, skip');
-      return;
+      return; // Posizione invariata, non fare nulla
     }
 
     _lastLat = lat;
     _lastLng = lng;
 
     if (_socket.connected) {
-      FeedbackUtils.logDebug('Socket: emit listen con posizione');
       _socket.emit(locationUpdateEvent, [lat, lng]);
-    } else {
-      FeedbackUtils.logDebug('Socket: non connesso, provo a connettere');
-      _socket.connect();
     }
   }
 
@@ -96,10 +97,7 @@ class SocketService {
     _socket.on('connect', (_) {
       FeedbackUtils.logInfo('Socket connesso');
       if (_lastLat != null && _lastLng != null) {
-        FeedbackUtils.logDebug('Socket: emit listen su reconnect');
         _socket.emit(locationUpdateEvent, [_lastLat, _lastLng]);
-      } else {
-        FeedbackUtils.logDebug('Socket: connesso senza posizione');
       }
     });
     _socket.on('disconnect', (_) {
@@ -110,7 +108,6 @@ class SocketService {
     });
     _socket.on(notificationEvent, (data) {
       final payload = _normalizePayload(data);
-      FeedbackUtils.logInfo('Socket: content ricevuto $payload');
       _notificationsController.add(payload);
     });
   }
