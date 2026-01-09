@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
+import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 import 'package:latlong2/latlong.dart';
-
-import '../../../core/utils/feedback_utils.dart';
 
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
@@ -26,31 +24,15 @@ class _MapPageState extends ConsumerState<MapPage> {
   @override
   void initState() {
     super.initState();
-    _determinePosition();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _centerMapOnUser();
+    });
   }
 
-  Future<void> _determinePosition() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return;
-      }
-
-      if (permission == LocationPermission.deniedForever) return;
-
-      final position = await Geolocator.getCurrentPosition();
-      if (mounted) {
-        _mapController.move(
-          LatLng(position.latitude, position.longitude),
-          12.0,
-        );
-      }
-    } catch (_) {
-      // In caso di errore restiamo dove siamo
+  void _centerMapOnUser() {
+    final userLoc = ref.read(userLocationProvider).value;
+    if (userLoc != null) {
+      _mapController.move(LatLng(userLoc.latitude, userLoc.longitude), 12.0);
     }
   }
 
@@ -62,37 +44,56 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final postsAsync = ref.watch(postsProvider(null));
-    final eventsAsync = ref.watch(eventsProvider);
+    final postsAsync = ref.watch(mapPostsProvider);
+    final eventsAsync = ref.watch(
+      eventsProvider,
+    ); // Potresti ottimizzare anche questo
+    final userLocAsync = ref.watch(userLocationProvider);
 
-    final posts = postsAsync.value?.posts ?? [];
+    final posts = postsAsync.value ?? [];
     final events = eventsAsync.value ?? [];
 
     return Scaffold(
       body: Stack(
         children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: _fallbackCenter,
-              initialZoom: 12.0,
-              minZoom: 3.0,
-              maxZoom: 18.0,
+          userLocAsync.when(
+            data: (userLoc) => FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: userLoc != null
+                    ? LatLng(userLoc.latitude, userLoc.longitude)
+                    : _fallbackCenter,
+                initialZoom: 12.0,
+                minZoom: 3.0,
+                maxZoom: 18.0,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.greenlink.app',
+                ),
+                MarkerLayer(
+                  markers: [
+                    if (userLoc != null)
+                      Marker(
+                        point: LatLng(userLoc.latitude, userLoc.longitude),
+                        width: 60,
+                        height: 60,
+                        child: const Icon(
+                          Icons.person_pin_circle,
+                          color: Colors.blue,
+                          size: 40,
+                        ),
+                      ),
+                    ...posts.map((post) => _buildPostMarker(context, post)),
+                    ...events.map((event) => _buildEventMarker(context, event)),
+                  ],
+                ),
+              ],
             ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.greenlink.app',
-              ),
-              MarkerLayer(
-                markers: [
-                  ...posts.map((post) => _buildPostMarker(context, post)),
-                  ...events.map((event) => _buildEventMarker(context, event)),
-                ],
-              ),
-            ],
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('Errore: $err')),
           ),
-          // Indicatore di caricamento dati discreto
           if (postsAsync.isLoading || eventsAsync.isLoading)
             Positioned(
               top: MediaQuery.of(context).padding.top + 10,
@@ -105,11 +106,11 @@ class _MapPageState extends ConsumerState<MapPage> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: 4,
                       ),
                     ],
@@ -124,7 +125,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        "Caricamento segnalazioni...",
+                        "Caricamento dati mappa...",
                         style: TextStyle(fontSize: 12),
                       ),
                     ],
@@ -132,7 +133,6 @@ class _MapPageState extends ConsumerState<MapPage> {
                 ),
               ),
             ),
-          // Pulsante Recenter
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
@@ -141,22 +141,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                 heroTag: "recenter",
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 foregroundColor: Theme.of(context).colorScheme.primary,
-                onPressed: () async {
-                  try {
-                    final position = await Geolocator.getCurrentPosition();
-                    _mapController.move(
-                      LatLng(position.latitude, position.longitude),
-                      12.0,
-                    );
-                  } catch (e) {
-                    if (context.mounted) {
-                      FeedbackUtils.showSuccess(
-                        context,
-                        "Impossibile recuperare la posizione",
-                      );
-                    }
-                  }
-                },
+                onPressed: _centerMapOnUser,
                 child: const Icon(Icons.my_location),
               ),
             ),
@@ -180,7 +165,7 @@ class _MapPageState extends ConsumerState<MapPage> {
             border: Border.all(color: post.category.color, width: 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -206,7 +191,7 @@ class _MapPageState extends ConsumerState<MapPage> {
             border: Border.all(color: Colors.white, width: 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -255,7 +240,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
+                        color: color.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(icon, color: color, size: 28),

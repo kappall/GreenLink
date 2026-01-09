@@ -104,7 +104,7 @@ final class PostsProvider
   }
 }
 
-String _$postsHash() => r'5e6b7f70ac23b48985127a33a3cbac5770299619';
+String _$postsHash() => r'8572cdc318743d877b21bd538b7cbc78943ff252';
 
 final class PostsFamily extends $Family
     with
@@ -152,3 +152,87 @@ abstract class _$Posts extends $AsyncNotifier<PaginatedPosts> {
     element.handleValue(ref, created);
   }
 }
+
+@ProviderFor(PostsByDistance)
+const postsByDistanceProvider = PostsByDistanceProvider._();
+
+final class PostsByDistanceProvider
+    extends $AsyncNotifierProvider<PostsByDistance, PaginatedPosts> {
+  const PostsByDistanceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'postsByDistanceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$postsByDistanceHash();
+
+  @$internal
+  @override
+  PostsByDistance create() => PostsByDistance();
+}
+
+String _$postsByDistanceHash() => r'3db9b7eed7e73330d8046dd68820f06a5277ccbb';
+
+abstract class _$PostsByDistance extends $AsyncNotifier<PaginatedPosts> {
+  FutureOr<PaginatedPosts> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<PaginatedPosts>, PaginatedPosts>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<PaginatedPosts>, PaginatedPosts>,
+              AsyncValue<PaginatedPosts>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(mapPosts)
+const mapPostsProvider = MapPostsProvider._();
+
+final class MapPostsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<PostModel>>,
+          List<PostModel>,
+          FutureOr<List<PostModel>>
+        >
+    with $FutureModifier<List<PostModel>>, $FutureProvider<List<PostModel>> {
+  const MapPostsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mapPostsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$mapPostsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<PostModel>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<PostModel>> create(Ref ref) {
+    return mapPosts(ref);
+  }
+}
+
+String _$mapPostsHash() => r'250d219694e6e01a3d18402d5be2cd525352ed07';

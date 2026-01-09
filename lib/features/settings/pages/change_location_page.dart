@@ -133,12 +133,18 @@ class _ChangeLocationPageState extends ConsumerState<ChangeLocationPage> {
                 color: Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                userLoc != null
-                    ? (userLoc.address ??
-                          "Coordinate: ${userLoc.latitude.toStringAsFixed(4)}, ${userLoc.longitude.toStringAsFixed(4)}")
-                    : "Non impostata",
-                style: const TextStyle(fontStyle: FontStyle.italic),
+              child: userLoc.when(
+                data: (userLoc) => Text(
+                  userLoc != null
+                      ? (userLoc.address ??
+                            "Coordinate: ${userLoc.latitude.toStringAsFixed(4)}, ${userLoc.longitude.toStringAsFixed(4)}")
+                      : "Non impostata",
+                  style: const TextStyle(fontStyle: FontStyle.italic),
+                ),
+                error: (e, _) {
+                  return Text("Posizione non dispnibile");
+                },
+                loading: () => const CircularProgressIndicator(),
               ),
             ),
             const SizedBox(height: 32),

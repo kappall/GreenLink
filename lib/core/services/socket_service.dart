@@ -30,10 +30,10 @@ final socketServiceProvider = Provider<SocketService>((ref) {
   });
 
   ref.listen(userLocationProvider, (previous, next) {
-    if (next == null) {
+    if (next.value == null) {
       return;
     }
-    service.updateLocation(next.latitude, next.longitude);
+    service.updateLocation(next.value!.latitude, next.value!.longitude);
   }, fireImmediately: true);
 
   return service;

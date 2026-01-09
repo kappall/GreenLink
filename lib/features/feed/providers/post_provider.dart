@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
+import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -445,11 +446,87 @@ class Posts extends _$Posts {
   }
 }
 
+@riverpod
+class PostsByDistance extends _$PostsByDistance {
+  final _postService = PostService();
+  static const _pageSize = 20;
+  bool _isLoadingMore = false;
+
+  @override
+  FutureOr<PaginatedPosts> build() async {
+    final userLocationAsync = ref.watch(userLocationProvider);
+
+    return userLocationAsync.when(
+      data: (userLocation) {
+        if (userLocation == null) {
+          return PaginatedPosts(hasMore: false);
+        }
+        return _fetchPage(1, userLocation.latitude, userLocation.longitude);
+      },
+      loading: () => PaginatedPosts(hasMore: false), // Handle loading state
+      error: (err, stack) =>
+          PaginatedPosts(hasMore: false), // Handle error state
+    );
+  }
+
+  Future<PaginatedPosts> _fetchPage(int page, double lat, double lng) async {
+    final authState = ref.watch(authProvider);
+    final token = authState.asData?.value.token;
+
+    final posts = await _postService.fetchPostsByDistance(
+      token: token,
+      latitude: lat,
+      longitude: lng,
+      skip: (page - 1) * _pageSize,
+      limit: _pageSize,
+    );
+
+    return PaginatedPosts(
+      posts: posts,
+      page: page,
+      hasMore: posts.length == _pageSize,
+    );
+  }
+
+  Future<void> loadMore() async {
+    final userLocation = ref.read(userLocationProvider).value;
+    if (_isLoadingMore || !state.value!.hasMore || userLocation == null) return;
+    _isLoadingMore = true;
+
+    try {
+      final nextPage = state.value!.page + 1;
+      final newPage = await _fetchPage(
+        nextPage,
+        userLocation.latitude,
+        userLocation.longitude,
+      );
+      final currentPosts = state.value?.posts ?? [];
+      final allPosts = [...currentPosts, ...newPage.posts];
+      final uniquePosts = allPosts.toSet().toList();
+
+      state = AsyncValue.data(
+        state.value!.copyWith(
+          posts: uniquePosts,
+          page: nextPage,
+          hasMore: newPage.hasMore,
+        ),
+      );
+    } finally {
+      _isLoadingMore = false;
+    }
+  }
+}
+
 final sortedPostsProvider = Provider.autoDispose<AsyncValue<PaginatedPosts>>((
   ref,
 ) {
-  final postsAsync = ref.watch(postsProvider(null));
   final criteria = ref.watch(postSortCriteriaProvider);
+
+  if (criteria == PostSortCriteria.proximity) {
+    return ref.watch(postsByDistanceProvider);
+  }
+
+  final postsAsync = ref.watch(postsProvider(null));
   final filter = ref.watch(postFilterProvider);
 
   return postsAsync.whenData((paginated) {
@@ -462,31 +539,35 @@ final sortedPostsProvider = Provider.autoDispose<AsyncValue<PaginatedPosts>>((
       return matchesVotes && matchesDate;
     }).toList();
 
-    final distance = const Distance();
-    filteredPosts.sort((a, b) {
-      switch (criteria) {
-        case PostSortCriteria.date:
-          final dateA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final dateB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          return dateB.compareTo(dateA);
-        case PostSortCriteria.votes:
-          return b.votesCount.compareTo(a.votesCount);
-        case PostSortCriteria.proximity:
-          if (filter.resolvedLocation == null) return 0;
-          final distA = distance.as(
-            LengthUnit.Meter,
-            filter.resolvedLocation!,
-            LatLng(a.latitude, a.longitude),
-          );
-          final distB = distance.as(
-            LengthUnit.Meter,
-            filter.resolvedLocation!,
-            LatLng(b.latitude, b.longitude),
-          );
-          return distA.compareTo(distB);
-      }
-    });
+    if (criteria == PostSortCriteria.votes) {
+      filteredPosts.sort((a, b) => b.votesCount.compareTo(a.votesCount));
+    }
 
     return paginated.copyWith(posts: filteredPosts);
   });
 });
+
+@riverpod
+Future<List<PostModel>> mapPosts(Ref ref) async {
+  final userLocationAsync = ref.watch(userLocationProvider);
+
+  return userLocationAsync.when(
+    data: (userLocation) {
+      if (userLocation == null) {
+        return [];
+      }
+      final service = PostService();
+      final authState = ref.watch(authProvider);
+      final token = authState.asData?.value.token;
+
+      return service.fetchPostsByDistance(
+        token: token,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        limit: 30,
+      );
+    },
+    loading: () => [],
+    error: (err, stack) => [],
+  );
+}

@@ -18,10 +18,32 @@ class PostService {
       queryParameters: {
         'sort': 'id',
         'order': 'desc',
-        'skip': '$skip',
-        'limit': '$limit',
+        'skip': skip?.toString() ?? '0',
+        'limit': limit?.toString() ?? '20',
       },
     );
+
+    return _requestPosts(uri: uri, token: token);
+  }
+
+  Future<List<PostModel>> fetchPostsByDistance({
+    required String? token,
+    required double latitude,
+    required double longitude,
+    int? skip,
+    int? limit,
+  }) {
+    final uri = Uri.parse('$_baseUrl/posts').replace(
+      queryParameters: {
+        'sort': 'distance',
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+        'skip': skip?.toString() ?? '0',
+        'limit': limit?.toString() ?? '20',
+      },
+    );
+
+    FeedbackUtils.logDebug(uri);
 
     return _requestPosts(uri: uri, token: token);
   }
@@ -150,7 +172,6 @@ class PostService {
     String extension = file.path.split('.').last.toLowerCase();
     if (extension == 'jpeg') extension = 'jpg';
 
-    // Per il MIME type ufficiale, jpg deve essere jpeg
     String mimeSubtype = (extension == 'jpg') ? 'jpeg' : extension;
 
     request.fields['type'] = extension;
