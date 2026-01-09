@@ -45,9 +45,7 @@ class _MapPageState extends ConsumerState<MapPage> {
   @override
   Widget build(BuildContext context) {
     final postsAsync = ref.watch(mapPostsProvider);
-    final eventsAsync = ref.watch(
-      eventsProvider,
-    ); // Potresti ottimizzare anche questo
+    final eventsAsync = ref.watch(mapEventsProvider);
     final userLocAsync = ref.watch(userLocationProvider);
 
     final posts = postsAsync.value ?? [];

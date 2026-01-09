@@ -9,9 +9,44 @@ class EventService {
   static final EventService instance = EventService._();
 
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
+  final Map<String, List<EventModel>> _cache = {};
 
-  Future<List<EventModel>> fetchAllEvents({required String? token}) {
-    final uri = Uri.parse('$_baseUrl/events');
+  void clearCache() {
+    _cache.clear();
+  }
+
+  Future<List<EventModel>> fetchAllEvents({
+    required String? token,
+    int? skip,
+    int? limit,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/events').replace(
+      queryParameters: {
+        'skip': skip?.toString() ?? '0',
+        'limit': limit?.toString() ?? '20',
+      },
+    );
+
+    return _requestEvents(uri: uri, token: token);
+  }
+
+  Future<List<EventModel>> fetchEventsByDistance({
+    required String? token,
+    required double latitude,
+    required double longitude,
+    int? skip,
+    int? limit,
+  }) {
+    final uri = Uri.parse('$_baseUrl/events').replace(
+      queryParameters: {
+        'sort': 'distance',
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+        'skip': skip?.toString() ?? '0',
+        'limit': limit?.toString() ?? '20',
+      },
+    );
+
     return _requestEvents(uri: uri, token: token);
   }
 
@@ -42,6 +77,11 @@ class EventService {
     required Uri uri,
     required String? token,
   }) async {
+    final cacheKey = uri.toString();
+    if (_cache.containsKey(cacheKey)) {
+      return _cache[cacheKey]!;
+    }
+
     final headers = {'Accept': 'application/json'};
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
@@ -71,10 +111,12 @@ class EventService {
         FeedbackUtils.logError("Unexpected format from $uri: ${response.body}");
         throw Exception('Errore nel formato dei dati riceveuti.');
       }
-      return rawList
+      final events = rawList
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
           .toList();
+      _cache[cacheKey] = events;
+      return events;
     } catch (e) {
       if (e is Exception) rethrow;
       FeedbackUtils.logError("Connection error on $uri: $e");
@@ -133,7 +175,7 @@ class EventService {
         FeedbackUtils.logError("Invalid event response: ${response.body}");
         throw Exception('Errore nella risposta del server.');
       }
-
+      clearCache();
       return EventModel.fromJson(rawEvent);
     } catch (e) {
       if (e is Exception) rethrow;
@@ -167,6 +209,7 @@ class EventService {
           'Non è stato possibile registrarti all\'evento. Riprova tra poco.',
         );
       }
+      clearCache();
     } catch (e) {
       FeedbackUtils.logError("Exception in participate: $e");
       throw Exception('Errore durante l\'iscrizione all\'evento.');

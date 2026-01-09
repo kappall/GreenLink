@@ -194,7 +194,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     setState(() => _isPublishing = true);
     try {
       await ref
-          .read(eventsProvider.notifier)
+          .read(eventsProvider(null).notifier)
           .createEvent(
             title: _titleController.text,
             description: _descriptionController.text,

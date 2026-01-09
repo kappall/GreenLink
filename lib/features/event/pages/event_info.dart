@@ -184,7 +184,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
   Future<void> _participateEvent(BuildContext context, WidgetRef ref) async {
     try {
       await ref
-          .read(eventsProvider.notifier)
+          .read(eventsProvider(null).notifier)
           .participate(eventId: widget.event.id!);
       context.pop();
       FeedbackUtils.showSuccess(context, "Partecipi all'evento");

@@ -6,42 +6,126 @@ import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/event/widgets/button.dart';
 import 'package:greenlinkapp/features/event/widgets/event_feed.dart';
 
-class VolunteeringFeedPage extends ConsumerWidget {
+class VolunteeringFeedPage extends ConsumerStatefulWidget {
   const VolunteeringFeedPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final eventsAsync = ref.watch(filteredEventsProvider);
+  ConsumerState<VolunteeringFeedPage> createState() =>
+      _VolunteeringFeedPageState();
+}
+
+class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final criteria = ref.read(eventSortCriteriaProvider);
+      if (criteria == EventSortCriteria.proximity) {
+        ref.read(eventsByDistanceProvider.notifier).loadMore();
+      } else {
+        ref.read(eventsProvider(null).notifier).loadMore();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final eventsAsync = ref.watch(sortedEventsProvider);
+    final filter = ref.watch(eventFilterProvider);
+    final sortCriteria = ref.watch(eventSortCriteriaProvider);
     final isPartner = ref.watch(authProvider).asData?.value.isPartner ?? false;
     final colorScheme = Theme.of(context).colorScheme;
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(eventsProvider.notifier).refreshAll(),
+      onRefresh: () {
+        final criteria = ref.read(eventSortCriteriaProvider);
+        if (criteria == EventSortCriteria.proximity) {
+          return ref.refresh(eventsByDistanceProvider.future);
+        } else {
+          return ref.refresh(eventsProvider(null).future);
+        }
+      },
       child: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
-                    onChanged: (val) =>
-                        ref.read(eventsSearchQueryProvider.notifier).state =
-                            val,
-                    decoration: InputDecoration(
-                      hintText: 'Cerca eventi di volontariato...',
-                      prefixIcon: const Icon(Icons.search),
-                      filled: true,
-                      fillColor: colorScheme.secondaryContainer,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onChanged: (val) =>
+                              ref
+                                      .read(eventsSearchQueryProvider.notifier)
+                                      .state =
+                                  val,
+                          decoration: InputDecoration(
+                            hintText: 'Cerca eventi di volontariato...',
+                            prefixIcon: const Icon(Icons.search),
+                            filled: true,
+                            fillColor: colorScheme.secondaryContainer,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                      const SizedBox(width: 8),
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.filter_list),
+                        onSelected: (String value) {
+                          if (value == 'excludeParticipating') {
+                            ref
+                                .read(eventFilterProvider.notifier)
+                                .setExcludeParticipating(
+                                  !filter.excludeParticipating,
+                                );
+                          } else if (value == 'excludeExpired') {
+                            ref
+                                .read(eventFilterProvider.notifier)
+                                .setExcludeExpired(!filter.excludeExpired);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) =>
+                            <PopupMenuEntry<String>>[
+                              CheckedPopupMenuItem<String>(
+                                value: 'excludeParticipating',
+                                checked: filter.excludeParticipating,
+                                child: const Text(
+                                  'Nascondi eventi a cui partecipo',
+                                ),
+                              ),
+                              CheckedPopupMenuItem<String>(
+                                value: 'excludeExpired',
+                                checked: filter.excludeExpired,
+                                child: const Text('Nascondi eventi scaduti'),
+                              ),
+                            ],
                       ),
-                    ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -68,6 +152,30 @@ class VolunteeringFeedPage extends ConsumerWidget {
                         ),
                       ],
                     ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: SegmentedButton<EventSortCriteria>(
+                      segments: const [
+                        ButtonSegment(
+                          value: EventSortCriteria.date,
+                          label: Text('Recenti'),
+                          icon: Icon(Icons.calendar_today),
+                        ),
+                        ButtonSegment(
+                          value: EventSortCriteria.proximity,
+                          label: Text('Vicinanza'),
+                          icon: Icon(Icons.near_me),
+                        ),
+                      ],
+                      selected: {sortCriteria},
+                      onSelectionChanged: (newSelection) {
+                        ref
+                            .read(eventSortCriteriaProvider.notifier)
+                            .setCriteria(newSelection.first);
+                      },
+                    ),
                   ),
                 ],
               ),

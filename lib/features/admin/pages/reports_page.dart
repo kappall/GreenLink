@@ -141,7 +141,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
   }
 
   Widget _buildAllEventsList() {
-    final eventsAsync = ref.watch(eventsProvider);
+    final eventsAsync = ref.watch(eventsProvider(null));
     return CustomScrollView(slivers: [EventFeed(eventsAsync: eventsAsync)]);
   }
 
