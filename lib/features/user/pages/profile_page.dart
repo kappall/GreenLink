@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
+import 'package:greenlinkapp/features/feed/providers/comment_provider.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
+import 'package:greenlinkapp/features/feed/widgets/comment_card.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 
@@ -24,6 +26,9 @@ class ProfilePage extends ConsumerWidget {
     final userPostsAsync = ref.watch(postsProvider(currentUserAsync.value?.id));
     final userEventsAsync = ref.watch(
       eventsByUserIdProvider(currentUserAsync.value!.id),
+    );
+    final userCommentsAsync = ref.watch(
+      commentsByUserIdProvider(currentUserAsync.value!.id),
     );
 
     return authState.when(
@@ -83,7 +88,7 @@ class ProfilePage extends ConsumerWidget {
 
             return Scaffold(
               body: DefaultTabController(
-                length: 2,
+                length: 3,
                 child: NestedScrollView(
                   headerSliverBuilder: (context, innerBoxIsScrolled) {
                     return [
@@ -207,6 +212,16 @@ class ProfilePage extends ConsumerWidget {
                                           error: (_, __) =>
                                               _buildStatItem("Eventi", "!"),
                                         ),
+                                        userCommentsAsync.when(
+                                          data: (comments) => _buildStatItem(
+                                            "Commenti",
+                                            comments.length.toString(),
+                                          ),
+                                          loading: () =>
+                                              _buildStatItem("Commenti", "-"),
+                                          error: (_, __) =>
+                                              _buildStatItem("Commenti", "!"),
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -225,6 +240,7 @@ class ProfilePage extends ConsumerWidget {
                             tabs: const [
                               Tab(text: "Post"),
                               Tab(text: "Eventi"),
+                              Tab(text: "Commenti"),
                             ],
                           ),
                         ),
@@ -271,6 +287,27 @@ class ProfilePage extends ConsumerWidget {
                                     const SizedBox(height: 16),
                                 itemBuilder: (context, index) =>
                                     EventCard(event: events[index]),
+                              ),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) =>
+                            Center(child: Text("Errore: $error")),
+                      ),
+                      userCommentsAsync.when(
+                        data: (comments) => comments.isEmpty
+                            ? const Center(
+                                child: Text("Nessun commento pubblicato"),
+                              )
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: comments.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 16),
+                                itemBuilder: (context, index) => CommentCard(
+                                  comment: comments[index],
+                                  postId:
+                                      71, //TODO: shoudl be comments[index].contentId
+                                ),
                               ),
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
