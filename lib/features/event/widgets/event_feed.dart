@@ -24,10 +24,7 @@ class EventFeed extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final event = page.events[index];
                   return UiCard(
-                    child: EventCard(
-                      event: event,
-                      onTap: () => context.push('/event-info', extra: event),
-                    ),
+                    child: EventCard(event: event),
                     onTap: () => context.push('/event-info', extra: event),
                   );
                 },

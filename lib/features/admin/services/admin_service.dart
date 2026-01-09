@@ -13,6 +13,7 @@ final adminServiceProvider = Provider<AdminService>((ref) {
   return AdminService(token: token);
 });
 
+//TODO: skip and limit
 class AdminService {
   final String token;
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
@@ -51,7 +52,7 @@ class AdminService {
   Future<List<UserModel>> getUsers() async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/users'),
+        Uri.parse('$_baseUrl/users').replace(queryParameters: {'limit': '100'}),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',

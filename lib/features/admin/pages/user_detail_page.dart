@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/features/admin/widgets/admin_comment_card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
+import 'package:greenlinkapp/features/event/widgets/event_card.dart';
 import 'package:greenlinkapp/features/feed/providers/comment_provider.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
@@ -84,14 +86,15 @@ class UserDetailPage extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text("Errore: $e"),
             ),
+            const SizedBox(height: 20),
             if (user.role == AuthRole.partner) ...[
-              const SizedBox(height: 20),
               Text(
                 "Eventi Creati",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 12),
               userEvents.when(
+                //TODO: partner events
                 data: (events) {
                   if (events.isEmpty) {
                     return const Text("Nessun evento creato.");
@@ -100,12 +103,8 @@ class UserDetailPage extends ConsumerWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: events.length,
-                    itemBuilder: (context, index) => Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(events[index].description),
-                      ),
-                    ),
+                    itemBuilder: (context, index) =>
+                        EventCard(event: events[index]),
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),
                   );
@@ -113,8 +112,38 @@ class UserDetailPage extends ConsumerWidget {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Text("Errore: $e"),
               ),
+              const SizedBox(height: 20),
             ],
-            const SizedBox(height: 20),
+            if (user.role == AuthRole.user) ...[
+              Text(
+                "Eventi a cui Partecipa",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              userEvents.when(
+                //TODO: partner events
+                data: (events) {
+                  if (events.isEmpty) {
+                    return const Text("Nessun evento creato.");
+                  }
+                  return UiCard(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: events.length,
+                      itemBuilder: (context, index) => EventCard(
+                        event: events[index],
+                      ), // TODO: non si vedono dettagli on tap
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
+                    ),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Text("Errore: $e"),
+              ),
+              const SizedBox(height: 20),
+            ],
             Text(
               "Commenti Pubblicati",
               style: Theme.of(context).textTheme.titleLarge,
@@ -131,12 +160,7 @@ class UserDetailPage extends ConsumerWidget {
                   itemCount: comments.length,
                   itemBuilder: (context, index) {
                     final comment = comments[index];
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(comment.description),
-                      ),
-                    );
+                    return AdminCommentCard(comment: comment);
                   },
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 10),
@@ -173,18 +197,21 @@ class UserDetailPage extends ConsumerWidget {
               user.displayName,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Text(user.email, style: TextStyle(color: Colors.grey[600])),
+            Text(
+              user.email,
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.8),
+                color: colorScheme.primary.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: colorScheme.primary),
               ),
               child: Text(
                 roleLabel(user.role ?? AuthRole.unknown),
-                style: TextStyle(color: colorScheme.onPrimary),
+                style: TextStyle(color: colorScheme.onPrimary, fontSize: 14),
               ),
             ),
           ],
@@ -205,7 +232,7 @@ class UserDetailPage extends ConsumerWidget {
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 2.5,
+      childAspectRatio: 2.2,
       children: [
         _StatItem(
           label: "Post Totali",
@@ -277,11 +304,11 @@ class _StatItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ],
       ),
