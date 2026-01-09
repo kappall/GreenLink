@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 
 typedef GeoKey = ({double lat, double lng});
 
@@ -25,6 +26,7 @@ final placeNameProvider = FutureProvider.family<String, GeoKey>((
 
     return [street, locality, country].where((s) => s.isNotEmpty).join(', ');
   } catch (e) {
-    return "Errore Geocoding";
+    FeedbackUtils.logError("geocoding error: $e");
+    return "Narnia";
   }
 });

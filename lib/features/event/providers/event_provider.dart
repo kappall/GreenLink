@@ -29,6 +29,7 @@ class EventsNotifier extends AsyncNotifier<List<EventModel>> {
   }
 
   Future<void> createEvent({
+    required String title,
     required String description,
     required double latitude,
     required double longitude,
@@ -48,6 +49,7 @@ class EventsNotifier extends AsyncNotifier<List<EventModel>> {
     state = await AsyncValue.guard(() async {
       await _eventService.createEvent(
         token: token,
+        title: title,
         description: description,
         latitude: latitude,
         longitude: longitude,

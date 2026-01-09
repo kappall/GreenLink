@@ -19,11 +19,9 @@ class EventService {
     required String? token,
     required int userId,
   }) {
-    final uri = Uri.parse('$_baseUrl/events').replace(
-      queryParameters: {
-        'user': userId.toString(),
-      },
-    );
+    final uri = Uri.parse(
+      '$_baseUrl/events',
+    ).replace(queryParameters: {'user': userId.toString()});
     return _requestEvents(uri: uri, token: token);
   }
 
@@ -73,7 +71,6 @@ class EventService {
         FeedbackUtils.logError("Unexpected format from $uri: ${response.body}");
         throw Exception('Errore nel formato dei dati riceveuti.');
       }
-
       return rawList
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
@@ -87,6 +84,7 @@ class EventService {
 
   Future<EventModel> createEvent({
     required String token,
+    required String title,
     required String description,
     required double latitude,
     required double longitude,
@@ -105,6 +103,7 @@ class EventService {
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
+          'title': title,
           'description': description,
           'latitude': latitude,
           'longitude': longitude,

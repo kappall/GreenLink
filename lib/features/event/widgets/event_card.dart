@@ -34,7 +34,7 @@ class EventCard extends ConsumerWidget {
           children: [
             Expanded(
               child: Text(
-                event.description.split('\n').first,
+                event.title,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -135,17 +135,23 @@ class EventCard extends ConsumerWidget {
           children: [
             const Icon(Icons.group, size: 16, color: Colors.grey),
             const SizedBox(width: 4),
-            Text(
-              '${event.participantsCount} / ${event.maxParticipants} Partecipanti',
-              style: TextStyle(
-                color: event.participantsCount >= event.maxParticipants
-                    ? Colors.red
-                    : null,
-                fontWeight: event.participantsCount >= event.maxParticipants
-                    ? FontWeight.bold
-                    : null,
+            if (event.maxParticipants != null)
+              Text(
+                '${event.participantsCount} / ${event.maxParticipants} Partecipanti',
+                style: TextStyle(
+                  color: event.participantsCount >= event.maxParticipants!
+                      ? Colors.red
+                      : null,
+                  fontWeight: event.participantsCount >= event.maxParticipants!
+                      ? FontWeight.bold
+                      : null,
+                ),
               ),
-            ),
+            if (event.maxParticipants == null)
+              Text(
+                '${event.participantsCount} Partecipanti',
+                style: const TextStyle(color: Colors.grey),
+              ),
           ],
         ),
         const SizedBox(height: 12),

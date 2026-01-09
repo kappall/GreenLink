@@ -23,12 +23,13 @@ _EventModel _$EventModelFromJson(Map<String, dynamic> json) => _EventModel(
     unknownValue: EventType.unknown,
   ),
   author: UserModel.fromJson(json['author'] as Map<String, dynamic>),
+  title: json['title'] as String? ?? "Evento",
   votesCount: (json['votes_count'] as num?)?.toInt() ?? 0,
   participantsCount: (json['participants_count'] as num?)?.toInt() ?? 0,
   isParticipating: json['is_participating'] == null
       ? false
       : const BoolConverter().fromJson(json['is_participating']),
-  maxParticipants: (json['max_participants'] as num).toInt(),
+  maxParticipants: (json['max_participants'] as num?)?.toInt(),
   startDate: DateTime.parse(json['start_date'] as String),
   endDate: DateTime.parse(json['end_date'] as String),
 );
@@ -44,6 +45,7 @@ Map<String, dynamic> _$EventModelToJson(
   'longitude': instance.longitude,
   'event_type': _$EventTypeEnumMap[instance.eventType]!,
   'author': instance.author,
+  'title': instance.title,
   'votes_count': instance.votesCount,
   'participants_count': instance.participantsCount,
   'is_participating': const BoolConverter().toJson(instance.isParticipating),

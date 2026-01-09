@@ -14,7 +14,6 @@ enum EventType { cleaning, planting, emergency, learning, other, unknown }
 
 @freezed
 abstract class EventModel with _$EventModel {
-  //TODO: add title field
   const EventModel._();
 
   const factory EventModel({
@@ -27,13 +26,14 @@ abstract class EventModel with _$EventModel {
     @JsonKey(name: 'event_type', unknownEnumValue: EventType.unknown)
     required EventType eventType,
     required UserModel author,
+    @Default("Evento") String title,
     @JsonKey(name: 'votes_count') @Default(0) int votesCount,
     @JsonKey(name: 'participants_count') @Default(0) int participantsCount,
     @BoolConverter()
     @JsonKey(name: 'is_participating')
     @Default(false)
     bool isParticipating,
-    @JsonKey(name: 'max_participants') required int maxParticipants,
+    @JsonKey(name: 'max_participants') int? maxParticipants,
     @JsonKey(name: 'start_date') required DateTime startDate,
     @JsonKey(name: 'end_date') required DateTime endDate,
   }) = _EventModel;

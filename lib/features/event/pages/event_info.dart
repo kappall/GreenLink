@@ -73,7 +73,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              event.description.split('\n').first,
+                              event.title,
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -122,11 +122,18 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                   const SizedBox(height: 12),
                   _buildInfoRow(Icons.calendar_today, "Fine", endDate),
                   const SizedBox(height: 12),
-                  _buildInfoRow(
-                    Icons.people_outline,
-                    "Partecipanti",
-                    "${event.participantsCount} / ${event.maxParticipants}",
-                  ),
+                  if (event.maxParticipants != null)
+                    _buildInfoRow(
+                      Icons.people_outline,
+                      "Partecipanti",
+                      "${event.participantsCount} / ${event.maxParticipants}",
+                    ),
+                  if (event.maxParticipants == null)
+                    _buildInfoRow(
+                      Icons.people_outline,
+                      "Partecipanti",
+                      "${event.participantsCount}",
+                    ),
                   const SizedBox(height: 12),
                   _buildInfoRow(
                     Icons.location_on_outlined,
