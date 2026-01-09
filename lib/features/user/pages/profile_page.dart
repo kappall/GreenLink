@@ -22,14 +22,6 @@ class ProfilePage extends ConsumerWidget {
       authProvider.select((auth) => auth.value?.role ?? AuthRole.unknown),
     );
     final colorScheme = Theme.of(context).colorScheme;
-    final currentUserAsync = ref.watch(currentUserProvider);
-    final userPostsAsync = ref.watch(postsProvider(currentUserAsync.value?.id));
-    final userEventsAsync = ref.watch(
-      eventsByUserIdProvider(currentUserAsync.value!.id),
-    );
-    final userCommentsAsync = ref.watch(
-      commentsByUserIdProvider(currentUserAsync.value!.id),
-    );
 
     return authState.when(
       loading: () =>
@@ -37,6 +29,7 @@ class ProfilePage extends ConsumerWidget {
       error: (error, stackTrace) =>
           Scaffold(body: Center(child: Text("Errore: $error"))),
       data: (_) {
+        final currentUserAsync = ref.watch(currentUserProvider);
         return currentUserAsync.when(
           loading: () =>
               const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -82,6 +75,11 @@ class ProfilePage extends ConsumerWidget {
               );
             }
 
+            final userPostsAsync = ref.watch(postsProvider(user.id));
+            final userEventsAsync = ref.watch(eventsByUserIdProvider(user.id));
+            final userCommentsAsync = ref.watch(
+              commentsByUserIdProvider(user.id),
+            );
             final displayName = user.username ?? user.email;
             final email = user.email;
             final avatarLetter = displayName.characters.first.toUpperCase();
@@ -306,7 +304,7 @@ class ProfilePage extends ConsumerWidget {
                                 itemBuilder: (context, index) => CommentCard(
                                   comment: comments[index],
                                   postId:
-                                      71, //TODO: shoudl be comments[index].contentId
+                                      71, //TODO: should be comments[index].contentId
                                 ),
                               ),
                         loading: () =>
