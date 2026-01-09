@@ -32,6 +32,24 @@ class PostService {
     return _requestPosts(uri: uri, token: token);
   }
 
+  Future<PostModel> fetchPostById({
+    required String token,
+    required String postId,
+  }) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/post/$postId'),
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      throw Exception('Errore durante il recupero dei post: $message');
+    }
+
+    final decoded = jsonDecode(response.body);
+    final post = PostModel.fromJson(decoded);
+    return post;
+  }
+
   Future<List<PostModel>> _requestPosts({
     //TODO: set limit e skip
     required Uri uri,

@@ -316,6 +316,26 @@ class Posts extends _$Posts {
     return _postService.fetchAllPosts(token: token);
   }
 
+  Future<PostModel> fetchPostById(String postId) async {
+    final authState = ref.read(authProvider).value;
+    final token = authState?.token;
+
+    if (token == null) {
+      throw Exception('Authentication token not found');
+    }
+
+    try {
+      final post = await _postService.fetchPostById(
+        token: token,
+        postId: postId,
+      );
+      return post;
+    } catch (e) {
+      print('Failed to fetch post by ID: $e');
+      throw Exception('Could not load the post.');
+    }
+  }
+
   Future<void> reportContent({
     required int contentId,
     required String reason,
