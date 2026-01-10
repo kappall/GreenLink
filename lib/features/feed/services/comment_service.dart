@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/comment_model.dart';
@@ -63,6 +64,8 @@ class CommentService {
         'Errore durante il recupero dei commenti: malformattato: $responseBody',
       );
     }
+
+    FeedbackUtils.logInfo("Comments: $rawList");
 
     return rawList
         .whereType<Map<String, dynamic>>()

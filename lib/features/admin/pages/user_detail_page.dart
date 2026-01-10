@@ -78,7 +78,8 @@ class UserDetailPage extends ConsumerWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: posts.length,
-                  itemBuilder: (context, index) => PostCard(post: posts[index]),
+                  itemBuilder: (context, index) =>
+                      UiCard(child: PostCard(post: posts[index])),
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 10),
                 );
@@ -169,6 +170,7 @@ class UserDetailPage extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text("Errore: $e"),
             ),
+            const SizedBox(height: 30),
           ],
         ),
       ),

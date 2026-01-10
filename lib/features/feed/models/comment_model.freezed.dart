@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CommentModel {
 
- int get id; String get description; UserModel get author; List<UserModel> get votes;@JsonKey(name: 'votes_count') int get votesCount;@JsonKey(name: 'has_voted') bool get hasVoted;@JsonKey(name: 'deleted_at') DateTime? get deletedAt;@JsonKey(name: 'created_at') DateTime get createdAt;
+ int get id; String get description; UserModel get author; List<UserModel> get votes;@JsonKey(name: 'content', fromJson: _contentIdFromJson) int get contentId;@JsonKey(name: 'votes_count') int get votesCount;@JsonKey(name: 'has_voted') bool get hasVoted;@JsonKey(name: 'deleted_at') DateTime? get deletedAt;@JsonKey(name: 'created_at') DateTime get createdAt;
 /// Create a copy of CommentModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CommentModelCopyWith<CommentModel> get copyWith => _$CommentModelCopyWithImpl<C
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CommentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other.votes, votes)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CommentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other.votes, votes)&&(identical(other.contentId, contentId) || other.contentId == contentId)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,description,author,const DeepCollectionEquality().hash(votes),votesCount,hasVoted,deletedAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,description,author,const DeepCollectionEquality().hash(votes),contentId,votesCount,hasVoted,deletedAt,createdAt);
 
 @override
 String toString() {
-  return 'CommentModel(id: $id, description: $description, author: $author, votes: $votes, votesCount: $votesCount, hasVoted: $hasVoted, deletedAt: $deletedAt, createdAt: $createdAt)';
+  return 'CommentModel(id: $id, description: $description, author: $author, votes: $votes, contentId: $contentId, votesCount: $votesCount, hasVoted: $hasVoted, deletedAt: $deletedAt, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CommentModelCopyWith<$Res>  {
   factory $CommentModelCopyWith(CommentModel value, $Res Function(CommentModel) _then) = _$CommentModelCopyWithImpl;
 @useResult
 $Res call({
- int id, String description, UserModel author, List<UserModel> votes,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime createdAt
+ int id, String description, UserModel author, List<UserModel> votes,@JsonKey(name: 'content', fromJson: _contentIdFromJson) int contentId,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime createdAt
 });
 
 
@@ -65,13 +65,14 @@ class _$CommentModelCopyWithImpl<$Res>
 
 /// Create a copy of CommentModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? description = null,Object? author = null,Object? votes = null,Object? votesCount = null,Object? hasVoted = null,Object? deletedAt = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? description = null,Object? author = null,Object? votes = null,Object? contentId = null,Object? votesCount = null,Object? hasVoted = null,Object? deletedAt = freezed,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as UserModel,votes: null == votes ? _self.votes : votes // ignore: cast_nullable_to_non_nullable
-as List<UserModel>,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
+as List<UserModel>,contentId: null == contentId ? _self.contentId : contentId // ignore: cast_nullable_to_non_nullable
+as int,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
 as int,hasVoted: null == hasVoted ? _self.hasVoted : hasVoted // ignore: cast_nullable_to_non_nullable
 as bool,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
@@ -169,10 +170,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String description,  UserModel author,  List<UserModel> votes, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String description,  UserModel author,  List<UserModel> votes, @JsonKey(name: 'content', fromJson: _contentIdFromJson)  int contentId, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CommentModel() when $default != null:
-return $default(_that.id,_that.description,_that.author,_that.votes,_that.votesCount,_that.hasVoted,_that.deletedAt,_that.createdAt);case _:
+return $default(_that.id,_that.description,_that.author,_that.votes,_that.contentId,_that.votesCount,_that.hasVoted,_that.deletedAt,_that.createdAt);case _:
   return orElse();
 
 }
@@ -190,10 +191,10 @@ return $default(_that.id,_that.description,_that.author,_that.votes,_that.votesC
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String description,  UserModel author,  List<UserModel> votes, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String description,  UserModel author,  List<UserModel> votes, @JsonKey(name: 'content', fromJson: _contentIdFromJson)  int contentId, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _CommentModel():
-return $default(_that.id,_that.description,_that.author,_that.votes,_that.votesCount,_that.hasVoted,_that.deletedAt,_that.createdAt);case _:
+return $default(_that.id,_that.description,_that.author,_that.votes,_that.contentId,_that.votesCount,_that.hasVoted,_that.deletedAt,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -210,10 +211,10 @@ return $default(_that.id,_that.description,_that.author,_that.votes,_that.votesC
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String description,  UserModel author,  List<UserModel> votes, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String description,  UserModel author,  List<UserModel> votes, @JsonKey(name: 'content', fromJson: _contentIdFromJson)  int contentId, @JsonKey(name: 'votes_count')  int votesCount, @JsonKey(name: 'has_voted')  bool hasVoted, @JsonKey(name: 'deleted_at')  DateTime? deletedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _CommentModel() when $default != null:
-return $default(_that.id,_that.description,_that.author,_that.votes,_that.votesCount,_that.hasVoted,_that.deletedAt,_that.createdAt);case _:
+return $default(_that.id,_that.description,_that.author,_that.votes,_that.contentId,_that.votesCount,_that.hasVoted,_that.deletedAt,_that.createdAt);case _:
   return null;
 
 }
@@ -225,7 +226,7 @@ return $default(_that.id,_that.description,_that.author,_that.votes,_that.votesC
 @JsonSerializable()
 
 class _CommentModel extends CommentModel {
-  const _CommentModel({required this.id, required this.description, required this.author, final  List<UserModel> votes = const [], @JsonKey(name: 'votes_count') required this.votesCount, @JsonKey(name: 'has_voted') this.hasVoted = false, @JsonKey(name: 'deleted_at') this.deletedAt, @JsonKey(name: 'created_at') required this.createdAt}): _votes = votes,super._();
+  const _CommentModel({required this.id, required this.description, required this.author, final  List<UserModel> votes = const [], @JsonKey(name: 'content', fromJson: _contentIdFromJson) required this.contentId, @JsonKey(name: 'votes_count') required this.votesCount, @JsonKey(name: 'has_voted') this.hasVoted = false, @JsonKey(name: 'deleted_at') this.deletedAt, @JsonKey(name: 'created_at') required this.createdAt}): _votes = votes,super._();
   factory _CommentModel.fromJson(Map<String, dynamic> json) => _$CommentModelFromJson(json);
 
 @override final  int id;
@@ -238,6 +239,7 @@ class _CommentModel extends CommentModel {
   return EqualUnmodifiableListView(_votes);
 }
 
+@override@JsonKey(name: 'content', fromJson: _contentIdFromJson) final  int contentId;
 @override@JsonKey(name: 'votes_count') final  int votesCount;
 @override@JsonKey(name: 'has_voted') final  bool hasVoted;
 @override@JsonKey(name: 'deleted_at') final  DateTime? deletedAt;
@@ -256,16 +258,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CommentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other._votes, _votes)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CommentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.description, description) || other.description == description)&&(identical(other.author, author) || other.author == author)&&const DeepCollectionEquality().equals(other._votes, _votes)&&(identical(other.contentId, contentId) || other.contentId == contentId)&&(identical(other.votesCount, votesCount) || other.votesCount == votesCount)&&(identical(other.hasVoted, hasVoted) || other.hasVoted == hasVoted)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,description,author,const DeepCollectionEquality().hash(_votes),votesCount,hasVoted,deletedAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,description,author,const DeepCollectionEquality().hash(_votes),contentId,votesCount,hasVoted,deletedAt,createdAt);
 
 @override
 String toString() {
-  return 'CommentModel(id: $id, description: $description, author: $author, votes: $votes, votesCount: $votesCount, hasVoted: $hasVoted, deletedAt: $deletedAt, createdAt: $createdAt)';
+  return 'CommentModel(id: $id, description: $description, author: $author, votes: $votes, contentId: $contentId, votesCount: $votesCount, hasVoted: $hasVoted, deletedAt: $deletedAt, createdAt: $createdAt)';
 }
 
 
@@ -276,7 +278,7 @@ abstract mixin class _$CommentModelCopyWith<$Res> implements $CommentModelCopyWi
   factory _$CommentModelCopyWith(_CommentModel value, $Res Function(_CommentModel) _then) = __$CommentModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String description, UserModel author, List<UserModel> votes,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime createdAt
+ int id, String description, UserModel author, List<UserModel> votes,@JsonKey(name: 'content', fromJson: _contentIdFromJson) int contentId,@JsonKey(name: 'votes_count') int votesCount,@JsonKey(name: 'has_voted') bool hasVoted,@JsonKey(name: 'deleted_at') DateTime? deletedAt,@JsonKey(name: 'created_at') DateTime createdAt
 });
 
 
@@ -293,13 +295,14 @@ class __$CommentModelCopyWithImpl<$Res>
 
 /// Create a copy of CommentModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? description = null,Object? author = null,Object? votes = null,Object? votesCount = null,Object? hasVoted = null,Object? deletedAt = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? description = null,Object? author = null,Object? votes = null,Object? contentId = null,Object? votesCount = null,Object? hasVoted = null,Object? deletedAt = freezed,Object? createdAt = null,}) {
   return _then(_CommentModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as UserModel,votes: null == votes ? _self._votes : votes // ignore: cast_nullable_to_non_nullable
-as List<UserModel>,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
+as List<UserModel>,contentId: null == contentId ? _self.contentId : contentId // ignore: cast_nullable_to_non_nullable
+as int,votesCount: null == votesCount ? _self.votesCount : votesCount // ignore: cast_nullable_to_non_nullable
 as int,hasVoted: null == hasVoted ? _self.hasVoted : hasVoted // ignore: cast_nullable_to_non_nullable
 as bool,deletedAt: freezed == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../auth/utils/role_parser.dart';
 import '../../user/models/user_model.dart';
@@ -42,10 +43,10 @@ class UserCard extends StatelessWidget {
         ],
       ),
       child: ListTile(
+        onTap: () => context.push('/admin/users/${user.id}', extra: user),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Stack(
           children: [
-            // Avatar Base
             CircleAvatar(
               radius: 24,
               backgroundColor: roleColor.withValues(alpha: 0.1),
@@ -99,7 +100,7 @@ class UserCard extends StatelessWidget {
                 border: Border.all(color: roleColor.withValues(alpha: 0.3)),
               ),
               child: Text(
-                user.role.toString().split('.').last.toUpperCase(),
+                roleLabel(user.role!),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,

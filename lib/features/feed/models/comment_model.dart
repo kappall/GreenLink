@@ -7,6 +7,13 @@ import '../../user/models/user_model.dart';
 part 'comment_model.freezed.dart';
 part 'comment_model.g.dart';
 
+int _contentIdFromJson(dynamic json) {
+  if (json is Map<String, dynamic>) {
+    return json['id'] as int;
+  }
+  return json as int;
+}
+
 @freezed
 abstract class CommentModel with _$CommentModel {
   const CommentModel._();
@@ -16,6 +23,8 @@ abstract class CommentModel with _$CommentModel {
     required String description,
     required UserModel author,
     @Default([]) List<UserModel> votes,
+    @JsonKey(name: 'content', fromJson: _contentIdFromJson)
+    required int contentId,
     @JsonKey(name: 'votes_count') required int votesCount,
     @JsonKey(name: 'has_voted') @Default(false) bool hasVoted,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,

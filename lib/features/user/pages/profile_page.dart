@@ -303,8 +303,7 @@ class ProfilePage extends ConsumerWidget {
                                     const SizedBox(height: 16),
                                 itemBuilder: (context, index) => CommentCard(
                                   comment: comments[index],
-                                  postId:
-                                      71, //TODO: should be comments[index].contentId
+                                  postId: comments[index].contentId,
                                 ),
                               ),
                         loading: () =>

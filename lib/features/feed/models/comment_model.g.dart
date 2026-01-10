@@ -16,6 +16,7 @@ _CommentModel _$CommentModelFromJson(Map<String, dynamic> json) =>
               ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      contentId: _contentIdFromJson(json['content']),
       votesCount: (json['votes_count'] as num).toInt(),
       hasVoted: json['has_voted'] as bool? ?? false,
       deletedAt: json['deleted_at'] == null
@@ -30,6 +31,7 @@ Map<String, dynamic> _$CommentModelToJson(_CommentModel instance) =>
       'description': instance.description,
       'author': instance.author,
       'votes': instance.votes,
+      'content': instance.contentId,
       'votes_count': instance.votesCount,
       'has_voted': instance.hasVoted,
       'deleted_at': instance.deletedAt?.toIso8601String(),

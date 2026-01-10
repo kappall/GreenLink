@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/features/admin/widgets/user_card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 
@@ -150,7 +151,7 @@ class _UserList extends ConsumerWidget {
       itemCount: users.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        return _UserCard(
+        return UserCard(
           user: users[index],
           onOptionsTap: () => _showUserOptions(context, ref, users[index]),
         );
@@ -206,97 +207,13 @@ class _UserList extends ConsumerWidget {
                 title: const Text("Vedi dettagli completi"),
                 onTap: () {
                   Navigator.pop(ctx);
-                  context.push('/admin/users/${user.id}', extra: user);
+                  ctx.push('/admin/users/${user.id}', extra: user);
                 },
               ),
             ],
           ),
         );
       },
-    );
-  }
-}
-
-class _UserCard extends StatelessWidget {
-  final UserModel user;
-  final VoidCallback onOptionsTap;
-
-  const _UserCard({required this.user, required this.onOptionsTap});
-
-  @override
-  Widget build(BuildContext context) {
-    Color roleColor;
-    switch (user.role) {
-      case AuthRole.partner:
-        roleColor = Colors.blue;
-        break;
-      case AuthRole.user:
-        roleColor = Colors.green;
-        break;
-      default:
-        roleColor = Colors.grey;
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          radius: 24,
-          backgroundColor: roleColor.withValues(alpha: 0.1),
-          child: Text(
-            user.displayName.isNotEmpty
-                ? user.displayName[0].toUpperCase()
-                : "?",
-            style: TextStyle(color: roleColor, fontWeight: FontWeight.bold),
-          ),
-        ),
-        title: Text(
-          user.displayName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              user.email,
-              style: TextStyle(color: Colors.grey[600], fontSize: 13),
-            ),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: roleColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: roleColor.withValues(alpha: 0.3)),
-              ),
-              child: Text(
-                user.role?.name.toUpperCase() ?? "SCONOSCIUTO",
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: roleColor,
-                ),
-              ),
-            ),
-          ],
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.more_vert, color: Colors.grey),
-          onPressed: onOptionsTap,
-        ),
-      ),
     );
   }
 }
