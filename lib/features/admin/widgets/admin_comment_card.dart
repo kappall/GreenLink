@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/card.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../feed/models/comment_model.dart';
 import '../../feed/providers/comment_provider.dart';
-import '../../user/providers/user_provider.dart';
 
 class AdminCommentCard extends ConsumerWidget {
   final CommentModel comment;
@@ -36,95 +34,84 @@ class AdminCommentCard extends ConsumerWidget {
     );
 
     if (confirmed == true) {
-      await ref
-          .read(commentsProvider(-1).notifier)
-          .deleteComment(comment.id); // non serve postId per eliminare commento
+      await ref.read(commentsProvider(-1).notifier).deleteComment(comment.id);
+      ref.invalidate(commentsByUserIdProvider(comment.author.id));
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final timestamp = DateFormat(
-      'dd MMM, HH:mm',
+      'dd MMM yyyy, HH:mm',
     ).format(comment.createdAt.toLocal());
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final currentUser = ref.watch(currentUserProvider).value;
-    final isAdmin = ref.watch(authProvider).value?.isAdmin ?? false;
-    final isAuthor = currentUser?.id == comment.author.id;
-
     return UiCard(
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      timestamp,
-                      style: TextStyle(
-                        color: colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.7,
-                        ),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  comment.description,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: colorScheme.primaryContainer,
+                child: Text(
+                  comment.author.displayName.characters.first.toUpperCase(),
                   style: TextStyle(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    height: 1.4,
-                    color: colorScheme.onSurface,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${comment.votesCount} votes',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: theme.colorScheme.secondary,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                        ),
+                    Text(
+                      comment.author.displayName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
-
-                    const Spacer(),
-                    if (isAuthor || isAdmin)
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          size: 24,
-                          color: Colors.red,
-                        ),
-                        onPressed: () => _confirmDeleteComment(context, ref),
-                      ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'ID Contenuto: ${comment.contentId}',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: () => _confirmDeleteComment(context, ref),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            comment.description,
+            style: const TextStyle(fontSize: 14, height: 1.5),
+          ),
+          const SizedBox(height: 12),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${comment.votesCount} Upvote',
+                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+              ),
+              Text(
+                timestamp,
+                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+              ),
+            ],
           ),
         ],
       ),
