@@ -200,6 +200,15 @@ final eventsByUserIdProvider = FutureProvider.family<List<EventModel>, int>((
   );
 });
 
+final eventsByPartnerIdProvider = FutureProvider.family<List<EventModel>, int>((
+  ref,
+  partnerId,
+) async {
+  final authState = ref.watch(authProvider);
+  final token = authState.asData?.value.token ?? '';
+  return EventService.instance.fetchEvents(token: token, partnerId: partnerId);
+});
+
 @Riverpod(keepAlive: true)
 class EventsByDistance extends _$EventsByDistance {
   final _eventService = EventService.instance;

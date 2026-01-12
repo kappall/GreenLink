@@ -111,7 +111,7 @@ class EventService {
         FeedbackUtils.logError("Unexpected format from $uri: ${response.body}");
         throw Exception('Errore nel formato dei dati riceveuti.');
       }
-        final events = rawList
+      final events = rawList
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
           .toList();

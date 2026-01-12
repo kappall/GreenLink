@@ -77,13 +77,19 @@ class ProfilePage extends ConsumerWidget {
             }
 
             final userPostsAsync = ref.watch(postsProvider(user.id));
-            final userEventsAsync = ref.watch(eventsByUserIdProvider(user.id));
+            final isPartner = role == AuthRole.partner;
+            final userEventsAsync = isPartner
+                ? ref.watch(eventsByPartnerIdProvider(user.id))
+                : ref.watch(eventsByUserIdProvider(user.id));
             final userCommentsAsync = ref.watch(
               commentsByUserIdProvider(user.id),
             );
             final displayName = user.username ?? user.email;
             final email = user.email;
             final avatarLetter = displayName.characters.first.toUpperCase();
+            final emptyEventsLabel = isPartner
+                ? "Nessun evento creato"
+                : "Nessun evento partecipato";
 
             return Scaffold(
               body: DefaultTabController(
@@ -276,9 +282,7 @@ class ProfilePage extends ConsumerWidget {
                       ),
                       userEventsAsync.when(
                         data: (events) => events.isEmpty
-                            ? const Center(
-                                child: Text("Nessun evento partecipato"),
-                              )
+                            ? Center(child: Text(emptyEventsLabel))
                             : ListView.separated(
                                 padding: const EdgeInsets.all(16),
                                 itemCount: events.length,
