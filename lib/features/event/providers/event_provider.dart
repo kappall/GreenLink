@@ -192,7 +192,7 @@ class Events extends _$Events {
       return event;
     }).toList();
 
-    ref.read(eventsProvider(null).notifier).state = AsyncValue.data(
+    state = AsyncValue.data(
       state.value!.copyWith(events: newEvents),
     );
 
@@ -205,7 +205,7 @@ class Events extends _$Events {
       ref.invalidate(eventsProvider);
       ref.invalidate(eventsByDistanceProvider);
     } catch (e) {
-      ref.read(eventsProvider(null).notifier).state = AsyncValue.data(
+      state = AsyncValue.data(
         state.value!.copyWith(events: previousEvents),
       );
     }
@@ -221,6 +221,18 @@ final eventsByUserIdProvider = FutureProvider.family<List<EventModel>, int>((
   return EventService.instance.fetchEventsByUserId(
     token: token,
     userId: userId,
+  );
+});
+
+final eventsByPartnerIdProvider = FutureProvider.family<List<EventModel>, int>((
+  ref,
+  partnerId,
+) async {
+  final authState = ref.watch(authProvider);
+  final token = authState.asData?.value.token ?? '';
+  return EventService.instance.fetchEvents(
+    token: token,
+    partnerId: partnerId,
   );
 });
 
