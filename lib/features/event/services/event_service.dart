@@ -111,7 +111,7 @@ class EventService {
         FeedbackUtils.logError("Unexpected format from $uri: ${response.body}");
         throw Exception('Errore nel formato dei dati riceveuti.');
       }
-      final events = rawList
+        final events = rawList
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
           .toList();
@@ -168,15 +168,27 @@ class EventService {
 
       final decoded = jsonDecode(response.body);
       final rawEvent = decoded is Map<String, dynamic>
-          ? decoded['event'] ?? decoded
+          ? decoded['event'] ?? decoded['data'] ?? decoded
           : decoded;
 
       if (rawEvent is! Map<String, dynamic>) {
         FeedbackUtils.logError("Invalid event response: ${response.body}");
         throw Exception('Errore nella risposta del server.');
       }
+
+      // Normalizza author se arriva come ID o è mancante
+      final normalizedEvent = Map<String, dynamic>.from(rawEvent);
+      final author = normalizedEvent['author'];
+      if (author is! Map<String, dynamic>) {
+        final authorId = author is int ? author : 0;
+        normalizedEvent['author'] = {
+          'id': authorId,
+          'email': 'default@example.com',
+        };
+      }
+
       clearCache();
-      return EventModel.fromJson(rawEvent);
+      return EventModel.fromJson(normalizedEvent);
     } catch (e) {
       if (e is Exception) rethrow;
       FeedbackUtils.logError("Exception during createEvent: $e");
