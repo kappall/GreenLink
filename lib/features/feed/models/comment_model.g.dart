@@ -17,7 +17,7 @@ _CommentModel _$CommentModelFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [],
       contentId: _contentIdFromJson(json['content']),
-      votesCount: (json['votes_count'] as num).toInt(),
+      votesCount: (json['votes_count'] as num?)?.toInt() ?? 0,
       hasVoted: json['has_voted'] as bool? ?? false,
       deletedAt: json['deleted_at'] == null
           ? null

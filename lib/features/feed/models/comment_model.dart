@@ -9,9 +9,10 @@ part 'comment_model.g.dart';
 
 int _contentIdFromJson(dynamic json) {
   if (json is Map<String, dynamic>) {
-    return json['id'] as int;
+    return (json['id'] as num?)?.toInt() ?? 0;
   }
-  return json as int;
+  if (json == null) return 0;
+  return (json as num).toInt();
 }
 
 @freezed
@@ -25,7 +26,7 @@ abstract class CommentModel with _$CommentModel {
     @Default([]) List<UserModel> votes,
     @JsonKey(name: 'content', fromJson: _contentIdFromJson)
     required int contentId,
-    @JsonKey(name: 'votes_count') required int votesCount,
+    @JsonKey(name: 'votes_count') @Default(0) int votesCount,
     @JsonKey(name: 'has_voted') @Default(false) bool hasVoted,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     @JsonKey(name: 'created_at') required DateTime createdAt,
