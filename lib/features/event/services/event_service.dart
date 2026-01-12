@@ -111,7 +111,7 @@ class EventService {
         FeedbackUtils.logError("Unexpected format from $uri: ${response.body}");
         throw Exception('Errore nel formato dei dati riceveuti.');
       }
-      final events = rawList
+        final events = rawList
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
           .toList();
@@ -168,7 +168,7 @@ class EventService {
 
       final decoded = jsonDecode(response.body);
       final rawEvent = decoded is Map<String, dynamic>
-          ? decoded['event'] ?? decoded
+          ? decoded['event'] ?? decoded['data'] ?? decoded
           : decoded;
 
       if (rawEvent is! Map<String, dynamic>) {
