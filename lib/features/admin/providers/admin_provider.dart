@@ -1,76 +1,170 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../../feed/models/comment_model.dart';
 import '../models/report.dart';
 import '../services/admin_service.dart';
 
-final adminServiceProvider = Provider<AdminService>((ref) {
-  final authState = ref.watch(authProvider);
-  final token = authState.asData?.value.token;
+part 'admin_provider.g.dart';
 
-  if (token == null || token.isEmpty) {
-    throw Exception('Utente non autenticato');
+@riverpod
+AdminService adminService(Ref ref) {
+  final authAsync = ref.watch(authProvider);
+
+  final token = authAsync.value?.token;
+  if (token == null) {
+    throw StateError('AdminService requested without a valid token');
   }
 
   return AdminService(token: token);
-});
+}
 
-class ReportsNotifier extends AsyncNotifier<List<Report>> {
+@Riverpod(keepAlive: true)
+class Reports extends _$Reports {
+  static const _pageSize = 20;
+  bool _isLoadingMore = false;
+
+  AdminService get _adminService => ref.read(adminServiceProvider);
+
   @override
-  Future<List<Report>> build() async {
-    return ref.read(adminServiceProvider).getReports();
+  FutureOr<PaginatedResult<Report>> build() async {
+    return _fetchPage(1);
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(adminServiceProvider).getReports(),
-    );
+    state = await AsyncValue.guard(() => _fetchPage(1));
+  }
+
+  Future<PaginatedResult<Report>> _fetchPage(int page) async {
+    try {
+      final reports = await _adminService.getReports(
+        skip: (page - 1) * _pageSize,
+        limit: _pageSize,
+      );
+
+      return PaginatedResult<Report>(
+        items: reports,
+        page: page,
+        hasMore: reports.length == _pageSize,
+      );
+    } catch (e) {
+      FeedbackUtils.logError(e);
+      rethrow;
+    }
   }
 
   Future<void> moderateReport({
     required Report report,
     required bool approve,
   }) async {
-    await ref
-        .read(adminServiceProvider)
-        .moderateReport(report: report, approve: approve);
-    await refresh();
+    try {
+      await _adminService.moderateReport(report: report, approve: approve);
+      await refresh();
+    } catch (e) {
+      FeedbackUtils.logError(e);
+      rethrow;
+    }
+  }
+
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (_isLoadingMore || current == null || !current.hasMore) return;
+    _isLoadingMore = true;
+
+    try {
+      final nextPage = current.page + 1;
+      final newPage = await _fetchPage(nextPage);
+      final currentReports = current.items;
+      final allReports = [...currentReports, ...newPage.items];
+      final uniqueReports = allReports.toSet().toList();
+
+      state = AsyncValue.data(
+        state.value!.copyWith(
+          items: uniqueReports,
+          page: nextPage,
+          hasMore: newPage.hasMore,
+        ),
+      );
+    } finally {
+      _isLoadingMore = false;
+    }
   }
 }
 
-final reportsProvider = AsyncNotifierProvider<ReportsNotifier, List<Report>>(
-  ReportsNotifier.new,
-);
+@Riverpod(keepAlive: true)
+class Users extends _$Users {
+  static const _pageSize = 20;
 
-class UsersNotifier extends AsyncNotifier<List<UserModel>> {
+  bool _isLoadingMore = false;
+
+  AdminService get _adminService => ref.read(adminServiceProvider);
+
   @override
-  Future<List<UserModel>> build() async {
-    final adminService = ref.read(adminServiceProvider);
-    final users = await adminService.getUsers();
-    final partners = await adminService.getPartners();
-    return [...users, ...partners];
+  FutureOr<PaginatedResult<UserModel>> build() async {
+    return _fetchPage(1);
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final adminService = ref.read(adminServiceProvider);
-      final users = await adminService.getUsers();
-      final partners = await adminService.getPartners();
-      return [...users, ...partners];
-    });
+    state = await AsyncValue.guard(() => _fetchPage(1));
+  }
+
+  Future<PaginatedResult<UserModel>> _fetchPage(int page) async {
+    try {
+      final skip = (page - 1) * _pageSize;
+
+      final users = await _adminService.getUsers(skip: skip, limit: _pageSize);
+
+      final partners = await _adminService.getPartners(
+        skip: skip,
+        limit: _pageSize,
+      );
+
+      final combined = [...users, ...partners];
+
+      return PaginatedResult<UserModel>(
+        items: combined,
+        page: page,
+        hasMore: combined.length == _pageSize * 2,
+      );
+    } catch (e) {
+      FeedbackUtils.logError(e);
+      rethrow;
+    }
+  }
+
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (current == null || _isLoadingMore || !current.hasMore) return;
+
+    _isLoadingMore = true;
+
+    try {
+      final nextPage = current.page + 1;
+      final next = await _fetchPage(nextPage);
+
+      final merged = [...current.items, ...next.items].toSet().toList();
+
+      state = AsyncValue.data(
+        current.copyWith(items: merged, page: nextPage, hasMore: next.hasMore),
+      );
+    } catch (e) {
+      FeedbackUtils.logError(e);
+      rethrow;
+    } finally {
+      _isLoadingMore = false;
+    }
   }
 }
 
-final usersProvider = AsyncNotifierProvider<UsersNotifier, List<UserModel>>(
-  UsersNotifier.new,
-);
-
-class UserActionsNotifier extends Notifier<void> {
+@riverpod
+class UserActions extends _$UserActions {
   @override
   void build() {}
 
@@ -80,11 +174,8 @@ class UserActionsNotifier extends Notifier<void> {
   }
 }
 
-final userActionsProvider = NotifierProvider<UserActionsNotifier, void>(
-  UserActionsNotifier.new,
-);
-
-class PartnerNotifier extends Notifier<void> {
+@riverpod
+class Partner extends _$Partner {
   @override
   void build() {}
 
@@ -95,17 +186,14 @@ class PartnerNotifier extends Notifier<void> {
     final token = await ref
         .read(adminServiceProvider)
         .createPartner(email: email, username: username);
+
     ref.invalidate(usersProvider);
     return token;
   }
 }
 
-final partnerProvider = NotifierProvider<PartnerNotifier, void>(
-  PartnerNotifier.new,
-);
-
-// Search and Filter Notifiers
-class UsersSearchQueryNotifier extends Notifier<String> {
+@riverpod
+class UsersSearchQuery extends _$UsersSearchQuery {
   @override
   String build() => '';
 
@@ -114,12 +202,8 @@ class UsersSearchQueryNotifier extends Notifier<String> {
   }
 }
 
-final usersSearchQueryProvider =
-    NotifierProvider<UsersSearchQueryNotifier, String>(
-      UsersSearchQueryNotifier.new,
-    );
-
-class UserRoleFilterNotifier extends Notifier<AuthRole?> {
+@riverpod
+class UserRoleFilter extends _$UserRoleFilter {
   @override
   AuthRole? build() => null;
 
@@ -128,32 +212,24 @@ class UserRoleFilterNotifier extends Notifier<AuthRole?> {
   }
 }
 
-final userRoleFilterProvider =
-    NotifierProvider<UserRoleFilterNotifier, AuthRole?>(
-      UserRoleFilterNotifier.new,
-    );
-
 // Derived Providers
-final filteredUsersProvider = Provider<List<UserModel>>((ref) {
+@riverpod
+List<UserModel> filteredUsers(Ref ref) {
   final usersAsync = ref.watch(usersProvider);
   final query = ref.watch(usersSearchQueryProvider).toLowerCase();
   final selectedRole = ref.watch(userRoleFilterProvider);
 
   return usersAsync.maybeWhen(
-    data: (users) {
-      var filteredUsers = users;
+    data: (paginated) {
+      var users = paginated.items;
 
       if (selectedRole != null) {
-        filteredUsers = filteredUsers
-            .where((user) => user.role == selectedRole)
-            .toList();
+        users = users.where((u) => u.role == selectedRole).toList();
       }
 
-      if (query.isEmpty) {
-        return filteredUsers;
-      }
+      if (query.isEmpty) return users;
 
-      return filteredUsers
+      return users
           .where(
             (u) =>
                 u.displayName.toLowerCase().contains(query) ||
@@ -161,9 +237,9 @@ final filteredUsersProvider = Provider<List<UserModel>>((ref) {
           )
           .toList();
     },
-    orElse: () => [],
+    orElse: () => const [],
   );
-});
+}
 
 final activeFilteredUsersProvider = Provider<List<UserModel>>((ref) {
   final users = ref.watch(filteredUsersProvider);

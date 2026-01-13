@@ -8,7 +8,7 @@ part 'comment_provider.g.dart';
 
 enum CommentSortCriteria { recent, mostLiked }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CommentSort extends _$CommentSort {
   @override
   CommentSortCriteria build() => CommentSortCriteria.recent;
@@ -18,7 +18,7 @@ class CommentSort extends _$CommentSort {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Comments extends _$Comments {
   final _commentService = CommentService.instance;
   @override
@@ -108,7 +108,7 @@ class Comments extends _$Comments {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<List<CommentModel>> commentsByUserId(Ref ref, int userId) async {
   final authState = ref.watch(authProvider);
   final token = authState.asData?.value.token;

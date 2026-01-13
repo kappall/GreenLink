@@ -20,7 +20,7 @@ final class CommentSortProvider
         argument: null,
         retry: null,
         name: r'commentSortProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -41,7 +41,7 @@ final class CommentSortProvider
   }
 }
 
-String _$commentSortHash() => r'7c121553f797b2e39543a3501c4b68cdcbffde3f';
+String _$commentSortHash() => r'75620f045017e1bd78928881eaa7bcd542d8ab97';
 
 abstract class _$CommentSort extends $Notifier<CommentSortCriteria> {
   CommentSortCriteria build();
@@ -73,7 +73,7 @@ final class CommentsProvider
   }) : super(
          retry: null,
          name: r'commentsProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -103,7 +103,7 @@ final class CommentsProvider
   }
 }
 
-String _$commentsHash() => r'b644f73a4bbd0400b065a69f0ed592975564b5fe';
+String _$commentsHash() => r'7889cd4305b9c777a4e30d9c49e702cf19469252';
 
 final class CommentsFamily extends $Family
     with
@@ -120,7 +120,7 @@ final class CommentsFamily extends $Family
         name: r'commentsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   CommentsProvider call(int contentId) =>
@@ -172,7 +172,7 @@ final class CommentsByUserIdProvider
   }) : super(
          retry: null,
          name: r'commentsByUserIdProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -210,7 +210,7 @@ final class CommentsByUserIdProvider
   }
 }
 
-String _$commentsByUserIdHash() => r'406a63611921cd36baa5bd7d53c3dccd18d73244';
+String _$commentsByUserIdHash() => r'db8bd6148b94ddd0aeea0374450951636cae2615';
 
 final class CommentsByUserIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<CommentModel>>, int> {
@@ -220,7 +220,7 @@ final class CommentsByUserIdFamily extends $Family
         name: r'commentsByUserIdProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   CommentsByUserIdProvider call(int userId) =>

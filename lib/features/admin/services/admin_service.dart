@@ -15,15 +15,41 @@ final adminServiceProvider = Provider<AdminService>((ref) {
 
 //TODO: skip and limit
 class AdminService {
+  AdminService({required this.token});
   final String token;
+
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
+  final Map<String, List<Report>> _reportCache = {};
+  final Map<String, List<UserModel>> _userCache = {};
 
-  AdminService({this.token = ''});
+  void _clearReportCache() {
+    _reportCache.clear();
+  }
 
-  Future<List<Report>> getReports() async {
+  void _clearUserCache() {
+    _userCache.clear();
+  }
+
+  Future<List<Report>> getReports({
+    int? skip,
+    int? limit,
+    bool refresh = false,
+  }) async {
     try {
+      final uri = Uri.parse('$_baseUrl/reports').replace(
+        queryParameters: {
+          'sort': 'id',
+          'order': 'desc',
+          'skip': skip?.toString() ?? '0',
+          'limit': limit?.toString() ?? '20',
+        },
+      );
+      final cacheKey = uri.toString();
+      if (_reportCache.containsKey(cacheKey) && !refresh) {
+        return _reportCache[cacheKey]!;
+      }
       final response = await http.get(
-        Uri.parse('$_baseUrl/reports'),
+        uri,
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -37,7 +63,7 @@ class AdminService {
               (jsonItem) => Report.fromJson(jsonItem as Map<String, dynamic>),
             )
             .toList();
-
+        _reportCache[cacheKey] = reports;
         return reports;
       } else {
         throw Exception(
@@ -49,10 +75,26 @@ class AdminService {
     }
   }
 
-  Future<List<UserModel>> getUsers() async {
+  Future<List<UserModel>> getUsers({
+    int? skip,
+    int? limit,
+    bool refresh = false,
+  }) async {
     try {
+      final uri = Uri.parse('$_baseUrl/users').replace(
+        queryParameters: {
+          'sort': 'id',
+          'order': 'desc',
+          'skip': skip?.toString() ?? '0',
+          'limit': limit?.toString() ?? '20',
+        },
+      );
+      final cacheKey = uri.toString();
+      if (_userCache.containsKey(cacheKey) && !refresh) {
+        return _userCache[cacheKey]!;
+      }
       final response = await http.get(
-        Uri.parse('$_baseUrl/users').replace(queryParameters: {'limit': '100'}),
+        uri,
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -61,10 +103,12 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((jsonItem) {
+        final users = jsonList.map((jsonItem) {
           final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
           return user.role == null ? user.copyWith(role: AuthRole.user) : user;
         }).toList();
+        _userCache[cacheKey] = users;
+        return users;
       } else {
         throw Exception(
           'Fallimento nel caricamento degli user: ${response.statusCode}',
@@ -75,10 +119,26 @@ class AdminService {
     }
   }
 
-  Future<List<UserModel>> getPartners() async {
+  Future<List<UserModel>> getPartners({
+    int? skip,
+    int? limit,
+    bool refresh = false,
+  }) async {
     try {
+      final uri = Uri.parse('$_baseUrl/partners').replace(
+        queryParameters: {
+          'sort': 'id',
+          'order': 'desc',
+          'skip': skip?.toString() ?? '0',
+          'limit': limit?.toString() ?? '20',
+        },
+      );
+      final cacheKey = uri.toString();
+      if (_userCache.containsKey(cacheKey) && !refresh) {
+        return _userCache[cacheKey]!;
+      }
       final response = await http.get(
-        Uri.parse('$_baseUrl/partners'),
+        uri,
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -87,12 +147,14 @@ class AdminService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((jsonItem) {
+        final partners = jsonList.map((jsonItem) {
           final user = UserModel.fromJson(jsonItem as Map<String, dynamic>);
           return user.role == null
               ? user.copyWith(role: AuthRole.partner)
               : user;
         }).toList();
+        _userCache[cacheKey] = partners;
+        return partners;
       } else {
         throw Exception(
           'Fallimento nel caricamento dei partner: ${response.statusCode}',
@@ -162,6 +224,7 @@ class AdminService {
           );
         }
       }
+      _clearReportCache();
     } catch (e) {
       throw Exception('Errore durante la moderazione: $e');
     }
@@ -182,6 +245,7 @@ class AdminService {
           'Fallimento del blocco user $userId: ${response.statusCode}',
         );
       }
+      _clearUserCache();
     } catch (e) {
       throw Exception('Errore di connessione: $e');
     }

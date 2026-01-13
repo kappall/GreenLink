@@ -40,7 +40,7 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
     final postFromProvider =
         ref.watch(
           postsProvider(null).select(
-            (value) => value.value?.posts.firstWhere(
+            (value) => value.value?.items.firstWhere(
               (p) => p.id == widget.post.id,
               orElse: () => widget.post,
             ),

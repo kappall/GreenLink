@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
+import 'package:greenlinkapp/features/admin/services/admin_service.dart';
 import 'package:greenlinkapp/features/admin/widgets/admin_comment_card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
@@ -58,7 +59,7 @@ class UserDetailPage extends ConsumerWidget {
             const SizedBox(height: 12),
             _buildStatsGrid(
               user,
-              userPostsPage.asData?.value.posts.length ?? 0,
+              userPostsPage.asData?.value.items.length ?? 0,
               userEvents.asData?.value.length ?? 0,
               userComments.asData?.value.length ?? 0,
             ),
@@ -70,7 +71,7 @@ class UserDetailPage extends ConsumerWidget {
             const SizedBox(height: 12),
             userPostsPage.when(
               data: (page) {
-                final posts = page.posts;
+                final posts = page.items;
                 if (posts.isEmpty) {
                   return const Text("Nessun post pubblicato.");
                 }
@@ -85,7 +86,7 @@ class UserDetailPage extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text("Errore: $e"),
+              error: (e, _) => Text("No posts"),
             ),
             const SizedBox(height: 20),
             if (user.role == AuthRole.partner) ...[

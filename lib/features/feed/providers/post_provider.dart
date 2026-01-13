@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
+import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -165,7 +166,7 @@ class CreatePostState {
       category != null && locationLabel != null && !isPublishing;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CreatePostNotifier extends _$CreatePostNotifier {
   final _postService = PostService.instance;
   final _picker = ImagePicker();
@@ -292,34 +293,18 @@ class CreatePostNotifier extends _$CreatePostNotifier {
   }
 }
 
-class PaginatedPosts {
-  final List<PostModel> posts;
-  final int page;
-  final bool hasMore;
-
-  PaginatedPosts({this.posts = const [], this.page = 1, this.hasMore = true});
-
-  PaginatedPosts copyWith({List<PostModel>? posts, int? page, bool? hasMore}) {
-    return PaginatedPosts(
-      posts: posts ?? this.posts,
-      page: page ?? this.page,
-      hasMore: hasMore ?? this.hasMore,
-    );
-  }
-}
-
-@riverpod
+@Riverpod(keepAlive: true)
 class Posts extends _$Posts {
   final _postService = PostService.instance;
   static const _pageSize = 20;
   bool _isLoadingMore = false;
 
   @override
-  FutureOr<PaginatedPosts> build(int? userId) async {
+  FutureOr<PaginatedResult<PostModel>> build(int? userId) async {
     return _fetchPage(1);
   }
 
-  Future<PaginatedPosts> _fetchPage(int page) async {
+  Future<PaginatedResult<PostModel>> _fetchPage(int page) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
@@ -330,8 +315,8 @@ class Posts extends _$Posts {
       limit: _pageSize,
     );
 
-    return PaginatedPosts(
-      posts: posts,
+    return PaginatedResult<PostModel>(
+      items: posts,
       page: page,
       hasMore: posts.length == _pageSize,
     );
@@ -344,11 +329,11 @@ class Posts extends _$Posts {
     try {
       final nextPage = state.value!.page + 1;
       final newPage = await _fetchPage(nextPage);
-      final currentPosts = state.value?.posts ?? [];
+      final currentPosts = state.value?.items ?? [];
 
       state = AsyncValue.data(
         state.value!.copyWith(
-          posts: currentPosts,
+          items: currentPosts,
           page: nextPage,
           hasMore: newPage.hasMore,
         ),
@@ -417,7 +402,7 @@ class Posts extends _$Posts {
     if (state.hasValue) {
       state = AsyncValue.data(
         state.value!.copyWith(
-          posts: state.value!.posts.map((post) {
+          items: state.value!.items.map((post) {
             if (post.id == postId) {
               final isCurrentlyVoted = post.hasVoted;
               return post.copyWith(
@@ -445,30 +430,35 @@ class Posts extends _$Posts {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class PostsByDistance extends _$PostsByDistance {
   final _postService = PostService.instance;
   static const _pageSize = 20;
   bool _isLoadingMore = false;
 
   @override
-  FutureOr<PaginatedPosts> build() async {
+  FutureOr<PaginatedResult<PostModel>> build() async {
     final userLocationAsync = ref.watch(userLocationProvider);
 
     return userLocationAsync.when(
       data: (userLocation) {
         if (userLocation == null) {
-          return PaginatedPosts(hasMore: false);
+          return PaginatedResult<PostModel>(hasMore: false);
         }
         return _fetchPage(1, userLocation.latitude, userLocation.longitude);
       },
-      loading: () => PaginatedPosts(hasMore: false), // Handle loading state
+      loading: () =>
+          PaginatedResult<PostModel>(hasMore: false), // Handle loading state
       error: (err, stack) =>
-          PaginatedPosts(hasMore: false), // Handle error state
+          PaginatedResult<PostModel>(hasMore: false), // Handle error state
     );
   }
 
-  Future<PaginatedPosts> _fetchPage(int page, double lat, double lng) async {
+  Future<PaginatedResult<PostModel>> _fetchPage(
+    int page,
+    double lat,
+    double lng,
+  ) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
@@ -480,8 +470,8 @@ class PostsByDistance extends _$PostsByDistance {
       limit: _pageSize,
     );
 
-    return PaginatedPosts(
-      posts: posts,
+    return PaginatedResult<PostModel>(
+      items: posts,
       page: page,
       hasMore: posts.length == _pageSize,
     );
@@ -499,13 +489,13 @@ class PostsByDistance extends _$PostsByDistance {
         userLocation.latitude,
         userLocation.longitude,
       );
-      final currentPosts = state.value?.posts ?? [];
-      final allPosts = [...currentPosts, ...newPage.posts];
+      final currentPosts = state.value?.items ?? [];
+      final allPosts = [...currentPosts, ...newPage.items];
       final uniquePosts = allPosts.toSet().toList();
 
       state = AsyncValue.data(
         state.value!.copyWith(
-          posts: uniquePosts,
+          items: uniquePosts,
           page: nextPage,
           hasMore: newPage.hasMore,
         ),
@@ -516,37 +506,36 @@ class PostsByDistance extends _$PostsByDistance {
   }
 }
 
-final sortedPostsProvider = Provider.autoDispose<AsyncValue<PaginatedPosts>>((
-  ref,
-) {
-  final criteria = ref.watch(postSortCriteriaProvider);
+final sortedPostsProvider =
+    Provider.autoDispose<AsyncValue<PaginatedResult<PostModel>>>((ref) {
+      final criteria = ref.watch(postSortCriteriaProvider);
 
-  if (criteria == PostSortCriteria.proximity) {
-    return ref.watch(postsByDistanceProvider);
-  }
+      if (criteria == PostSortCriteria.proximity) {
+        return ref.watch(postsByDistanceProvider);
+      }
 
-  final postsAsync = ref.watch(postsProvider(null));
-  final filter = ref.watch(postFilterProvider);
+      final postsAsync = ref.watch(postsProvider(null));
+      final filter = ref.watch(postFilterProvider);
 
-  return postsAsync.whenData((paginated) {
-    final filteredPosts = paginated.posts.where((post) {
-      final matchesVotes = post.votesCount >= filter.minVotes;
-      final matchesDate =
-          filter.startDate == null ||
-          (post.createdAt != null &&
-              post.createdAt!.isAfter(filter.startDate!));
-      return matchesVotes && matchesDate;
-    }).toList();
+      return postsAsync.whenData((paginated) {
+        final filteredPosts = paginated.items.where((post) {
+          final matchesVotes = post.votesCount >= filter.minVotes;
+          final matchesDate =
+              filter.startDate == null ||
+              (post.createdAt != null &&
+                  post.createdAt!.isAfter(filter.startDate!));
+          return matchesVotes && matchesDate;
+        }).toList();
 
-    if (criteria == PostSortCriteria.votes) {
-      filteredPosts.sort((a, b) => b.votesCount.compareTo(a.votesCount));
-    }
+        if (criteria == PostSortCriteria.votes) {
+          filteredPosts.sort((a, b) => b.votesCount.compareTo(a.votesCount));
+        }
 
-    return paginated.copyWith(posts: filteredPosts);
-  });
-});
+        return paginated.copyWith(items: filteredPosts);
+      });
+    });
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<List<PostModel>> mapPosts(Ref ref) async {
   final userLocationAsync = ref.watch(userLocationProvider);
 

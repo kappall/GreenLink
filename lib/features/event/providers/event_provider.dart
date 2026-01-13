@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/services/event_service.dart';
@@ -11,26 +12,6 @@ import '../../location/providers/location_provider.dart';
 part 'event_provider.g.dart';
 
 enum EventSortCriteria { date, proximity }
-
-class PaginatedEvents {
-  final List<EventModel> events;
-  final int page;
-  final bool hasMore;
-
-  PaginatedEvents({this.events = const [], this.page = 1, this.hasMore = true});
-
-  PaginatedEvents copyWith({
-    List<EventModel>? events,
-    int? page,
-    bool? hasMore,
-  }) {
-    return PaginatedEvents(
-      events: events ?? this.events,
-      page: page ?? this.page,
-      hasMore: hasMore ?? this.hasMore,
-    );
-  }
-}
 
 class EventFilter {
   final bool excludeParticipating;
@@ -99,14 +80,14 @@ class Events extends _$Events {
   bool _isLoadingMore = false;
 
   @override
-  FutureOr<PaginatedEvents> build(int? partnerId) async {
+  FutureOr<PaginatedResult<EventModel>> build(int? partnerId) async {
     ref.onDispose(() {
       _eventService.clearCache();
     });
     return _fetchPage(1);
   }
 
-  Future<PaginatedEvents> _fetchPage(int page) async {
+  Future<PaginatedResult<EventModel>> _fetchPage(int page) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
@@ -116,8 +97,8 @@ class Events extends _$Events {
       limit: _pageSize,
     );
 
-    return PaginatedEvents(
-      events: events,
+    return PaginatedResult<EventModel>(
+      items: events,
       page: page,
       hasMore: events.length == _pageSize,
     );
@@ -130,12 +111,12 @@ class Events extends _$Events {
     try {
       final nextPage = state.value!.page + 1;
       final newPage = await _fetchPage(nextPage);
-      final currentEvents = state.value?.events ?? [];
-      final allEvents = [...currentEvents, ...newPage.events];
+      final currentEvents = state.value?.items ?? [];
+      final allEvents = [...currentEvents, ...newPage.items];
 
       state = AsyncValue.data(
         state.value!.copyWith(
-          events: allEvents,
+          items: allEvents,
           page: nextPage,
           hasMore: newPage.hasMore,
         ),
@@ -180,7 +161,7 @@ class Events extends _$Events {
     final authState = ref.read(authProvider).value;
     if (authState == null || authState.token == null) return;
 
-    final previousEvents = state.value?.events ?? [];
+    final previousEvents = state.value?.items ?? [];
 
     final newEvents = previousEvents.map((event) {
       if (event.id == eventId) {
@@ -193,7 +174,7 @@ class Events extends _$Events {
     }).toList();
 
     ref.read(eventsProvider(null).notifier).state = AsyncValue.data(
-      state.value!.copyWith(events: newEvents),
+      state.value!.copyWith(items: newEvents),
     );
 
     try {
@@ -206,7 +187,7 @@ class Events extends _$Events {
       ref.invalidate(eventsByDistanceProvider);
     } catch (e) {
       ref.read(eventsProvider(null).notifier).state = AsyncValue.data(
-        state.value!.copyWith(events: previousEvents),
+        state.value!.copyWith(items: previousEvents),
       );
     }
   }
@@ -231,7 +212,7 @@ class EventsByDistance extends _$EventsByDistance {
   bool _isLoadingMore = false;
 
   @override
-  FutureOr<PaginatedEvents> build() async {
+  FutureOr<PaginatedResult<EventModel>> build() async {
     ref.onDispose(() {
       _eventService.clearCache();
     });
@@ -240,16 +221,20 @@ class EventsByDistance extends _$EventsByDistance {
     return userLocationAsync.when(
       data: (userLocation) {
         if (userLocation == null) {
-          return PaginatedEvents(hasMore: false);
+          return PaginatedResult<EventModel>(hasMore: false);
         }
         return _fetchPage(1, userLocation.latitude, userLocation.longitude);
       },
-      loading: () => PaginatedEvents(hasMore: false),
-      error: (err, stack) => PaginatedEvents(hasMore: false),
+      loading: () => PaginatedResult<EventModel>(hasMore: false),
+      error: (err, stack) => PaginatedResult<EventModel>(hasMore: false),
     );
   }
 
-  Future<PaginatedEvents> _fetchPage(int page, double lat, double lng) async {
+  Future<PaginatedResult<EventModel>> _fetchPage(
+    int page,
+    double lat,
+    double lng,
+  ) async {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
@@ -261,8 +246,8 @@ class EventsByDistance extends _$EventsByDistance {
       limit: _pageSize,
     );
 
-    return PaginatedEvents(
-      events: events,
+    return PaginatedResult<EventModel>(
+      items: events,
       page: page,
       hasMore: events.length == _pageSize,
     );
@@ -280,13 +265,13 @@ class EventsByDistance extends _$EventsByDistance {
         userLocation.latitude,
         userLocation.longitude,
       );
-      final currentEvents = state.value?.events ?? [];
-      final allEvents = [...currentEvents, ...newPage.events];
+      final currentEvents = state.value?.items ?? [];
+      final allEvents = [...currentEvents, ...newPage.items];
       final uniqueEvents = allEvents.toSet().toList();
 
       state = AsyncValue.data(
         state.value!.copyWith(
-          events: uniqueEvents,
+          items: uniqueEvents,
           page: nextPage,
           hasMore: newPage.hasMore,
         ),
@@ -297,48 +282,47 @@ class EventsByDistance extends _$EventsByDistance {
   }
 }
 
-final sortedEventsProvider = Provider.autoDispose<AsyncValue<PaginatedEvents>>((
-  ref,
-) {
-  final criteria = ref.watch(eventSortCriteriaProvider);
+final sortedEventsProvider =
+    Provider.autoDispose<AsyncValue<PaginatedResult<EventModel>>>((ref) {
+      final criteria = ref.watch(eventSortCriteriaProvider);
 
-  final eventsAsync = criteria == EventSortCriteria.proximity
-      ? ref.watch(eventsByDistanceProvider)
-      : ref.watch(eventsProvider(null));
+      final eventsAsync = criteria == EventSortCriteria.proximity
+          ? ref.watch(eventsByDistanceProvider)
+          : ref.watch(eventsProvider(null));
 
-  final filter = ref.watch(eventFilterProvider);
-  final query = ref.watch(eventsSearchQueryProvider).toLowerCase();
+      final filter = ref.watch(eventFilterProvider);
+      final query = ref.watch(eventsSearchQueryProvider).toLowerCase();
 
-  return eventsAsync.whenData((paginated) {
-    var filteredEvents = paginated.events;
+      return eventsAsync.whenData((paginated) {
+        var filteredEvents = paginated.items;
 
-    if (filter.excludeParticipating) {
-      filteredEvents = filteredEvents
-          .where((element) => !element.isParticipating)
-          .toList();
-    }
+        if (filter.excludeParticipating) {
+          filteredEvents = filteredEvents
+              .where((element) => !element.isParticipating)
+              .toList();
+        }
 
-    if (filter.excludeExpired) {
-      filteredEvents = filteredEvents
-          .where((element) => element.startDate.isAfter(DateTime.now()))
-          .toList();
-    }
+        if (filter.excludeExpired) {
+          filteredEvents = filteredEvents
+              .where((element) => element.startDate.isAfter(DateTime.now()))
+              .toList();
+        }
 
-    if (query.isNotEmpty) {
-      filteredEvents = filteredEvents.where((event) {
-        final titleMatch = event.title.toLowerCase().contains(query);
-        final descriptionMatch = event.description.toLowerCase().contains(
-          query,
-        );
-        return titleMatch || descriptionMatch;
-      }).toList();
-    }
+        if (query.isNotEmpty) {
+          filteredEvents = filteredEvents.where((event) {
+            final titleMatch = event.title.toLowerCase().contains(query);
+            final descriptionMatch = event.description.toLowerCase().contains(
+              query,
+            );
+            return titleMatch || descriptionMatch;
+          }).toList();
+        }
 
-    return paginated.copyWith(events: filteredEvents);
-  });
-});
+        return paginated.copyWith(items: filteredEvents);
+      });
+    });
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<List<EventModel>> mapEvents(Ref ref) async {
   final userLocationAsync = ref.watch(userLocationProvider);
 

@@ -20,7 +20,7 @@ final class CreatePostNotifierProvider
         argument: null,
         retry: null,
         name: r'createPostProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -42,7 +42,7 @@ final class CreatePostNotifierProvider
 }
 
 String _$createPostNotifierHash() =>
-    r'7b35933233dd51b9ba4a54a350628b2c4fc11c9f';
+    r'0b028652e8c5bcebdd9611d6477a1d2c3bfe6ef3';
 
 abstract class _$CreatePostNotifier extends $Notifier<CreatePostState> {
   CreatePostState build();
@@ -67,14 +67,14 @@ abstract class _$CreatePostNotifier extends $Notifier<CreatePostState> {
 const postsProvider = PostsFamily._();
 
 final class PostsProvider
-    extends $AsyncNotifierProvider<Posts, PaginatedPosts> {
+    extends $AsyncNotifierProvider<Posts, PaginatedResult<PostModel>> {
   const PostsProvider._({
     required PostsFamily super.from,
     required int? super.argument,
   }) : super(
          retry: null,
          name: r'postsProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -104,15 +104,15 @@ final class PostsProvider
   }
 }
 
-String _$postsHash() => r'762fa924af8ebcd57635209ce200893a80ae4d95';
+String _$postsHash() => r'0c1aceea43eeab77613ae0375a165a630dc5061d';
 
 final class PostsFamily extends $Family
     with
         $ClassFamilyOverride<
           Posts,
-          AsyncValue<PaginatedPosts>,
-          PaginatedPosts,
-          FutureOr<PaginatedPosts>,
+          AsyncValue<PaginatedResult<PostModel>>,
+          PaginatedResult<PostModel>,
+          FutureOr<PaginatedResult<PostModel>>,
           int?
         > {
   const PostsFamily._()
@@ -121,7 +121,7 @@ final class PostsFamily extends $Family
         name: r'postsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   PostsProvider call(int? userId) =>
@@ -131,21 +131,29 @@ final class PostsFamily extends $Family
   String toString() => r'postsProvider';
 }
 
-abstract class _$Posts extends $AsyncNotifier<PaginatedPosts> {
+abstract class _$Posts extends $AsyncNotifier<PaginatedResult<PostModel>> {
   late final _$args = ref.$arg as int?;
   int? get userId => _$args;
 
-  FutureOr<PaginatedPosts> build(int? userId);
+  FutureOr<PaginatedResult<PostModel>> build(int? userId);
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref = this.ref as $Ref<AsyncValue<PaginatedPosts>, PaginatedPosts>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PaginatedResult<PostModel>>,
+              PaginatedResult<PostModel>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<PaginatedPosts>, PaginatedPosts>,
-              AsyncValue<PaginatedPosts>,
+              AnyNotifier<
+                AsyncValue<PaginatedResult<PostModel>>,
+                PaginatedResult<PostModel>
+              >,
+              AsyncValue<PaginatedResult<PostModel>>,
               Object?,
               Object?
             >;
@@ -157,14 +165,15 @@ abstract class _$Posts extends $AsyncNotifier<PaginatedPosts> {
 const postsByDistanceProvider = PostsByDistanceProvider._();
 
 final class PostsByDistanceProvider
-    extends $AsyncNotifierProvider<PostsByDistance, PaginatedPosts> {
+    extends
+        $AsyncNotifierProvider<PostsByDistance, PaginatedResult<PostModel>> {
   const PostsByDistanceProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'postsByDistanceProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -177,20 +186,29 @@ final class PostsByDistanceProvider
   PostsByDistance create() => PostsByDistance();
 }
 
-String _$postsByDistanceHash() => r'1b9dab68585303af4cd5f4f04c26b2964f2e7b64';
+String _$postsByDistanceHash() => r'c37e16860e1d0b1f49749d1f6eb004c1721a54f1';
 
-abstract class _$PostsByDistance extends $AsyncNotifier<PaginatedPosts> {
-  FutureOr<PaginatedPosts> build();
+abstract class _$PostsByDistance
+    extends $AsyncNotifier<PaginatedResult<PostModel>> {
+  FutureOr<PaginatedResult<PostModel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<PaginatedPosts>, PaginatedPosts>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PaginatedResult<PostModel>>,
+              PaginatedResult<PostModel>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<PaginatedPosts>, PaginatedPosts>,
-              AsyncValue<PaginatedPosts>,
+              AnyNotifier<
+                AsyncValue<PaginatedResult<PostModel>>,
+                PaginatedResult<PostModel>
+              >,
+              AsyncValue<PaginatedResult<PostModel>>,
               Object?,
               Object?
             >;
@@ -215,7 +233,7 @@ final class MapPostsProvider
         argument: null,
         retry: null,
         name: r'mapPostsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -235,4 +253,4 @@ final class MapPostsProvider
   }
 }
 
-String _$mapPostsHash() => r'c6608eb34a62d4296f0535201e7477d5452aef06';
+String _$mapPostsHash() => r'6b8c9637d012e540b49a34c940ff3d326787833e';

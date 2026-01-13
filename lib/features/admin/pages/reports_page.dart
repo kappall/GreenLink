@@ -19,6 +19,27 @@ class ReportsPage extends ConsumerStatefulWidget {
 
 class _ReportsPageState extends ConsumerState<ReportsPage> {
   bool _showOnlyReported = true;
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
+      ref.read(reportsProvider.notifier).loadMore();
+    }
+  }
 
   void _handleAction(Report report, bool isApprove) async {
     await ref
@@ -59,13 +80,15 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
 
     return reportsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stackTrace) => Center(child: Text('Error: $error')),
-      data: (reports) {
-        final posts = reports.where((r) => r.type == ReportType.post).toList();
-        final events = reports
+      error: (error, stackTrace) => Center(child: Text('No reports')),
+      data: (page) {
+        final posts = page.items
+            .where((r) => r.type == ReportType.post)
+            .toList();
+        final events = page.items
             .where((r) => r.type == ReportType.event)
             .toList();
-        final comments = reports
+        final comments = page.items
             .where((r) => r.type == ReportType.comment)
             .toList();
 
@@ -137,12 +160,18 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
 
   Widget _buildAllPostsList() {
     final postsAsync = ref.watch(postsProvider(null));
-    return CustomScrollView(slivers: [PostFeed(postPageAsync: postsAsync)]);
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [PostFeed(postPageAsync: postsAsync)],
+    );
   }
 
   Widget _buildAllEventsList() {
     final eventsAsync = ref.watch(eventsProvider(null));
-    return CustomScrollView(slivers: [EventFeed(eventsAsync: eventsAsync)]);
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [EventFeed(eventsAsync: eventsAsync)],
+    );
   }
 
   Widget _buildReportList(List<Report> reports) {
@@ -167,6 +196,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     }
 
     return ListView.separated(
+      controller: _scrollController,
       padding: const EdgeInsets.all(16),
       itemCount: reports.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),

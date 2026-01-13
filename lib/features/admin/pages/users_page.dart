@@ -8,11 +8,38 @@ import 'package:greenlinkapp/features/user/models/user_model.dart';
 import '../../../core/utils/feedback_utils.dart';
 import '../providers/admin_provider.dart';
 
-class UsersPage extends ConsumerWidget {
+class UsersPage extends ConsumerStatefulWidget {
   const UsersPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UsersPage> createState() => _UsersPageState();
+}
+
+class _UsersPageState extends ConsumerState<UsersPage> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
+      ref.read(usersProvider.notifier).loadMore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final usersAsync = ref.watch(usersProvider);
     final selectedRole = ref.watch(userRoleFilterProvider);
 
@@ -106,8 +133,14 @@ class UsersPage extends ConsumerWidget {
                 error: (err, stack) => Center(child: Text('Errore: $err')),
                 data: (_) => TabBarView(
                   children: [
-                    _UserList(users: ref.watch(activeFilteredUsersProvider)),
-                    _UserList(users: ref.watch(blockedFilteredUsersProvider)),
+                    _UserList(
+                      users: ref.watch(activeFilteredUsersProvider),
+                      scrollController: _scrollController,
+                    ),
+                    _UserList(
+                      users: ref.watch(blockedFilteredUsersProvider),
+                      scrollController: _scrollController,
+                    ),
                   ],
                 ),
               ),
@@ -121,8 +154,9 @@ class UsersPage extends ConsumerWidget {
 
 class _UserList extends ConsumerWidget {
   final List<UserModel> users;
+  final ScrollController scrollController;
 
-  const _UserList({required this.users});
+  const _UserList({required this.users, required this.scrollController});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -147,7 +181,8 @@ class _UserList extends ConsumerWidget {
     }
 
     return ListView.separated(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 40),
+      controller: scrollController,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
       itemCount: users.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {

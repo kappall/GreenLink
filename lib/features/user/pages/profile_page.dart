@@ -193,7 +193,7 @@ class ProfilePage extends ConsumerWidget {
                                         userPostsAsync.when(
                                           data: (page) => _buildStatItem(
                                             "Post",
-                                            page.posts.length.toString(),
+                                            page.items.length.toString(),
                                           ),
                                           loading: () =>
                                               _buildStatItem("Post", "-"),
@@ -249,13 +249,13 @@ class ProfilePage extends ConsumerWidget {
                   body: TabBarView(
                     children: [
                       userPostsAsync.when(
-                        data: (page) => page.posts.isEmpty
+                        data: (page) => page.items.isEmpty
                             ? const Center(
                                 child: Text("Nessun post pubblicato"),
                               )
                             : ListView.separated(
                                 padding: const EdgeInsets.all(16),
-                                itemCount: page.posts.length,
+                                itemCount: page.items.length,
                                 separatorBuilder: (_, __) =>
                                     const Divider(height: 32, thickness: 1),
                                 itemBuilder: (context, index) =>
@@ -263,9 +263,9 @@ class ProfilePage extends ConsumerWidget {
                                       behavior: HitTestBehavior.opaque,
                                       onTap: () => context.push(
                                         '/post-info',
-                                        extra: page.posts[index],
+                                        extra: page.items[index],
                                       ),
-                                      child: PostCard(post: page.posts[index]),
+                                      child: PostCard(post: page.items[index]),
                                     ),
                               ),
                         loading: () =>

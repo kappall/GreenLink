@@ -13,7 +13,7 @@ part of 'event_provider.dart';
 const eventsProvider = EventsFamily._();
 
 final class EventsProvider
-    extends $AsyncNotifierProvider<Events, PaginatedEvents> {
+    extends $AsyncNotifierProvider<Events, PaginatedResult<EventModel>> {
   const EventsProvider._({
     required EventsFamily super.from,
     required int? super.argument,
@@ -50,15 +50,15 @@ final class EventsProvider
   }
 }
 
-String _$eventsHash() => r'e1e9bd68d11591d4ebdb1cdf7aa9a4ce88a440d8';
+String _$eventsHash() => r'a139547099d9165dc95353773f00c0f430afbda1';
 
 final class EventsFamily extends $Family
     with
         $ClassFamilyOverride<
           Events,
-          AsyncValue<PaginatedEvents>,
-          PaginatedEvents,
-          FutureOr<PaginatedEvents>,
+          AsyncValue<PaginatedResult<EventModel>>,
+          PaginatedResult<EventModel>,
+          FutureOr<PaginatedResult<EventModel>>,
           int?
         > {
   const EventsFamily._()
@@ -77,21 +77,29 @@ final class EventsFamily extends $Family
   String toString() => r'eventsProvider';
 }
 
-abstract class _$Events extends $AsyncNotifier<PaginatedEvents> {
+abstract class _$Events extends $AsyncNotifier<PaginatedResult<EventModel>> {
   late final _$args = ref.$arg as int?;
   int? get partnerId => _$args;
 
-  FutureOr<PaginatedEvents> build(int? partnerId);
+  FutureOr<PaginatedResult<EventModel>> build(int? partnerId);
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref = this.ref as $Ref<AsyncValue<PaginatedEvents>, PaginatedEvents>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PaginatedResult<EventModel>>,
+              PaginatedResult<EventModel>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<PaginatedEvents>, PaginatedEvents>,
-              AsyncValue<PaginatedEvents>,
+              AnyNotifier<
+                AsyncValue<PaginatedResult<EventModel>>,
+                PaginatedResult<EventModel>
+              >,
+              AsyncValue<PaginatedResult<EventModel>>,
               Object?,
               Object?
             >;
@@ -103,7 +111,8 @@ abstract class _$Events extends $AsyncNotifier<PaginatedEvents> {
 const eventsByDistanceProvider = EventsByDistanceProvider._();
 
 final class EventsByDistanceProvider
-    extends $AsyncNotifierProvider<EventsByDistance, PaginatedEvents> {
+    extends
+        $AsyncNotifierProvider<EventsByDistance, PaginatedResult<EventModel>> {
   const EventsByDistanceProvider._()
     : super(
         from: null,
@@ -123,20 +132,29 @@ final class EventsByDistanceProvider
   EventsByDistance create() => EventsByDistance();
 }
 
-String _$eventsByDistanceHash() => r'98c4349a7bbe88ac5075d0533644244a3427504e';
+String _$eventsByDistanceHash() => r'ed30f7870d36112eb67c42db2a578a704cc212e9';
 
-abstract class _$EventsByDistance extends $AsyncNotifier<PaginatedEvents> {
-  FutureOr<PaginatedEvents> build();
+abstract class _$EventsByDistance
+    extends $AsyncNotifier<PaginatedResult<EventModel>> {
+  FutureOr<PaginatedResult<EventModel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<PaginatedEvents>, PaginatedEvents>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PaginatedResult<EventModel>>,
+              PaginatedResult<EventModel>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<PaginatedEvents>, PaginatedEvents>,
-              AsyncValue<PaginatedEvents>,
+              AnyNotifier<
+                AsyncValue<PaginatedResult<EventModel>>,
+                PaginatedResult<EventModel>
+              >,
+              AsyncValue<PaginatedResult<EventModel>>,
               Object?,
               Object?
             >;
@@ -161,7 +179,7 @@ final class MapEventsProvider
         argument: null,
         retry: null,
         name: r'mapEventsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -181,4 +199,4 @@ final class MapEventsProvider
   }
 }
 
-String _$mapEventsHash() => r'989b30d47d607e0436ee9e932a015cd5c817b4f4';
+String _$mapEventsHash() => r'a609dc0ae79ada562dd83562d992c9094609a4e1';
