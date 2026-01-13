@@ -534,28 +534,3 @@ final sortedPostsProvider =
         return paginated.copyWith(items: filteredPosts);
       });
     });
-
-@Riverpod(keepAlive: true)
-Future<List<PostModel>> mapPosts(Ref ref) async {
-  final userLocationAsync = ref.watch(userLocationProvider);
-
-  return userLocationAsync.when(
-    data: (userLocation) {
-      if (userLocation == null) {
-        return [];
-      }
-      final service = PostService.instance;
-      final authState = ref.watch(authProvider);
-      final token = authState.asData?.value.token;
-
-      return service.fetchPostsByDistance(
-        token: token,
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        limit: 30,
-      );
-    },
-    loading: () => [],
-    error: (err, stack) => [],
-  );
-}

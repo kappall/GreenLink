@@ -3,11 +3,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
-import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
-import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/location/providers/location_provider.dart';
+import 'package:greenlinkapp/features/map/provider/map_provider.dart';
+import 'package:greenlinkapp/features/map/widgets/map_filter_drawer.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapPage extends ConsumerStatefulWidget {
@@ -44,12 +45,9 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final postsAsync = ref.watch(mapPostsProvider);
-    final eventsAsync = ref.watch(mapEventsProvider);
+    final posts = ref.watch(filteredMapPostsProvider);
+    final events = ref.watch(filteredMapEventsProvider);
     final userLocAsync = ref.watch(userLocationProvider);
-
-    final posts = postsAsync.value ?? [];
-    final events = eventsAsync.value ?? [];
 
     return Scaffold(
       body: Stack(
@@ -92,45 +90,6 @@ class _MapPageState extends ConsumerState<MapPage> {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => Center(child: Text('Errore: $err')),
           ),
-          if (postsAsync.isLoading || eventsAsync.isLoading)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 10,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        "Caricamento dati mappa...",
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
@@ -143,6 +102,11 @@ class _MapPageState extends ConsumerState<MapPage> {
                 child: const Icon(Icons.my_location),
               ),
             ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 160,
+            right: 0,
+            child: const MapFilterDrawer(),
           ),
         ],
       ),

@@ -280,7 +280,7 @@ class UserDetailPage extends ConsumerWidget {
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(ctx);
-              ref.read(adminServiceProvider).blockUser(user.id);
+              ref.read(usersProvider.notifier).blockUser(userId: user.id);
               ref.invalidate(usersProvider);
             },
             child: const Text("Blocca"),

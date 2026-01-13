@@ -161,6 +161,14 @@ class Users extends _$Users {
       _isLoadingMore = false;
     }
   }
+
+  Future<void> blockUser({required int userId}) async {
+    try {
+      await _adminService.blockUser(userId);
+    } catch (e) {
+      FeedbackUtils.logError(e);
+    }
+  }
 }
 
 @riverpod

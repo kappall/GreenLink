@@ -321,28 +321,3 @@ final sortedEventsProvider =
         return paginated.copyWith(items: filteredEvents);
       });
     });
-
-@Riverpod(keepAlive: true)
-Future<List<EventModel>> mapEvents(Ref ref) async {
-  final userLocationAsync = ref.watch(userLocationProvider);
-
-  return userLocationAsync.when(
-    data: (userLocation) {
-      if (userLocation == null) {
-        return [];
-      }
-      final service = EventService.instance;
-      final authState = ref.watch(authProvider);
-      final token = authState.asData?.value.token;
-
-      return service.fetchEventsByDistance(
-        token: token,
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        limit: 30,
-      );
-    },
-    loading: () => [],
-    error: (err, stack) => [],
-  );
-}

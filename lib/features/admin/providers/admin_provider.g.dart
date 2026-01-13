@@ -9,6 +9,47 @@ part of 'admin_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(adminService)
+const adminServiceProvider = AdminServiceProvider._();
+
+final class AdminServiceProvider
+    extends $FunctionalProvider<AdminService, AdminService, AdminService>
+    with $Provider<AdminService> {
+  const AdminServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'adminServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$adminServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<AdminService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  AdminService create(Ref ref) {
+    return adminService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AdminService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AdminService>(value),
+    );
+  }
+}
+
+String _$adminServiceHash() => r'c95fb4ec8bc348295afaed23ed288ce561333ac3';
+
 @ProviderFor(Reports)
 const reportsProvider = ReportsProvider._();
 
@@ -33,7 +74,7 @@ final class ReportsProvider
   Reports create() => Reports();
 }
 
-String _$reportsHash() => r'682de41958e16f7bf8aa384669c49987b804c18e';
+String _$reportsHash() => r'f7517b04f0d9a9e41e914c20525d7aa889e862d7';
 
 abstract class _$Reports extends $AsyncNotifier<PaginatedResult<Report>> {
   FutureOr<PaginatedResult<Report>> build();
@@ -86,7 +127,7 @@ final class UsersProvider
   Users create() => Users();
 }
 
-String _$usersHash() => r'e95559b0a38e1eb7537ea6f966e56988b7098c2f';
+String _$usersHash() => r'12ccc8c96a9d54761730980f7edf43e346d7bd01';
 
 abstract class _$Users extends $AsyncNotifier<PaginatedResult<UserModel>> {
   FutureOr<PaginatedResult<UserModel>> build();

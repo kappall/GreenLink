@@ -50,7 +50,7 @@ final class EventsProvider
   }
 }
 
-String _$eventsHash() => r'a139547099d9165dc95353773f00c0f430afbda1';
+String _$eventsHash() => r'0bd40528e90fffd13da7de5d06ec73148b86481d';
 
 final class EventsFamily extends $Family
     with
@@ -132,7 +132,7 @@ final class EventsByDistanceProvider
   EventsByDistance create() => EventsByDistance();
 }
 
-String _$eventsByDistanceHash() => r'ed30f7870d36112eb67c42db2a578a704cc212e9';
+String _$eventsByDistanceHash() => r'3a0c34fc31989820bca07497a82cf49ac5745a90';
 
 abstract class _$EventsByDistance
     extends $AsyncNotifier<PaginatedResult<EventModel>> {
@@ -161,42 +161,3 @@ abstract class _$EventsByDistance
     element.handleValue(ref, created);
   }
 }
-
-@ProviderFor(mapEvents)
-const mapEventsProvider = MapEventsProvider._();
-
-final class MapEventsProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<EventModel>>,
-          List<EventModel>,
-          FutureOr<List<EventModel>>
-        >
-    with $FutureModifier<List<EventModel>>, $FutureProvider<List<EventModel>> {
-  const MapEventsProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'mapEventsProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$mapEventsHash();
-
-  @$internal
-  @override
-  $FutureProviderElement<List<EventModel>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<EventModel>> create(Ref ref) {
-    return mapEvents(ref);
-  }
-}
-
-String _$mapEventsHash() => r'a609dc0ae79ada562dd83562d992c9094609a4e1';
