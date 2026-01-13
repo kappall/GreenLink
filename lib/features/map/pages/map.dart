@@ -3,12 +3,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
-import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 import 'package:greenlinkapp/features/map/provider/map_provider.dart';
 import 'package:greenlinkapp/features/map/widgets/map_filter_drawer.dart';
+import 'package:greenlinkapp/features/map/widgets/map_summary.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapPage extends ConsumerStatefulWidget {
@@ -108,6 +108,12 @@ class _MapPageState extends ConsumerState<MapPage> {
             right: 0,
             child: const MapFilterDrawer(),
           ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 16,
+            child: const MapSummary(),
+          ),
+          //TODO: widget per selezionare la desnità dei contenuti, tipo 4 livelli di densità 1=20, 2=40, 3=80 4=160
         ],
       ),
     );
