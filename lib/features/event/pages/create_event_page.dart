@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
@@ -21,10 +23,10 @@ class CreateEventPage extends ConsumerStatefulWidget {
 class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
-  final _maxParticipantsController = TextEditingController();
   final _titleController = TextEditingController();
 
   EventType _selectedType = EventType.cleaning;
+  int? _maxParticipants;
   DateTime _startDate = DateTime.now().add(const Duration(days: 1));
   DateTime _endDate = DateTime.now().add(const Duration(days: 1, hours: 2));
 
@@ -37,7 +39,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   @override
   void dispose() {
     _descriptionController.dispose();
-    _maxParticipantsController.dispose();
     _titleController.dispose();
     super.dispose();
   }
@@ -183,6 +184,89 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     }
   }
 
+  Future<void> _showMaxParticipantsPicker(
+    FormFieldState<int> fieldState,
+  ) async {
+    final options = List<int>.generate(10000, (index) => index + 1);
+    final initialIndex = fieldState.value != null
+        ? options.indexOf(fieldState.value!)
+        : 0;
+    final controller = FixedExtentScrollController(initialItem: initialIndex);
+    int tempSelection = fieldState.value ?? options.first;
+    final textController =
+        TextEditingController(text: tempSelection.toString());
+
+    final selected = await showModalBottomSheet<int>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Annulla"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, tempSelection),
+                      child: const Text("Conferma"),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: TextField(
+                  controller: textController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: "Inserisci numero",
+                  ),
+                  onChanged: (value) {
+                    final parsed = int.tryParse(value);
+                    if (parsed != null &&
+                        parsed >= 1 &&
+                        parsed <= 7000000000) {
+                      tempSelection = parsed;
+                    }
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 220,
+                child: CupertinoPicker(
+                  scrollController: controller,
+                  itemExtent: 44,
+                  useMagnifier: true,
+                  magnification: 1.08,
+                  onSelectedItemChanged: (index) {
+                    tempSelection = options[index];
+                    textController.text = tempSelection.toString();
+                  },
+                  children: options
+                      .map((value) => Center(child: Text(value.toString())))
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      setState(() => _maxParticipants = selected);
+      fieldState.didChange(selected);
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate() || _latitude == null) {
       if (_latitude == null) {
@@ -201,7 +285,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
             latitude: _latitude!,
             longitude: _longitude!,
             eventType: _selectedType,
-            maxParticipants: int.parse(_maxParticipantsController.text),
+            maxParticipants: _maxParticipants!,
             startDate: _startDate,
             endDate: _endDate,
           );
@@ -270,14 +354,31 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
               validator: (v) => v!.isEmpty ? "Inserisci una descrizione" : null,
             ),
             const SizedBox(height: 20),
-            TextFormField(
-              controller: _maxParticipantsController,
-              decoration: const InputDecoration(
-                labelText: "Partecipanti massimi",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-              validator: (v) => v!.isEmpty ? "Inserisci un numero" : null,
+            FormField<int>(
+              initialValue: _maxParticipants,
+              validator: (v) => v == null ? "Seleziona un numero" : null,
+              builder: (state) {
+                final displayValue =
+                    state.value != null ? state.value.toString() : "Seleziona";
+                final textStyle = TextStyle(
+                  color: state.value == null
+                      ? Theme.of(context).hintColor
+                      : Colors.black,
+                );
+
+                return InkWell(
+                  onTap: () => _showMaxParticipantsPicker(state),
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: "Partecipanti massimi",
+                      border: const OutlineInputBorder(),
+                      errorText: state.errorText,
+                      suffixIcon: const Icon(Icons.keyboard_arrow_down),
+                    ),
+                    child: Text(displayValue, style: textStyle),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
             Column(

@@ -7,6 +7,7 @@ import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/widgets/comment_card.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../../event/providers/event_provider.dart';
@@ -288,7 +289,13 @@ class ProfilePage extends ConsumerWidget {
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(height: 16),
                                 itemBuilder: (context, index) =>
-                                    EventCard(event: events[index]),
+                                    UiCard(
+                                      onTap: () => context.push(
+                                        '/event-info',
+                                        extra: events[index],
+                                      ),
+                                      child: EventCard(event: events[index]),
+                                    ),
                               ),
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
