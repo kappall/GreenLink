@@ -73,18 +73,21 @@ class _RegisterPage extends ConsumerState<RegisterPage> {
                         ),
                         const SizedBox(height: 16),
                         AuthTextField(
+                          keyboardType: TextInputType.emailAddress,
                           hint: 'Email',
                           controller: _emailController,
                           obscure: false,
                         ),
                         const SizedBox(height: 16),
                         AuthTextField(
+                          keyboardType: TextInputType.visiblePassword,
                           hint: 'Password',
                           controller: _passwordController,
                           obscure: true,
                         ),
                         const SizedBox(height: 16),
                         AuthTextField(
+                          keyboardType: TextInputType.visiblePassword,
                           hint: 'Conferma Password',
                           controller: _confirmPasswordController,
                           obscure: true,

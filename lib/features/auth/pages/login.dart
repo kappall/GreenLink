@@ -60,11 +60,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     child: Column(
                       children: [
                         AuthTextField(
+                          keyboardType: TextInputType.emailAddress,
                           controller: _emailController,
                           hint: "Email",
                         ),
                         const SizedBox(height: 16),
                         AuthTextField(
+                          keyboardType: TextInputType.visiblePassword,
                           controller: _passwordController,
                           hint: "Password",
                           obscure: true,
