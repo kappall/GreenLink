@@ -8,6 +8,7 @@ import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/widgets/comment_card.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../../event/providers/event_provider.dart';
