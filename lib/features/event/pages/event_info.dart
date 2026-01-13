@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -38,6 +39,9 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
     final isAdmin = authState.asData?.value.isAdmin ?? false;
     final currentUser = ref.watch(currentUserProvider).value;
     final isAuthor = currentUser?.id == event.author.id;
+    final participantsAsync = (isAuthor && event.id != null)
+      ? ref.watch(eventParticipantsProvider(event.id!))
+      : const AsyncData<List<UserModel>>([]);
 
     final bool isExpired = event.startDate.isBefore(DateTime.now());
 
@@ -140,6 +144,45 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                     "Posizione",
                     locationName,
                   ),
+                  if (isAuthor) ...[
+                    const SizedBox(height: 24),
+                    const Text(
+                      "Partecipanti",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (event.id == null)
+                      Text(
+                        "L'evento deve avere un ID valido per mostrare i partecipanti.",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      )
+                    else
+                      participantsAsync.when(
+                        data: (participants) => participants.isEmpty
+                            ? const Text("Non ci sono ancora partecipanti.")
+                            : Column(
+                                children: [
+                                  for (final user in participants)
+                                    _buildParticipantTile(user),
+                                ],
+                              ),
+                        loading: () => const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                        error: (error, _) => Text(
+                          "Errore nel caricamento dei partecipanti",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ),
+                  ],
                 ],
               ),
             ),
@@ -230,6 +273,24 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
         }
       }
     }
+  }
+
+  Widget _buildParticipantTile(UserModel user) {
+    final hasEmail = user.email.isNotEmpty && user.email != 'default@example.com';
+    final subtitle = hasEmail
+        ? user.email
+        : (user.role != null ? user.role!.name : '');
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: const Icon(Icons.person_outline),
+        title: Text(user.displayName),
+        subtitle: subtitle.isEmpty ? null : Text(subtitle),
+        trailing: user.isBlocked
+            ? const Icon(Icons.block, color: Colors.red)
+            : null,
+      ),
+    );
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {

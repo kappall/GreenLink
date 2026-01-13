@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class EventService {
@@ -71,6 +72,53 @@ class EventService {
     );
 
     return _requestEvents(uri: uri, token: token);
+  }
+
+  Future<List<UserModel>> fetchEventParticipants({
+    required String? token,
+    required int eventId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/event/$eventId');
+
+    final headers = {'Accept': 'application/json'};
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    try {
+      final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final message = _errorMessage(response);
+        FeedbackUtils.logError(
+          "GET $uri failed (${response.statusCode}): $message",
+        );
+        throw Exception(
+          'Non è stato possibile recuperare i partecipanti. Riprova più tardi.',
+        );
+      }
+
+      final decoded = jsonDecode(response.body);
+      final dynamic rawEvent = decoded is Map<String, dynamic>
+          ? decoded['event'] ?? decoded['data'] ?? decoded
+          : decoded;
+
+      if (rawEvent is Map<String, dynamic>) {
+        final participants = rawEvent['participants'];
+        if (participants is List) {
+          return participants
+              .whereType<Map<String, dynamic>>()
+              .map(UserModel.fromJson)
+              .toList();
+        }
+      }
+
+      return [];
+    } catch (e) {
+      if (e is Exception) rethrow;
+      FeedbackUtils.logError("Connection error on $uri: $e");
+      throw Exception('Controlla la tua connessione internet e riprova.');
+    }
   }
 
   Future<List<EventModel>> _requestEvents({

@@ -5,6 +5,7 @@ import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/services/event_service.dart';
+import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/utils/feedback_utils.dart';
@@ -208,6 +209,17 @@ final eventsByPartnerIdProvider = FutureProvider.family<List<EventModel>, int>((
   final token = authState.asData?.value.token ?? '';
   return EventService.instance.fetchEvents(token: token, partnerId: partnerId);
 });
+
+final eventParticipantsProvider = FutureProvider.family<List<UserModel>, int>(
+  (ref, eventId) async {
+    final authState = ref.watch(authProvider);
+    final token = authState.asData?.value.token;
+    return EventService.instance.fetchEventParticipants(
+      token: token,
+      eventId: eventId,
+    );
+  },
+);
 
 @Riverpod(keepAlive: true)
 class EventsByDistance extends _$EventsByDistance {
