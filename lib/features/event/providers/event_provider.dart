@@ -17,13 +17,23 @@ enum EventSortCriteria { date, proximity }
 class EventFilter {
   final bool excludeParticipating;
   final bool excludeExpired;
+  final bool excludeCreated;
 
-  EventFilter({this.excludeParticipating = false, this.excludeExpired = false});
+  EventFilter({
+    this.excludeParticipating = false,
+    this.excludeExpired = false,
+    this.excludeCreated = false,
+  });
 
-  EventFilter copyWith({bool? excludeParticipating, bool? excludeExpired}) {
+  EventFilter copyWith({
+    bool? excludeParticipating,
+    bool? excludeExpired,
+    bool? excludeCreated,
+  }) {
     return EventFilter(
       excludeParticipating: excludeParticipating ?? this.excludeParticipating,
       excludeExpired: excludeExpired ?? this.excludeExpired,
+      excludeCreated: excludeCreated ?? this.excludeCreated,
     );
   }
 }
@@ -38,6 +48,10 @@ class EventFilterNotifier extends Notifier<EventFilter> {
 
   void setExcludeExpired(bool value) {
     state = state.copyWith(excludeExpired: value);
+  }
+
+  void setExcludeCreated(bool value) {
+    state = state.copyWith(excludeCreated: value);
   }
 }
 
@@ -271,6 +285,10 @@ final sortedEventsProvider =
       final filter = ref.watch(eventFilterProvider);
       final query = ref.watch(eventsSearchQueryProvider).toLowerCase();
 
+      final isPartner =
+          ref.watch(authProvider).asData?.value.isPartner ?? false;
+      final partnerId = ref.watch(authProvider).asData?.value.user?.id;
+
       return eventsAsync.whenData((paginated) {
         var filteredEvents = paginated.items;
 
@@ -283,6 +301,13 @@ final sortedEventsProvider =
         if (filter.excludeExpired) {
           filteredEvents = filteredEvents
               .where((element) => element.startDate.isAfter(DateTime.now()))
+              .toList();
+        }
+
+        if (isPartner && filter.excludeCreated) {
+          FeedbackUtils.logInfo("Partner: $partnerId");
+          filteredEvents = filteredEvents
+              .where((element) => element.author.id != partnerId)
               .toList();
         }
 

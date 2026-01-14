@@ -107,6 +107,10 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
                             ref
                                 .read(eventFilterProvider.notifier)
                                 .setExcludeExpired(!filter.excludeExpired);
+                          } else if (value == 'excludeCreated') {
+                            ref
+                                .read(eventFilterProvider.notifier)
+                                .setExcludeCreated(!filter.excludeCreated);
                           }
                         },
                         itemBuilder: (BuildContext context) =>
@@ -123,6 +127,14 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
                                 checked: filter.excludeExpired,
                                 child: const Text('Nascondi eventi scaduti'),
                               ),
+                              if (isPartner) ...[
+                                const PopupMenuDivider(),
+                                CheckedPopupMenuItem<String>(
+                                  value: 'excludeCreated',
+                                  checked: false,
+                                  child: const Text('Nascondi eventi creati'),
+                                ),
+                              ],
                             ],
                       ),
                     ],
