@@ -112,7 +112,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           context,
                         ),
                         sliver: SliverAppBar(
-                          expandedHeight: 340.0,
+                          expandedHeight: 240.0,
                           floating: false,
                           pinned: true,
                           backgroundColor: colorScheme.primary,
@@ -146,61 +146,85 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(24.0),
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      CircleAvatar(
-                                        radius: 40,
-                                        backgroundColor: Colors.white,
-                                        child: CircleAvatar(
-                                          radius: 38,
-                                          backgroundColor:
-                                              colorScheme.primaryContainer,
-                                          child: Text(
-                                            avatarLetter,
-                                            style: TextStyle(
-                                              fontSize: 32,
-                                              color: colorScheme.primary,
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 40,
+                                            backgroundColor: Colors.white,
+                                            child: CircleAvatar(
+                                              radius: 38,
+                                              backgroundColor:
+                                                  colorScheme.primaryContainer,
+                                              child: Text(
+                                                avatarLetter,
+                                                style: TextStyle(
+                                                  fontSize: 32,
+                                                  color: colorScheme.primary,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        displayName,
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Text(
-                                        email,
-                                        style: TextStyle(
-                                          color: Colors.white.withAlpha(230),
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withAlpha(51),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
+                                          const SizedBox(width: 24),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  displayName,
+                                                  style: const TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Text(
+                                                  email,
+                                                  style: TextStyle(
+                                                    color: Colors.white
+                                                        .withAlpha(230),
+                                                    fontSize: 14,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 4,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white
+                                                        .withAlpha(51),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: Colors.white
+                                                          .withAlpha(77),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    roleLabel(role),
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          border: Border.all(
-                                            color: Colors.white.withAlpha(77),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          roleLabel(role),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                        ],
                                       ),
                                       const SizedBox(height: 20),
                                       Row(
