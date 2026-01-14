@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/feed/providers/comment_provider.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
@@ -283,8 +284,13 @@ class ProfilePage extends ConsumerWidget {
                                 itemCount: events.length,
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(height: 16),
-                                itemBuilder: (context, index) =>
-                                    EventCard(event: events[index]),
+                                itemBuilder: (context, index) => UiCard(
+                                  child: EventCard(event: events[index]),
+                                  onTap: () => context.push(
+                                    '/event-info',
+                                    extra: events[index],
+                                  ),
+                                ),
                               ),
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
