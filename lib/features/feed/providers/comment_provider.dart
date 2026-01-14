@@ -63,6 +63,7 @@ class Comments extends _$Comments {
     );
 
     ref.invalidateSelf();
+    ref.invalidate(commentsByUserIdProvider);
   }
 
   Future<void> deleteComment(int commentId) async {
@@ -71,6 +72,7 @@ class Comments extends _$Comments {
 
     await _commentService.deleteComment(token: token, commentId: commentId);
     ref.invalidateSelf();
+    ref.invalidate(commentsByUserIdProvider);
   }
 
   Future<void> voteComment(int commentId, bool hasVoted) async {
@@ -102,6 +104,7 @@ class Comments extends _$Comments {
         commentId: commentId,
         hasVoted: hasVoted,
       );
+      ref.invalidate(commentsByUserIdProvider(authState.user!.id));
     } catch (e) {
       state = previousState;
     }

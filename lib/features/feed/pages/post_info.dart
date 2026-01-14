@@ -12,7 +12,6 @@ import '../../../core/utils/feedback_utils.dart';
 import '../providers/comment_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/comment_card.dart';
-import '../widgets/report_dialog.dart';
 
 class PostInfoPage extends ConsumerStatefulWidget {
   final PostModel post;
@@ -313,12 +312,6 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                                 return CommentCard(
                                   comment: comment,
                                   postId: post.id!,
-                                  onReply: () {
-                                    // Logica risposta
-                                  },
-                                  onReport: () {
-                                    showReportDialog(context, item: comment);
-                                  },
                                 );
                               },
                             );

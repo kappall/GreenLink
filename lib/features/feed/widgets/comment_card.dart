@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/feed/widgets/report_dialog.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/card.dart';
@@ -11,16 +12,7 @@ import '../providers/comment_provider.dart';
 class CommentCard extends ConsumerWidget {
   final CommentModel comment;
   final int postId;
-  final VoidCallback? onReply;
-  final VoidCallback? onReport;
-
-  const CommentCard({
-    super.key,
-    required this.comment,
-    required this.postId,
-    this.onReply,
-    this.onReport,
-  });
+  const CommentCard({super.key, required this.comment, required this.postId});
 
   Future<void> _confirmDeleteComment(
     BuildContext context,
@@ -158,7 +150,7 @@ class CommentCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                      
+
                     const Spacer(),
                     if (isAuthor || isAdmin)
                       IconButton(
@@ -170,7 +162,7 @@ class CommentCard extends ConsumerWidget {
                         onPressed: () => _confirmDeleteComment(context, ref),
                       ),
                     IconButton(
-                      onPressed: onReport,
+                      onPressed: () => showReportDialog(context, item: comment),
                       icon: Icon(
                         Icons.flag_outlined,
                         size: 18,
