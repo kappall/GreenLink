@@ -39,7 +39,7 @@ class PostFeed extends ConsumerWidget {
         child: Center(child: CircularProgressIndicator()),
       ),
       error: (error, stackTrace) => SliverFillRemaining(
-        child: Center(child: Text("Errore nel caricamento: $error")),
+        child: Center(child: Text("Errore nel caricamento")),
       ),
     );
   }

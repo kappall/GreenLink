@@ -46,7 +46,7 @@ Future<List<PostModel>> mapPosts(Ref ref) async {
   final userLocationAsync = ref.watch(userLocationProvider);
 
   return userLocationAsync.when(
-    data: (userLocation) {
+    data: (userLocation) async {
       if (userLocation == null) {
         return [];
       }
@@ -54,12 +54,12 @@ Future<List<PostModel>> mapPosts(Ref ref) async {
       final authState = ref.watch(authProvider);
       final token = authState.asData?.value.token;
 
-      return service.fetchPostsByDistance(
+      return (await service.fetchPostsByDistance(
         token: token,
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         limit: 30,
-      );
+      )).items;
     },
     loading: () => [],
     error: (err, stack) {
@@ -74,7 +74,7 @@ Future<List<EventModel>> mapEvents(Ref ref) async {
   final userLocationAsync = ref.watch(userLocationProvider);
 
   return userLocationAsync.when(
-    data: (userLocation) {
+    data: (userLocation) async {
       if (userLocation == null) {
         return [];
       }
@@ -82,12 +82,12 @@ Future<List<EventModel>> mapEvents(Ref ref) async {
       final authState = ref.watch(authProvider);
       final token = authState.asData?.value.token;
 
-      return service.fetchEventsByDistance(
+      return (await service.fetchEventsByDistance(
         token: token,
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         limit: 30,
-      );
+      )).items;
     },
     loading: () => [],
     error: (err, stack) {

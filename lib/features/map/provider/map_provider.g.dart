@@ -99,7 +99,7 @@ final class MapPostsProvider
   }
 }
 
-String _$mapPostsHash() => r'6b8c9637d012e540b49a34c940ff3d326787833e';
+String _$mapPostsHash() => r'431985a740ec91b073d250982ccfd7b8c529e2f2';
 
 @ProviderFor(mapEvents)
 const mapEventsProvider = MapEventsProvider._();
@@ -138,7 +138,7 @@ final class MapEventsProvider
   }
 }
 
-String _$mapEventsHash() => r'a609dc0ae79ada562dd83562d992c9094609a4e1';
+String _$mapEventsHash() => r'b090d05a27ec9c2d0397fbfa5fed683cc54f8bfb';
 
 @ProviderFor(filteredMapPosts)
 const filteredMapPostsProvider = FilteredMapPostsProvider._();

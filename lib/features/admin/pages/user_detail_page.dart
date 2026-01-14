@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/features/admin/services/admin_service.dart';
 import 'package:greenlinkapp/features/admin/widgets/admin_comment_card.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
@@ -23,7 +22,7 @@ class UserDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final userPostsPage = ref.watch(postsProvider(user.id));
-    final userEvents = ref.watch(eventsByUserIdProvider(user.id));
+    final userEvents = ref.watch(eventsByUserProvider(user.id));
     final userComments = ref.watch(commentsByUserIdProvider(user.id));
 
     return Scaffold(
@@ -60,7 +59,7 @@ class UserDetailPage extends ConsumerWidget {
             _buildStatsGrid(
               user,
               userPostsPage.asData?.value.items.length ?? 0,
-              userEvents.asData?.value.length ?? 0,
+              userEvents.asData?.value.items.length ?? 0,
               userComments.asData?.value.length ?? 0,
             ),
             const SizedBox(height: 20),
@@ -97,7 +96,8 @@ class UserDetailPage extends ConsumerWidget {
               const SizedBox(height: 12),
               userEvents.when(
                 //TODO: partner events
-                data: (events) {
+                data: (page) {
+                  final events = page.items;
                   if (events.isEmpty) {
                     return const Text("Nessun evento creato.");
                   }
@@ -124,7 +124,8 @@ class UserDetailPage extends ConsumerWidget {
               const SizedBox(height: 12),
               userEvents.when(
                 //TODO: partner events
-                data: (events) {
+                data: (page) {
+                  final events = page.items;
                   if (events.isEmpty) {
                     return const Text("Nessun evento creato.");
                   }

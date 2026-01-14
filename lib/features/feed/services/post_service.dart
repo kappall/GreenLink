@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
@@ -11,13 +12,13 @@ class PostService {
   static final PostService instance = PostService._();
 
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
-  final Map<String, List<PostModel>> _cache = {};
+  final Map<String, PaginatedResult<PostModel>> _cache = {};
 
   void _clearCache() {
     _cache.clear();
   }
 
-  Future<List<PostModel>> fetchAllPosts({
+  Future<PaginatedResult<PostModel>> fetchAllPosts({
     required String? token,
     required int? userId,
     int? skip,
@@ -36,7 +37,7 @@ class PostService {
     return _requestPosts(uri: uri, token: token);
   }
 
-  Future<List<PostModel>> fetchPostsByDistance({
+  Future<PaginatedResult<PostModel>> fetchPostsByDistance({
     required String? token,
     required double latitude,
     required double longitude,
@@ -56,7 +57,7 @@ class PostService {
     return _requestPosts(uri: uri, token: token);
   }
 
-  Future<List<PostModel>> fetchUserPosts({
+  Future<PaginatedResult<PostModel>> fetchUserPosts({
     required String token,
     required int userId,
   }) async {
@@ -89,7 +90,7 @@ class PostService {
     return post;
   }
 
-  Future<List<PostModel>> _requestPosts({
+  Future<PaginatedResult<PostModel>> _requestPosts({
     required Uri uri,
     required String? token,
   }) async {
@@ -109,6 +110,8 @@ class PostService {
       throw Exception('Errore durante il recupero dei post: $message');
     }
 
+    final totalItems = int.tryParse(response.headers['total-items'] ?? '') ?? 0;
+
     final decoded = jsonDecode(response.body);
     final dynamic rawList = switch (decoded) {
       final Map<String, dynamic> map => map['posts'] ?? map['data'] ?? map,
@@ -122,8 +125,10 @@ class PostService {
         .whereType<Map<String, dynamic>>()
         .map(PostModel.fromJson)
         .toList();
-    _cache[cacheKey] = posts;
-    return posts;
+
+    final result = PaginatedResult(items: posts, totalItems: totalItems);
+    _cache[cacheKey] = result;
+    return result;
   }
 
   Future<int> createPost({

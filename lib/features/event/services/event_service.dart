@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
@@ -10,13 +11,13 @@ class EventService {
   static final EventService instance = EventService._();
 
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
-  final Map<String, List<EventModel>> _cache = {};
+  final Map<String, PaginatedResult<EventModel>> _cache = {};
 
   void _clearCache() {
     _cache.clear();
   }
 
-  Future<List<EventModel>> fetchAllEvents({
+  Future<PaginatedResult<EventModel>> fetchAllEvents({
     required String? token,
     int? skip,
     int? limit,
@@ -31,7 +32,7 @@ class EventService {
     return _requestEvents(uri: uri, token: token);
   }
 
-  Future<List<EventModel>> fetchEventsByDistance({
+  Future<PaginatedResult<EventModel>> fetchEventsByDistance({
     required String? token,
     required double latitude,
     required double longitude,
@@ -51,23 +52,33 @@ class EventService {
     return _requestEvents(uri: uri, token: token);
   }
 
-  Future<List<EventModel>> fetchEventsByUserId({
+  Future<PaginatedResult<EventModel>> fetchEventsByUserId({
     required String? token,
     required int userId,
+    int? skip,
+    int? limit,
   }) {
-    final uri = Uri.parse(
-      '$_baseUrl/events',
-    ).replace(queryParameters: {'user': userId.toString()});
+    final uri = Uri.parse('$_baseUrl/events').replace(
+      queryParameters: {
+        'user': userId.toString(),
+        'skip': skip?.toString() ?? '0',
+        'limit': limit?.toString() ?? '20',
+      },
+    );
     return _requestEvents(uri: uri, token: token);
   }
 
-  Future<List<EventModel>> fetchEvents({
+  Future<PaginatedResult<EventModel>> fetchEvents({
     required String token,
     int? partnerId,
+    int? skip,
+    int? limit,
   }) async {
     final uri = Uri.parse('$_baseUrl/events').replace(
       queryParameters: {
         if (partnerId != null && partnerId > 0) 'partner': partnerId.toString(),
+        'skip': skip?.toString() ?? '0',
+        'limit': limit?.toString() ?? '20',
       },
     );
 
@@ -121,7 +132,7 @@ class EventService {
     }
   }
 
-  Future<List<EventModel>> _requestEvents({
+  Future<PaginatedResult<EventModel>> _requestEvents({
     required Uri uri,
     required String? token,
   }) async {
@@ -148,6 +159,9 @@ class EventService {
         );
       }
 
+      final totalItems =
+          int.tryParse(response.headers['total-items'] ?? '') ?? 0;
+
       final decoded = jsonDecode(response.body);
       final dynamic rawList = switch (decoded) {
         final Map<String, dynamic> map => map['events'] ?? map['data'] ?? map,
@@ -163,8 +177,11 @@ class EventService {
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
           .toList();
-      _cache[cacheKey] = events;
-      return events;
+
+      final result = PaginatedResult(items: events, totalItems: totalItems);
+
+      _cache[cacheKey] = result;
+      return result;
     } catch (e) {
       if (e is Exception) rethrow;
       FeedbackUtils.logError("Connection error on $uri: $e");

@@ -308,17 +308,16 @@ class Posts extends _$Posts {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    final posts = await _postService.fetchAllPosts(
+    final paginatedResult = await _postService.fetchAllPosts(
       token: token,
       userId: this.userId,
       skip: (page - 1) * _pageSize,
       limit: _pageSize,
     );
 
-    return PaginatedResult<PostModel>(
-      items: posts,
+    return paginatedResult.copyWith(
       page: page,
-      hasMore: posts.length == _pageSize,
+      hasMore: paginatedResult.items.length < paginatedResult.totalItems,
     );
   }
 
@@ -333,7 +332,7 @@ class Posts extends _$Posts {
 
       state = AsyncValue.data(
         state.value!.copyWith(
-          items: currentPosts,
+          items: [...currentPosts, ...newPage.items],
           page: nextPage,
           hasMore: newPage.hasMore,
         ),
@@ -462,7 +461,7 @@ class PostsByDistance extends _$PostsByDistance {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    final posts = await _postService.fetchPostsByDistance(
+    final paginatedResult = await _postService.fetchPostsByDistance(
       token: token,
       latitude: lat,
       longitude: lng,
@@ -470,10 +469,9 @@ class PostsByDistance extends _$PostsByDistance {
       limit: _pageSize,
     );
 
-    return PaginatedResult<PostModel>(
-      items: posts,
+    return paginatedResult.copyWith(
       page: page,
-      hasMore: posts.length == _pageSize,
+      hasMore: paginatedResult.items.length == _pageSize,
     );
   }
 

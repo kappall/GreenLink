@@ -79,9 +79,6 @@ final eventSortCriteriaProvider =
 class EventsSearchQueryNotifier extends Notifier<String> {
   @override
   String build() => '';
-
-  @override
-  set state(String value) => super.state = value;
 }
 
 final eventsSearchQueryProvider =
@@ -104,16 +101,15 @@ class Events extends _$Events {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    final events = await _eventService.fetchAllEvents(
+    final paginatedResult = await _eventService.fetchAllEvents(
       token: token,
       skip: (page - 1) * _pageSize,
       limit: _pageSize,
     );
 
-    return PaginatedResult<EventModel>(
-      items: events,
+    return paginatedResult.copyWith(
       page: page,
-      hasMore: events.length == _pageSize,
+      hasMore: paginatedResult.items.length == _pageSize,
     );
   }
 
@@ -189,37 +185,128 @@ class Events extends _$Events {
   }
 }
 
-final eventsByUserIdProvider = FutureProvider.family<List<EventModel>, int>((
+@Riverpod(keepAlive: true)
+class EventsByUser extends _$EventsByUser {
+  final _eventService = EventService.instance;
+  static const _pageSize = 20;
+  bool _isLoadingMore = false;
+
+  @override
+  FutureOr<PaginatedResult<EventModel>> build(int userId) async {
+    return _fetchPage(1, userId);
+  }
+
+  Future<PaginatedResult<EventModel>> _fetchPage(int page, int userId) async {
+    try {
+      final token = ref.watch(authProvider).asData?.value.token;
+
+      final paginatedResult = await _eventService.fetchEventsByUserId(
+        token: token,
+        userId: userId,
+        skip: (page - 1) * _pageSize,
+        limit: _pageSize,
+      );
+
+      return paginatedResult.copyWith(
+        page: page,
+        hasMore: paginatedResult.items.length == _pageSize,
+      );
+    } catch (e, st) {
+      FeedbackUtils.logError(e);
+      rethrow;
+    }
+  }
+
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (_isLoadingMore || current == null || !current.hasMore) return;
+
+    _isLoadingMore = true;
+    try {
+      final nextPage = current.page + 1;
+      final next = await _fetchPage(nextPage, userId);
+
+      state = AsyncValue.data(
+        current.copyWith(
+          items: [...current.items, ...next.items].toSet().toList(),
+          page: nextPage,
+          hasMore: next.hasMore,
+        ),
+      );
+    } finally {
+      _isLoadingMore = false;
+    }
+  }
+}
+
+@Riverpod(keepAlive: true)
+class EventsByPartner extends _$EventsByPartner {
+  final _eventService = EventService.instance;
+  static const _pageSize = 20;
+  bool _isLoadingMore = false;
+
+  @override
+  FutureOr<PaginatedResult<EventModel>> build(int partnerId) async {
+    return _fetchPage(1, partnerId);
+  }
+
+  Future<PaginatedResult<EventModel>> _fetchPage(
+    int page,
+    int partnerId,
+  ) async {
+    try {
+      final token = ref.watch(authProvider).asData?.value.token;
+
+      final paginatedResult = await _eventService.fetchEvents(
+        token: token!,
+        partnerId: partnerId,
+        skip: (page - 1) * _pageSize,
+        limit: _pageSize,
+      );
+
+      return paginatedResult.copyWith(
+        page: page,
+        hasMore: paginatedResult.items.length == _pageSize,
+      );
+    } catch (e, st) {
+      FeedbackUtils.logError(e);
+      throw e;
+    }
+  }
+
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (_isLoadingMore || current == null || !current.hasMore) return;
+
+    _isLoadingMore = true;
+    try {
+      final nextPage = current.page + 1;
+      final next = await _fetchPage(nextPage, partnerId);
+
+      state = AsyncValue.data(
+        current.copyWith(
+          items: [...current.items, ...next.items].toSet().toList(),
+          page: nextPage,
+          hasMore: next.hasMore,
+        ),
+      );
+    } finally {
+      _isLoadingMore = false;
+    }
+  }
+}
+
+final eventParticipantsProvider = FutureProvider.family<List<UserModel>, int>((
   ref,
-  userId,
+  eventId,
 ) async {
   final authState = ref.watch(authProvider);
   final token = authState.asData?.value.token;
-  return EventService.instance.fetchEventsByUserId(
+  return EventService.instance.fetchEventParticipants(
     token: token,
-    userId: userId,
+    eventId: eventId,
   );
 });
-
-final eventsByPartnerIdProvider = FutureProvider.family<List<EventModel>, int>((
-  ref,
-  partnerId,
-) async {
-  final authState = ref.watch(authProvider);
-  final token = authState.asData?.value.token ?? '';
-  return EventService.instance.fetchEvents(token: token, partnerId: partnerId);
-});
-
-final eventParticipantsProvider = FutureProvider.family<List<UserModel>, int>(
-  (ref, eventId) async {
-    final authState = ref.watch(authProvider);
-    final token = authState.asData?.value.token;
-    return EventService.instance.fetchEventParticipants(
-      token: token,
-      eventId: eventId,
-    );
-  },
-);
 
 @Riverpod(keepAlive: true)
 class EventsByDistance extends _$EventsByDistance {
@@ -251,7 +338,7 @@ class EventsByDistance extends _$EventsByDistance {
     final authState = ref.watch(authProvider);
     final token = authState.asData?.value.token;
 
-    final events = await _eventService.fetchEventsByDistance(
+    final paginatedResult = await _eventService.fetchEventsByDistance(
       token: token,
       latitude: lat,
       longitude: lng,
@@ -259,10 +346,9 @@ class EventsByDistance extends _$EventsByDistance {
       limit: _pageSize,
     );
 
-    return PaginatedResult<EventModel>(
-      items: events,
+    return paginatedResult.copyWith(
       page: page,
-      hasMore: events.length == _pageSize,
+      hasMore: paginatedResult.items.length == _pageSize,
     );
   }
 
