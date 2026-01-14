@@ -7,6 +7,7 @@ import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/services/event_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/utils/feedback_utils.dart';
 import '../../location/providers/location_provider.dart';
 
 part 'event_provider.g.dart';
@@ -81,9 +82,6 @@ class Events extends _$Events {
 
   @override
   FutureOr<PaginatedResult<EventModel>> build(int? partnerId) async {
-    ref.onDispose(() {
-      _eventService.clearCache();
-    });
     return _fetchPage(1);
   }
 
@@ -155,40 +153,23 @@ class Events extends _$Events {
       endDate: endDate,
     );
     ref.invalidate(eventsProvider);
+    ref.invalidate(eventsByDistanceProvider);
   }
 
   Future<void> participate({required int eventId}) async {
     final authState = ref.read(authProvider).value;
     if (authState == null || authState.token == null) return;
 
-    final previousEvents = state.value?.items ?? [];
-
-    final newEvents = previousEvents.map((event) {
-      if (event.id == eventId) {
-        return event.copyWith(
-          isParticipating: true,
-          participantsCount: event.participantsCount + 1,
-        );
-      }
-      return event;
-    }).toList();
-
-    ref.read(eventsProvider(null).notifier).state = AsyncValue.data(
-      state.value!.copyWith(items: newEvents),
-    );
-
     try {
       await _eventService.participate(
         token: authState.token!,
         eventId: eventId,
       );
-      _eventService.clearCache();
       ref.invalidate(eventsProvider);
       ref.invalidate(eventsByDistanceProvider);
     } catch (e) {
-      ref.read(eventsProvider(null).notifier).state = AsyncValue.data(
-        state.value!.copyWith(items: previousEvents),
-      );
+      FeedbackUtils.logError("Exception in participate: $e");
+      rethrow;
     }
   }
 }
@@ -213,9 +194,6 @@ class EventsByDistance extends _$EventsByDistance {
 
   @override
   FutureOr<PaginatedResult<EventModel>> build() async {
-    ref.onDispose(() {
-      _eventService.clearCache();
-    });
     final userLocationAsync = ref.watch(userLocationProvider);
 
     return userLocationAsync.when(

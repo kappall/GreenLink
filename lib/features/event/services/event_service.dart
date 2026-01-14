@@ -11,7 +11,7 @@ class EventService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
   final Map<String, List<EventModel>> _cache = {};
 
-  void clearCache() {
+  void _clearCache() {
     _cache.clear();
   }
 
@@ -175,7 +175,7 @@ class EventService {
         FeedbackUtils.logError("Invalid event response: ${response.body}");
         throw Exception('Errore nella risposta del server.');
       }
-      clearCache();
+      _clearCache();
       return EventModel.fromJson(rawEvent);
     } catch (e) {
       if (e is Exception) rethrow;
@@ -209,7 +209,7 @@ class EventService {
           'Non è stato possibile registrarti all\'evento. Riprova tra poco.',
         );
       }
-      clearCache();
+      _clearCache();
     } catch (e) {
       FeedbackUtils.logError("Exception in participate: $e");
       throw Exception('Errore durante l\'iscrizione all\'evento.');
