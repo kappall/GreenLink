@@ -19,7 +19,7 @@ class EventTicketService {
 
   Future<String> participate({required String eventId}) async {
     final safeEventId = Uri.encodeComponent(eventId);
-    final uri = Uri.parse('$_baseUrl/event/$safeEventId/participate');
+    final uri = Uri.parse('$_baseUrl/event/$safeEventId/participation');
 
     try {
       final response = await http.post(uri, headers: _headers());

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
+import 'package:greenlinkapp/features/event/services/event_ticket_service.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/common/widgets/badge.dart';
 import '../../../core/providers/geocoding_provider.dart';
@@ -23,6 +24,7 @@ class EventInfoPage extends ConsumerStatefulWidget {
 
 class _EventInfoPageState extends ConsumerState<EventInfoPage> {
   bool _isDeleting = false;
+  bool? _isParticipatingOverride;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,10 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
       : const AsyncData<List<UserModel>>([]);
 
     final bool isExpired = event.startDate.isBefore(DateTime.now());
+    final bool isActionDisabled = isExpired || isAuthor;
+    final bool isParticipating =
+        _isParticipatingOverride ?? event.isParticipating;
+    final bool showQrAction = isParticipating && !isActionDisabled;
 
     return Scaffold(
       appBar: AppBar(
@@ -189,34 +195,50 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
           ),
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor:
-                      (event.isParticipating || isExpired || isAuthor)
-                      ? Colors.grey[400]
-                      : Theme.of(context).colorScheme.primary,
-                ),
-                onPressed: (event.isParticipating || isExpired || isAuthor)
-                    ? null
-                    : () => _participateEvent(context, ref),
-                child: Text(
-                  isExpired
-                      ? "EVENTO SCADUTO"
-                      : isAuthor
-                      ? "HAI CREATO QUESTO EVENTO"
-                      : event.isParticipating
-                      ? "SEI ISCRITTO"
-                      : "PARTECIPA ALL'EVENTO",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: isActionDisabled
+                          ? Colors.grey[400]
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                    onPressed: isActionDisabled
+                        ? null
+                        : (isParticipating
+                            ? () => _requestQrCode(context, ref)
+                            : () => _participateEvent(context, ref)),
+                    child: Text(
+                      isExpired
+                          ? "EVENTO SCADUTO"
+                          : isAuthor
+                          ? "HAI CREATO QUESTO EVENTO"
+                          : isParticipating
+                          ? "OTTIENI QR CODE"
+                          : "PARTECIPA ALL'EVENTO",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                if (showQrAction) ...[
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => _leaveEvent(context, ref),
+                      child: const Text("DISISCRIVITI"),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],
@@ -226,14 +248,92 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
 
   Future<void> _participateEvent(BuildContext context, WidgetRef ref) async {
     try {
-      await ref
+      final eventId = widget.event.id;
+      if (eventId == null) {
+        FeedbackUtils.showError(context, 'Evento non valido.');
+        return;
+      }
+      final ticket = await ref
           .read(eventsProvider(null).notifier)
-          .participate(eventId: widget.event.id!);
-      context.pop();
+          .participate(eventId: eventId);
+      if (!mounted) return;
+      setState(() => _isParticipatingOverride = true);
+      FeedbackUtils.logInfo('Ticket: $ticket');
+      await _showQrCode(context, ticket);
+      if (!mounted) return;
       FeedbackUtils.showSuccess(context, "Partecipi all'evento");
     } catch (e) {
       FeedbackUtils.showError(context, e);
     }
+  }
+
+  Future<void> _requestQrCode(BuildContext context, WidgetRef ref) async {
+    try {
+      final eventId = widget.event.id;
+      if (eventId == null) {
+        FeedbackUtils.showError(context, 'Evento non valido.');
+        return;
+      }
+      final ticket = await ref
+          .read(eventTicketServiceProvider)
+          .participate(eventId: eventId.toString());
+      FeedbackUtils.logInfo('Ticket: $ticket');
+      await _showQrCode(context, ticket);
+    } catch (e) {
+      FeedbackUtils.showError(context, e);
+    }
+  }
+
+  Future<void> _leaveEvent(BuildContext context, WidgetRef ref) async {
+    try {
+      final eventId = widget.event.id;
+      if (eventId == null) {
+        FeedbackUtils.showError(context, 'Evento non valido.');
+        return;
+      }
+      await ref
+          .read(eventsProvider(null).notifier)
+          .cancelParticipation(eventId: eventId);
+      if (!mounted) return;
+      setState(() => _isParticipatingOverride = false);
+      FeedbackUtils.showSuccess(context, "Hai annullato la partecipazione");
+    } catch (e) {
+      FeedbackUtils.showError(context, e);
+    }
+  }
+
+  Future<void> _showQrCode(BuildContext context, String ticket) async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('QR code evento'),
+        content: SizedBox(
+          width: 260,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              QrImageView(
+                data: ticket,
+                size: 220,
+                backgroundColor: Colors.white,
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Mostra questo QR al partner per la validazione.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Chiudi'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _confirmDelete(BuildContext context) async {

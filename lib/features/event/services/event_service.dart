@@ -251,7 +251,7 @@ class EventService {
     }
   }
 
-  Future<void> participate({
+  Future<String> participate({
     required String token,
     required int eventId,
   }) async {
@@ -274,10 +274,73 @@ class EventService {
           'Non è stato possibile registrarti all\'evento. Riprova tra poco.',
         );
       }
+      final ticket = _extractTicket(response.body);
+      if (ticket.isEmpty) {
+        FeedbackUtils.logError(
+          'Ticket mancante nella risposta: ${response.body}',
+        );
+        throw Exception('Ticket non valido nella risposta del server.');
+      }
       _clearCache();
+      return ticket;
     } catch (e) {
       FeedbackUtils.logError("Exception in participate: $e");
       throw Exception('Errore durante l\'iscrizione all\'evento.');
+    }
+  }
+
+  Future<void> cancelParticipation({
+    required String token,
+    required int eventId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/event/$eventId/participation');
+    try {
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final message = _errorMessage(response);
+        FeedbackUtils.logError(
+          "Cancel participation failed for event $eventId: $message",
+        );
+        throw Exception(
+          'Non è stato possibile annullare la partecipazione. Riprova tra poco.',
+        );
+      }
+      _clearCache();
+    } catch (e) {
+      FeedbackUtils.logError("Exception in cancelParticipation: $e");
+      throw Exception('Errore durante la disiscrizione dall\'evento.');
+    }
+  }
+
+  String _extractTicket(String body) {
+    final decoded = _tryDecode(body);
+
+    if (decoded is String) {
+      return decoded.trim();
+    }
+
+    if (decoded is Map) {
+      final value = decoded['ticket'] ?? decoded['data'] ?? decoded['code'];
+      if (value != null) {
+        return value.toString().trim();
+      }
+    }
+
+    return body.trim();
+  }
+
+  dynamic _tryDecode(String body) {
+    try {
+      return jsonDecode(body);
+    } catch (_) {
+      return body;
     }
   }
 

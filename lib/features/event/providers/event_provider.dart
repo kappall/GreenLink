@@ -167,19 +167,41 @@ class Events extends _$Events {
     ref.invalidate(eventsByDistanceProvider);
   }
 
-  Future<void> participate({required int eventId}) async {
+  Future<String> participate({required int eventId}) async {
     final authState = ref.read(authProvider).value;
-    if (authState == null || authState.token == null) return;
+    if (authState == null || authState.token == null) {
+      throw Exception('Utente non autenticato');
+    }
 
     try {
-      await _eventService.participate(
+      final ticket = await _eventService.participate(
+        token: authState.token!,
+        eventId: eventId,
+      );
+      ref.invalidate(eventsProvider);
+      ref.invalidate(eventsByDistanceProvider);
+      return ticket;
+    } catch (e) {
+      FeedbackUtils.logError("Exception in participate: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> cancelParticipation({required int eventId}) async {
+    final authState = ref.read(authProvider).value;
+    if (authState == null || authState.token == null) {
+      throw Exception('Utente non autenticato');
+    }
+
+    try {
+      await _eventService.cancelParticipation(
         token: authState.token!,
         eventId: eventId,
       );
       ref.invalidate(eventsProvider);
       ref.invalidate(eventsByDistanceProvider);
     } catch (e) {
-      FeedbackUtils.logError("Exception in participate: $e");
+      FeedbackUtils.logError("Exception in cancelParticipation: $e");
       rethrow;
     }
   }
