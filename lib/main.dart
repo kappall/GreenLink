@@ -4,13 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/providers/theme_provider.dart';
 import 'package:greenlinkapp/core/services/socket_service.dart';
 import 'package:greenlinkapp/router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/utils/provider_observer.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await initializeDateFormatting('it_IT', null);
 
   runApp(
     ProviderScope(observers: [AppProviderObserver()], child: const MyApp()),

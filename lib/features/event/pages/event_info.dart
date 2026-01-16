@@ -1,21 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
-import 'package:greenlinkapp/features/event/services/event_ticket_service.dart';
+import 'package:greenlinkapp/features/event/services/pdf_service.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
-import 'package:greenlinkapp/features/user/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/common/widgets/badge.dart';
 import '../../../core/providers/geocoding_provider.dart';
 import '../../../core/utils/feedback_utils.dart';
-import '../../auth/providers/auth_provider.dart';
 
 class EventInfoPage extends ConsumerStatefulWidget {
   final EventModel event;
-
   const EventInfoPage({super.key, required this.event});
 
   @override
@@ -29,24 +29,22 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
   @override
   Widget build(BuildContext context) {
     final event = widget.event;
-    final startDate = DateFormat('dd MMM yyyy, HH:mm').format(event.startDate);
-    final endDate = DateFormat('dd MMM yyyy, HH:mm').format(event.endDate);
+    final auth = ref.watch(authProvider).value;
+    final isAdmin = auth?.isAdmin ?? false;
+    final isAuthor = auth?.user?.id == event.author.id;
+
+    final participantsAsync = ref.watch(eventParticipantsProvider(event.id!));
+
+    final startDate = DateFormat.yMMMd().add_jm().format(event.startDate);
+    final endDate = DateFormat.yMMMd().add_jm().format(event.endDate);
 
     final geoKey = (lat: event.latitude, lng: event.longitude);
     final locationAsync = ref.watch(placeNameProvider(geoKey));
     final locationName =
         locationAsync.value ?? "${event.latitude}, ${event.longitude}";
 
-    final authState = ref.watch(authProvider);
-    final isAdmin = authState.asData?.value.isAdmin ?? false;
-    final currentUser = ref.watch(currentUserProvider).value;
-    final isAuthor = currentUser?.id == event.author.id;
-    final participantsAsync = (isAuthor && event.id != null)
-      ? ref.watch(eventParticipantsProvider(event.id!))
-      : const AsyncData<List<UserModel>>([]);
-
-    final bool isExpired = event.startDate.isBefore(DateTime.now());
-    final bool isActionDisabled = isExpired || isAuthor;
+    final isExpired = DateTime.now().isAfter(event.endDate);
+    final isActionDisabled = isExpired || isAuthor;
     final bool isParticipating =
         _isParticipatingOverride ?? event.isParticipating;
     final bool showQrAction = isParticipating && !isActionDisabled;
@@ -210,8 +208,8 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                     onPressed: isActionDisabled
                         ? null
                         : (isParticipating
-                            ? () => _requestQrCode(context, ref)
-                            : () => _participateEvent(context, ref)),
+                              ? () => _requestQrCode(context, ref)
+                              : () => _participateEvent(context, ref)),
                     child: Text(
                       isExpired
                           ? "EVENTO SCADUTO"
@@ -258,7 +256,6 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
           .participate(eventId: eventId);
       if (!mounted) return;
       setState(() => _isParticipatingOverride = true);
-      FeedbackUtils.logInfo('Ticket: $ticket');
       await _showQrCode(context, ticket);
       if (!mounted) return;
       FeedbackUtils.showSuccess(context, "Partecipi all'evento");
@@ -275,9 +272,8 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
         return;
       }
       final ticket = await ref
-          .read(eventTicketServiceProvider)
-          .participate(eventId: eventId.toString());
-      FeedbackUtils.logInfo('Ticket: $ticket');
+          .read(eventsProvider(null).notifier)
+          .participate(eventId: eventId);
       await _showQrCode(context, ticket);
     } catch (e) {
       FeedbackUtils.showError(context, e);
@@ -328,6 +324,29 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
         ),
         actions: [
           TextButton(
+            onPressed: () async {
+              try {
+                final auth = ref.watch(authProvider).value;
+                final pdfService = ref.read(pdfServiceProvider);
+
+                final ticketId =
+                    "${DateTime.now().toLocal()}-${widget.event.id!}";
+
+                final File ticketFile = await pdfService.createTicket(
+                  widget.event,
+                  ticketId,
+                  ticket,
+                  auth?.user?.displayName ?? '',
+                );
+
+                await pdfService.openPdf(ticketFile);
+              } catch (e) {
+                FeedbackUtils.logError("Error creating pdf: $e");
+              }
+            },
+            child: const Text('Download'),
+          ),
+          TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Chiudi'),
           ),
@@ -376,7 +395,8 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
   }
 
   Widget _buildParticipantTile(UserModel user) {
-    final hasEmail = user.email.isNotEmpty && user.email != 'default@example.com';
+    final hasEmail =
+        user.email.isNotEmpty && user.email != 'default@example.com';
     final subtitle = hasEmail
         ? user.email
         : (user.role != null ? user.role!.name : '');
