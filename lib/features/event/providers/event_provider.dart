@@ -86,6 +86,26 @@ final eventsSearchQueryProvider =
       EventsSearchQueryNotifier.new,
     );
 
+final todaysEventsProvider = Provider<List<EventModel>>((ref) {
+  final userId = ref.watch(authProvider).asData?.value.user?.id;
+  final eventsAsync = ref.watch(eventsByUserProvider(userId!));
+  return eventsAsync.when(
+    data: (events) {
+      final now = DateTime.now();
+      return events.items
+          .where(
+            (event) =>
+                event.startDate.year == now.year &&
+                event.startDate.month == now.month &&
+                event.startDate.day == now.day,
+          )
+          .toList();
+    },
+    loading: () => [],
+    error: (_, __) => [],
+  );
+});
+
 @Riverpod(keepAlive: true)
 class Events extends _$Events {
   final _eventService = EventService.instance;
@@ -170,7 +190,7 @@ class Events extends _$Events {
   Future<String> participate({required int eventId}) async {
     final authState = ref.read(authProvider).value;
     if (authState == null || authState.token == null) {
-      throw Exception('Utente non autenticato');
+      throw Exception('User not authenticated');
     }
 
     try {
@@ -180,6 +200,7 @@ class Events extends _$Events {
       );
       ref.invalidate(eventsProvider);
       ref.invalidate(eventsByDistanceProvider);
+      ref.invalidate(eventsByUserProvider(authState.user!.id));
       return ticket;
     } catch (e) {
       FeedbackUtils.logError("Exception in participate: $e");
@@ -190,7 +211,7 @@ class Events extends _$Events {
   Future<void> cancelParticipation({required int eventId}) async {
     final authState = ref.read(authProvider).value;
     if (authState == null || authState.token == null) {
-      throw Exception('Utente non autenticato');
+      throw Exception('User not authenticated');
     }
 
     try {
@@ -200,6 +221,7 @@ class Events extends _$Events {
       );
       ref.invalidate(eventsProvider);
       ref.invalidate(eventsByDistanceProvider);
+      ref.invalidate(eventsByUserProvider(authState.user!.id));
     } catch (e) {
       FeedbackUtils.logError("Exception in cancelParticipation: $e");
       rethrow;
