@@ -9,6 +9,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 const _socketBaseUrl = 'https://greenlink.tommasodeste.it';
 
 final socketServiceProvider = Provider<SocketService>((ref) {
+  FeedbackUtils.logInfo('socketServiceProvider created');
   final socket = IO.io(_socketBaseUrl, <String, dynamic>{
     'transports': ['websocket'],
     'autoConnect': false,
@@ -18,10 +19,16 @@ final socketServiceProvider = Provider<SocketService>((ref) {
   });
 
   final service = SocketService(socket);
-  ref.onDispose(service.dispose);
+  ref.onDispose(() {
+    FeedbackUtils.logInfo('Disposing SocketService');
+    service.dispose();
+  });
 
   ref.listen(authProvider, (_, next) {
     final isAuthenticated = next.asData?.value.isAuthenticated ?? false;
+    FeedbackUtils.logInfo(
+      'authProvider changed: isAuthenticated: $isAuthenticated',
+    );
     if (isAuthenticated) {
       service.connect();
     } else {
@@ -33,6 +40,7 @@ final socketServiceProvider = Provider<SocketService>((ref) {
     if (next.value == null) {
       return;
     }
+    FeedbackUtils.logInfo('userLocationProvider changed: ${next.value}');
     service.updateLocation(next.value!.latitude, next.value!.longitude);
   }, fireImmediately: true);
 
@@ -57,6 +65,7 @@ class SocketService {
   double? _lastLng;
 
   SocketService(this._socket) {
+    FeedbackUtils.logInfo('SocketService constructor');
     _registerHandlers();
   }
 
@@ -64,6 +73,7 @@ class SocketService {
       _notificationsController.stream;
 
   void connect() {
+    FeedbackUtils.logInfo('SocketService.connect called');
     if (!_socket.connected) {
       _socket.connect();
     }
@@ -77,18 +87,22 @@ class SocketService {
     _lastLat = lat;
     _lastLng = lng;
 
+    FeedbackUtils.logInfo('SocketService.updateLocation: $lat, $lng');
+
     if (_socket.connected) {
-      _socket.emit(locationUpdateEvent, [lat, lng]);
+      _socket.emit(locationUpdateEvent, {'latitude': lat, 'longitude': lng});
     }
   }
 
   void disconnect() {
+    FeedbackUtils.logInfo('SocketService.disconnect called');
     if (_socket.connected) {
       _socket.disconnect();
     }
   }
 
   void dispose() {
+    FeedbackUtils.logInfo('SocketService.dispose called');
     _notificationsController.close();
     _socket.dispose();
   }
@@ -97,7 +111,10 @@ class SocketService {
     _socket.on('connect', (_) {
       FeedbackUtils.logInfo('Socket connesso');
       if (_lastLat != null && _lastLng != null) {
-        _socket.emit(locationUpdateEvent, [_lastLat, _lastLng]);
+        _socket.emit(locationUpdateEvent, {
+          'latitude': _lastLat,
+          'longitude': _lastLng,
+        });
       }
     });
     _socket.on('disconnect', (_) {
@@ -107,6 +124,7 @@ class SocketService {
       FeedbackUtils.logError('Errore socket: $error');
     });
     _socket.on(notificationEvent, (data) {
+      FeedbackUtils.logInfo('SocketService received notification: $data');
       final payload = _normalizePayload(data);
       _notificationsController.add(payload);
     });

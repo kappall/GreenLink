@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/pulsing_icon.dart';
 import 'package:greenlinkapp/core/services/socket_service.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
-import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
+import 'package:greenlinkapp/features/feed/models/post_model.dart';
+
+import '../../event/models/event_model.dart';
 
 class MainWrapper extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -23,7 +25,6 @@ class MainWrapper extends ConsumerWidget {
     ref.listen(notificationStreamProvider, (previous, next) {
       final notification = next.value;
       if (notification != null && context.mounted) {
-        final contentId = notification['contentId'];
         final type = notification['type'];
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -47,21 +48,27 @@ class MainWrapper extends ConsumerWidget {
                   );
 
                 try {
-                  final post = await ref
-                      .read(postsProvider(null).notifier)
-                      .fetchPostById(contentId.toString());
+                  if (type == 'Post') {
+                    final post = PostModel.fromJson(notification);
+                    if (context.mounted) {
+                      context.push('/post-info', extra: post);
+                    }
+                  } else if (type == 'Event') {
+                    final event = EventModel.fromJson(notification);
 
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-                  if (context.mounted) {
-                    context.push('/post-info', extra: post);
+                    if (context.mounted) {
+                      context.push('/event-info', extra: event);
+                    }
                   }
                 } catch (e) {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Errore: ${e.toString()}')),
                     );
+                  }
+                } finally {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   }
                 }
               },

@@ -34,6 +34,47 @@ class EventService {
     return _requestEvents(uri: uri, token: token);
   }
 
+  Future<EventModel> fetchEventById({
+    required String? token,
+    required String eventId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/event/$eventId');
+
+    final headers = {'Accept': 'application/json'};
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    try {
+      final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final message = _errorMessage(response);
+        FeedbackUtils.logError(
+          "GET $uri failed (${response.statusCode}): $message",
+        );
+        throw Exception(
+          'Non è stato possibile recuperare l\'evento. Riprova più tardi.',
+        );
+      }
+
+      final decoded = jsonDecode(response.body);
+      final dynamic rawEvent = decoded is Map<String, dynamic>
+          ? decoded['event'] ?? decoded['data'] ?? decoded
+          : decoded;
+
+      if (rawEvent is Map<String, dynamic>) {
+        return EventModel.fromJson(rawEvent);
+      }
+
+      throw Exception('Formato dei dati dell\'evento non valido.');
+    } catch (e) {
+      if (e is Exception) rethrow;
+      FeedbackUtils.logError("Connection error on $uri: $e");
+      throw Exception('Controlla la tua connessione internet e riprova.');
+    }
+  }
+
   Future<PaginatedResult<EventModel>> fetchEventsByDistance({
     required String? token,
     required double latitude,
