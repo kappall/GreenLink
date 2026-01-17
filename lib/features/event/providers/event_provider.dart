@@ -87,23 +87,32 @@ final eventsSearchQueryProvider =
     );
 
 final todaysEventsProvider = Provider<List<EventModel>>((ref) {
-  final userId = ref.watch(authProvider).asData?.value.user?.id;
-  final eventsAsync = ref.watch(eventsByUserProvider(userId!));
-  return eventsAsync.when(
-    data: (events) {
-      final now = DateTime.now();
-      return events.items
-          .where(
-            (event) =>
-                event.startDate.year == now.year &&
-                event.startDate.month == now.month &&
-                event.startDate.day == now.day,
-          )
-          .toList();
-    },
-    loading: () => [],
-    error: (_, __) => [],
-  );
+  final authState = ref.watch(authProvider).value;
+  final userId = authState?.user?.id;
+  final isPartner = authState?.isPartner ?? false;
+
+  if (userId == null) {
+    return [];
+  }
+
+  final participatingEvents =
+      ref.watch(eventsByUserProvider(userId)).asData?.value.items ?? [];
+
+  final authoredEvents = isPartner
+      ? ref.watch(eventsByPartnerProvider(userId)).asData?.value.items ?? []
+      : <EventModel>[];
+
+  final allEvents = {...participatingEvents, ...authoredEvents};
+
+  final now = DateTime.now();
+  return allEvents
+      .where(
+        (event) =>
+            event.startDate.year == now.year &&
+            event.startDate.month == now.month &&
+            event.startDate.day == now.day,
+      )
+      .toList();
 });
 
 @Riverpod(keepAlive: true)
@@ -184,7 +193,23 @@ class Events extends _$Events {
       endDate: endDate,
     );
     ref.invalidate(eventsProvider);
+    ref.invalidate(eventsByPartnerProvider);
     ref.invalidate(eventsByDistanceProvider);
+  }
+
+  Future<void> deleteEvent(int eventId) async {
+    final authState = ref.read(authProvider).asData?.value;
+    final token = authState?.token;
+
+    try {
+      await _eventService.deleteEvent(token: token!, eventId: eventId);
+      ref.invalidate(eventsProvider);
+      ref.invalidate(eventsByPartnerProvider);
+      ref.invalidate(eventsByDistanceProvider);
+    } catch (e) {
+      FeedbackUtils.logError("Exception in deleteEvent: $e");
+      rethrow;
+    }
   }
 
   Future<String> participate({required int eventId}) async {
@@ -461,7 +486,6 @@ final sortedEventsProvider =
               .where((element) => element.author.id != partnerId)
               .toList();
         }
-
         if (query.isNotEmpty) {
           filteredEvents = filteredEvents.where((event) {
             final titleMatch = event.title.toLowerCase().contains(query);

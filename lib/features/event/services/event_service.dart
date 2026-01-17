@@ -146,7 +146,6 @@ class EventService {
     FeedbackUtils.logInfo("Fetching events from $uri");
     final cacheKey = uri.toString();
     if (_cache.containsKey(cacheKey)) {
-      FeedbackUtils.logInfo("Returning cached events from ${_cache[cacheKey]}");
       return _cache[cacheKey]!;
     }
 
@@ -186,7 +185,6 @@ class EventService {
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
           .toList();
-      FeedbackUtils.logInfo("first fetched ${events.first}");
       final result = PaginatedResult(items: events, totalItems: totalItems);
 
       _cache[cacheKey] = result;
@@ -286,6 +284,27 @@ class EventService {
       FeedbackUtils.logError("Exception in participate: $e");
       throw Exception('Errore durante l\'iscrizione all\'evento.');
     }
+  }
+
+  Future<void> deleteEvent({
+    required String token,
+    required int eventId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/event/$eventId');
+    final response = await http.delete(
+      uri,
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final message = _errorMessage(response);
+      FeedbackUtils.logError(
+        "DELETE $uri failed (${response.statusCode}): $message",
+      );
+      throw Exception(
+        'Non è stato possibile eliminare l\'evento. Riprova più tardi.',
+      );
+    }
+    _clearCache();
   }
 
   Future<void> cancelParticipation({

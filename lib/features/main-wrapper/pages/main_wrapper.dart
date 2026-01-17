@@ -77,7 +77,7 @@ class MainWrapper extends ConsumerWidget {
       }
     });
     final todaysEvents = ref.watch(todaysEventsProvider);
-    final hasTodaysEvents = ref.watch(todaysEventsProvider).isNotEmpty;
+    final hasTodaysEvents = todaysEvents.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(

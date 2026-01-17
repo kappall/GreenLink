@@ -50,7 +50,7 @@ final class EventsProvider
   }
 }
 
-String _$eventsHash() => r'465f68cc4642e44b9125423f6063c3f19618a39c';
+String _$eventsHash() => r'1fa1a4f6b4353b80c0ea2e5bd4d70298c18361c4';
 
 final class EventsFamily extends $Family
     with
@@ -148,7 +148,7 @@ final class EventsByUserProvider
   }
 }
 
-String _$eventsByUserHash() => r'b60dfbd43c13e10d736548d5c356dba42b10c2fe';
+String _$eventsByUserHash() => r'301653dfbe4c8af3c923fe52b19c297dd7ce1403';
 
 final class EventsByUserFamily extends $Family
     with
@@ -248,7 +248,7 @@ final class EventsByPartnerProvider
   }
 }
 
-String _$eventsByPartnerHash() => r'1e1306272be47916c499aa68f15579c855bd7f83';
+String _$eventsByPartnerHash() => r'fac7129d1c53b78f4e23d81d000d5813b2d4af5c';
 
 final class EventsByPartnerFamily extends $Family
     with
@@ -331,7 +331,7 @@ final class EventsByDistanceProvider
   EventsByDistance create() => EventsByDistance();
 }
 
-String _$eventsByDistanceHash() => r'2fc95e65d032a4464600d1e5af1361ffdcb7d798';
+String _$eventsByDistanceHash() => r'73f360dbfb201677c28e53d650f29288a04fa7b3';
 
 abstract class _$EventsByDistance
     extends $AsyncNotifier<PaginatedResult<EventModel>> {
