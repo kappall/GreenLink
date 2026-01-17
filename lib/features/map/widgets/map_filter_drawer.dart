@@ -25,7 +25,6 @@ class MapFilterDrawer extends ConsumerWidget {
       child: Stack(
         alignment: Alignment.centerRight,
         children: [
-          // Animated sliding panel (behind the tongue)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
@@ -38,11 +37,11 @@ class MapFilterDrawer extends ConsumerWidget {
               ),
               child: Material(
                 elevation: 6,
-                color: Colors.white.withOpacity(0.95),
+                color: Colors.white.withValues(alpha: 0.95),
                 child: SizedBox(
                   width: width,
                   child: Padding(
-                    padding: EdgeInsets.only(left: tongueWidth + 8, right: 12),
+                    padding: EdgeInsets.only(right: tongueWidth + 8, left: 12),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -79,7 +78,7 @@ class MapFilterDrawer extends ConsumerWidget {
                 width: tongueWidth,
                 height: height,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withValues(alpha: 0.95),
                   borderRadius: const BorderRadius.horizontal(
                     left: Radius.circular(16),
                   ),
