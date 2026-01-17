@@ -10,6 +10,7 @@ import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/pages/create_event_page.dart';
 import 'package:greenlinkapp/features/event/pages/event_info.dart';
+import 'package:greenlinkapp/features/event/pages/event_qr_scanner_page.dart';
 import 'package:greenlinkapp/features/event/pages/volunteering_feed_page.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/pages/feed_page.dart';
@@ -253,6 +254,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final event = state.extra as EventModel;
           return EventInfoPage(event: event);
+        },
+      ),
+      GoRoute(
+        path: '/event/:eventId/scanner',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final eventId = state.pathParameters['eventId']!;
+          return EventQrScannerPage(eventId: eventId);
         },
       ),
       GoRoute(

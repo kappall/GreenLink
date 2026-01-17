@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
@@ -37,6 +38,11 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
 
     final startDate = DateFormat.yMMMd().add_jm().format(event.startDate);
     final endDate = DateFormat.yMMMd().add_jm().format(event.endDate);
+    final today = DateTime.now();
+    final bool isToday =
+        event.startDate.year == today.year &&
+        event.startDate.month == today.month &&
+        event.startDate.day == today.day;
 
     final geoKey = (lat: event.latitude, lng: event.longitude);
     final locationAsync = ref.watch(placeNameProvider(geoKey));
@@ -199,32 +205,51 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                 SizedBox(
                   width: double.infinity,
                   height: 54,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: isActionDisabled
-                          ? Colors.grey[400]
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                    onPressed: isActionDisabled
-                        ? null
-                        : (isParticipating
-                              ? () => _requestQrCode(context, ref)
-                              : () => _participateEvent(context, ref)),
-                    child: Text(
-                      isExpired
-                          ? "EVENTO SCADUTO"
-                          : isAuthor
-                          ? "HAI CREATO QUESTO EVENTO"
-                          : isParticipating
-                          ? "OTTIENI QR CODE"
-                          : "PARTECIPA ALL'EVENTO",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
+                  child: (isAuthor && isToday)
+                      ? ElevatedButton.icon(
+                          onPressed: () {
+                            final eventId = event.id?.toString();
+                            if (eventId != null) {
+                              context.push('/event/$eventId/scanner');
+                            }
+                          },
+                          icon: const Icon(Icons.qr_code_scanner),
+                          label: const Text('Valida Biglietti'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
+                          ),
+                        )
+                      : FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: isActionDisabled
+                                ? Colors.grey[400]
+                                : Theme.of(context).colorScheme.primary,
+                          ),
+                          onPressed: isActionDisabled
+                              ? null
+                              : (isParticipating
+                                    ? () => _requestQrCode(context, ref)
+                                    : () => _participateEvent(context, ref)),
+                          child: Text(
+                            isExpired
+                                ? "EVENTO SCADUTO"
+                                : isAuthor
+                                ? "HAI CREATO QUESTO EVENTO"
+                                : isParticipating
+                                ? "OTTIENI QR CODE"
+                                : "PARTECIPA ALL'EVENTO",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
                 ),
                 if (showQrAction) ...[
                   const SizedBox(height: 8),
@@ -377,8 +402,9 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
     if (confirmed == true) {
       setState(() => _isDeleting = true);
       try {
-        // TODO: implement delete call in provider/service
-        // await ref.read(eventsProvider.notifier).deleteEvent(widget.event.id!);
+        await ref
+            .read(eventsProvider(null).notifier)
+            .deleteEvent(widget.event.id!);
         if (mounted) {
           Navigator.pop(context);
         }

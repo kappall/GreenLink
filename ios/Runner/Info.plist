@@ -50,7 +50,7 @@
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Questa app richiede l'accesso alla galleria per selezionare le foto da caricare nei post.</string>
 		<key>NSCameraUsageDescription</key>
-		<string>Questa app richiede l'accesso alla fotocamera per scattare foto.</string>
+		<string>Questa app richiede l'accesso alla fotocamera per scattare foto o scannerizzare QR code.</string>
 		<key>NSPhotoLibraryAddUsageDescription</key>
 		<string>Questa app richiede il permesso di salvare le foto scattate.</string>
 		<key>NSMicrophoneUsageDescription</key>

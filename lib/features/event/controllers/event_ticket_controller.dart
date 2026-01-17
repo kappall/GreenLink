@@ -1,7 +1,6 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 import 'package:greenlinkapp/features/event/models/ticket_validation_result.dart';
 import 'package:greenlinkapp/features/event/services/event_ticket_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'event_ticket_controller.g.dart';
 
@@ -11,26 +10,22 @@ class EventTicketState {
   final EventTicketStatus status;
   final String ticket;
   final TicketValidationResult? validationResult;
-  final String errorMessage;
 
   const EventTicketState({
     this.status = EventTicketStatus.idle,
     this.ticket = '',
     this.validationResult,
-    this.errorMessage = '',
   });
 
   EventTicketState copyWith({
     EventTicketStatus? status,
     String? ticket,
     TicketValidationResult? validationResult,
-    String? errorMessage,
   }) {
     return EventTicketState(
       status: status ?? this.status,
       ticket: ticket ?? this.ticket,
       validationResult: validationResult ?? this.validationResult,
-      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -47,10 +42,7 @@ class EventTicketController extends _$EventTicketController {
   Future<void> participate() async {
     if (state.isLoading) return;
 
-    state = EventTicketState(
-      status: EventTicketStatus.loading,
-      ticket: state.ticket,
-    );
+    state = const EventTicketState(status: EventTicketStatus.loading);
 
     try {
       final ticket = await ref
@@ -64,8 +56,9 @@ class EventTicketController extends _$EventTicketController {
     } catch (error) {
       state = EventTicketState(
         status: EventTicketStatus.error,
-        ticket: state.ticket,
-        errorMessage: _normalizeError(error),
+        validationResult: TicketValidationResult.error(
+          message: _normalizeError(error),
+        ),
       );
     }
   }
@@ -75,19 +68,17 @@ class EventTicketController extends _$EventTicketController {
 
     final ticket = _extractTicket(rawQrData);
     if (ticket.isEmpty) {
-      state = EventTicketState(
+      state = const EventTicketState(
         status: EventTicketStatus.error,
-        ticket: state.ticket,
-        errorMessage: 'Ticket non valido.',
+        validationResult: TicketValidationResult.error(
+          message: 'Ticket non valido.',
+        ),
       );
       return;
     }
 
     _isChecking = true;
-    state = EventTicketState(
-      status: EventTicketStatus.loading,
-      ticket: ticket,
-    );
+    state = const EventTicketState(status: EventTicketStatus.loading);
 
     try {
       final result = await ref
@@ -100,9 +91,6 @@ class EventTicketController extends _$EventTicketController {
             : EventTicketStatus.success,
         ticket: ticket,
         validationResult: result,
-        errorMessage: result.isError
-            ? (result.errorMessage ?? 'Errore durante la validazione.')
-            : '',
       );
     } finally {
       _isChecking = false;

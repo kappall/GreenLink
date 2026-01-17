@@ -59,7 +59,7 @@ final class EventTicketControllerProvider
 }
 
 String _$eventTicketControllerHash() =>
-    r'19cb542a115d5e1af7db69bcac8fb145f2f481aa';
+    r'12ad295cad19f9b9e7a8e9068acfc880a6a026de';
 
 final class EventTicketControllerFamily extends $Family
     with
