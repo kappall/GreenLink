@@ -55,13 +55,11 @@ extension TicketValidationResultPatterns on TicketValidationResult {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _TicketValid value)?  valid,TResult Function( _TicketAlreadyUsed value)?  alreadyUsed,TResult Function( _TicketExpired value)?  expired,TResult Function( _TicketWrongEvent value)?  wrongEvent,TResult Function( _TicketError value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _TicketValid value)?  valid,TResult Function( _TicketWrongEvent value)?  wrongEvent,TResult Function( _TicketError value)?  error,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _TicketValid() when valid != null:
-return valid(_that);case _TicketAlreadyUsed() when alreadyUsed != null:
-return alreadyUsed(_that);case _TicketExpired() when expired != null:
-return expired(_that);case _TicketWrongEvent() when wrongEvent != null:
+return valid(_that);case _TicketWrongEvent() when wrongEvent != null:
 return wrongEvent(_that);case _TicketError() when error != null:
 return error(_that);case _:
   return orElse();
@@ -81,13 +79,11 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _TicketValid value)  valid,required TResult Function( _TicketAlreadyUsed value)  alreadyUsed,required TResult Function( _TicketExpired value)  expired,required TResult Function( _TicketWrongEvent value)  wrongEvent,required TResult Function( _TicketError value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _TicketValid value)  valid,required TResult Function( _TicketWrongEvent value)  wrongEvent,required TResult Function( _TicketError value)  error,}){
 final _that = this;
 switch (_that) {
 case _TicketValid():
-return valid(_that);case _TicketAlreadyUsed():
-return alreadyUsed(_that);case _TicketExpired():
-return expired(_that);case _TicketWrongEvent():
+return valid(_that);case _TicketWrongEvent():
 return wrongEvent(_that);case _TicketError():
 return error(_that);case _:
   throw StateError('Unexpected subclass');
@@ -106,13 +102,11 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _TicketValid value)?  valid,TResult? Function( _TicketAlreadyUsed value)?  alreadyUsed,TResult? Function( _TicketExpired value)?  expired,TResult? Function( _TicketWrongEvent value)?  wrongEvent,TResult? Function( _TicketError value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _TicketValid value)?  valid,TResult? Function( _TicketWrongEvent value)?  wrongEvent,TResult? Function( _TicketError value)?  error,}){
 final _that = this;
 switch (_that) {
 case _TicketValid() when valid != null:
-return valid(_that);case _TicketAlreadyUsed() when alreadyUsed != null:
-return alreadyUsed(_that);case _TicketExpired() when expired != null:
-return expired(_that);case _TicketWrongEvent() when wrongEvent != null:
+return valid(_that);case _TicketWrongEvent() when wrongEvent != null:
 return wrongEvent(_that);case _TicketError() when error != null:
 return error(_that);case _:
   return null;
@@ -131,12 +125,10 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  valid,TResult Function()?  alreadyUsed,TResult Function()?  expired,TResult Function()?  wrongEvent,TResult Function( String? message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String? userName)?  valid,TResult Function()?  wrongEvent,TResult Function( String? message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TicketValid() when valid != null:
-return valid();case _TicketAlreadyUsed() when alreadyUsed != null:
-return alreadyUsed();case _TicketExpired() when expired != null:
-return expired();case _TicketWrongEvent() when wrongEvent != null:
+return valid(_that.userName);case _TicketWrongEvent() when wrongEvent != null:
 return wrongEvent();case _TicketError() when error != null:
 return error(_that.message);case _:
   return orElse();
@@ -156,12 +148,10 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  valid,required TResult Function()  alreadyUsed,required TResult Function()  expired,required TResult Function()  wrongEvent,required TResult Function( String? message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String? userName)  valid,required TResult Function()  wrongEvent,required TResult Function( String? message)  error,}) {final _that = this;
 switch (_that) {
 case _TicketValid():
-return valid();case _TicketAlreadyUsed():
-return alreadyUsed();case _TicketExpired():
-return expired();case _TicketWrongEvent():
+return valid(_that.userName);case _TicketWrongEvent():
 return wrongEvent();case _TicketError():
 return error(_that.message);case _:
   throw StateError('Unexpected subclass');
@@ -180,12 +170,10 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  valid,TResult? Function()?  alreadyUsed,TResult? Function()?  expired,TResult? Function()?  wrongEvent,TResult? Function( String? message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String? userName)?  valid,TResult? Function()?  wrongEvent,TResult? Function( String? message)?  error,}) {final _that = this;
 switch (_that) {
 case _TicketValid() when valid != null:
-return valid();case _TicketAlreadyUsed() when alreadyUsed != null:
-return alreadyUsed();case _TicketExpired() when expired != null:
-return expired();case _TicketWrongEvent() when wrongEvent != null:
+return valid(_that.userName);case _TicketWrongEvent() when wrongEvent != null:
 return wrongEvent();case _TicketError() when error != null:
 return error(_that.message);case _:
   return null;
@@ -199,97 +187,67 @@ return error(_that.message);case _:
 
 
 class _TicketValid extends TicketValidationResult {
-  const _TicketValid(): super._();
+  const _TicketValid({this.userName}): super._();
   
 
+ final  String? userName;
 
-
+/// Create a copy of TicketValidationResult
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$TicketValidCopyWith<_TicketValid> get copyWith => __$TicketValidCopyWithImpl<_TicketValid>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TicketValid);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TicketValid&&(identical(other.userName, userName) || other.userName == userName));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,userName);
 
 @override
 String toString() {
-  return 'TicketValidationResult.valid()';
+  return 'TicketValidationResult.valid(userName: $userName)';
 }
 
 
 }
-
-
-
 
 /// @nodoc
+abstract mixin class _$TicketValidCopyWith<$Res> implements $TicketValidationResultCopyWith<$Res> {
+  factory _$TicketValidCopyWith(_TicketValid value, $Res Function(_TicketValid) _then) = __$TicketValidCopyWithImpl;
+@useResult
+$Res call({
+ String? userName
+});
 
 
-class _TicketAlreadyUsed extends TicketValidationResult {
-  const _TicketAlreadyUsed(): super._();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TicketAlreadyUsed);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'TicketValidationResult.alreadyUsed()';
-}
 
 
 }
-
-
-
-
 /// @nodoc
+class __$TicketValidCopyWithImpl<$Res>
+    implements _$TicketValidCopyWith<$Res> {
+  __$TicketValidCopyWithImpl(this._self, this._then);
 
+  final _TicketValid _self;
+  final $Res Function(_TicketValid) _then;
 
-class _TicketExpired extends TicketValidationResult {
-  const _TicketExpired(): super._();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TicketExpired);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'TicketValidationResult.expired()';
+/// Create a copy of TicketValidationResult
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? userName = freezed,}) {
+  return _then(_TicketValid(
+userName: freezed == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
 
 }
-
-
-
 
 /// @nodoc
 
