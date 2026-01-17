@@ -17,8 +17,8 @@ class PostFeed extends ConsumerWidget {
           ? const SliverFillRemaining(
               child: Center(child: Text("Nessun post da visualizzare.")),
             )
-          : SliverPadding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            : SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               sliver: SliverList.separated(
                 itemCount: page.items.length,
                 itemBuilder: (context, index) {

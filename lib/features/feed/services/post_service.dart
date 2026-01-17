@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class PostService {
   PostService._();
@@ -188,19 +191,15 @@ class PostService {
       'Authorization': 'Bearer $token',
     });
 
-    String extension = file.path.split('.').last.toLowerCase();
-    if (extension == 'jpeg') extension = 'jpg';
-
-    String mimeSubtype = (extension == 'jpg') ? 'jpeg' : extension;
-
-    request.fields['type'] = extension;
+    final mimeInfo = _mimeInfo(file);
+    request.fields['type'] = mimeInfo.extension;
     request.fields['content'] = postId.toString();
 
-    var multipartFile = await http.MultipartFile.fromPath(
-      'image',
-      file.path,
-      filename: file.name,
-      contentType: http.MediaType('image', mimeSubtype),
+    final multipartFile = await _buildMultipartFile(
+      file: file,
+      fieldName: 'image',
+      mimeSubtype: mimeInfo.mimeSubtype,
+      usePng: mimeInfo.extension == 'png',
     );
     request.files.add(multipartFile);
 
@@ -212,6 +211,61 @@ class PostService {
       throw Exception('Errore durante il caricamento del media: $message');
     }
     _clearCache();
+  }
+
+  Future<http.MultipartFile> _buildMultipartFile({
+    required XFile file,
+    required String fieldName,
+    required String mimeSubtype,
+    required bool usePng,
+  }) async {
+    try {
+      final bytes = await file.readAsBytes();
+      final decoded = img.decodeImage(bytes);
+      if (decoded == null) throw Exception('decode failed');
+
+      final oriented = img.bakeOrientation(decoded);
+      final encodedBytes = usePng
+          ? img.encodePng(oriented)
+          : img.encodeJpg(oriented, quality: 90);
+
+      final tempDir = await getTemporaryDirectory();
+      final extension = usePng ? 'png' : 'jpg';
+      final filename = '${_stripExtension(file.name)}.$extension';
+      final tempPath =
+          '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_$filename';
+      final tempFile = await File(tempPath).writeAsBytes(
+        encodedBytes,
+        flush: true,
+      );
+
+      return http.MultipartFile.fromPath(
+        fieldName,
+        tempFile.path,
+        filename: filename,
+        contentType: http.MediaType('image', extension == 'png' ? 'png' : 'jpeg'),
+      );
+    } catch (_) {
+      return http.MultipartFile.fromPath(
+        fieldName,
+        file.path,
+        filename: file.name,
+        contentType: http.MediaType('image', mimeSubtype),
+      );
+    }
+  }
+
+  ({String extension, String mimeSubtype}) _mimeInfo(XFile file) {
+    String extension = file.path.split('.').last.toLowerCase();
+    if (extension == 'jpeg') extension = 'jpg';
+    final mimeSubtype = (extension == 'jpg') ? 'jpeg' : extension;
+    return (extension: extension, mimeSubtype: mimeSubtype);
+  }
+
+  String _stripExtension(String name) {
+    final dotIndex = name.lastIndexOf('.');
+    if (dotIndex <= 0) return name;
+    return name.substring(0, dotIndex);
   }
 
   Future<void> votePost({
