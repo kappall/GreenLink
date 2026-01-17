@@ -26,15 +26,11 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(socketServiceProvider);
     final router = ref.watch(routerProvider);
-    final themeMode = ref.watch(themeProvider);
 
     return MaterialApp.router(
       title: 'GreenLink',
       debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-
       routerConfig: router,
     );
   }
