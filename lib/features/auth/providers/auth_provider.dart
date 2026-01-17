@@ -155,6 +155,44 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     state = AsyncData(AuthState.unauthenticated());
   }
 
+  Future<void> patchUser({
+    required UserModel user,
+    final String? username,
+    final String? email,
+    final String? password,
+  }) async {
+    final currentState = state.asData?.value;
+    final token = currentState?.token;
+
+    if (currentState == null || token == null || token.isEmpty) {
+      throw Exception(
+        'Impossibile aggioranre l\'account senza utente autenticato.',
+      );
+    }
+
+    state = const AsyncLoading();
+
+    try {
+      await _authService.patchUser(
+        user: user,
+        username: username,
+        email: email,
+        password: password,
+        token: token,
+      );
+      final updatedUser = await _authService.fetchCurrentUser(token: token);
+      final updatedState = AuthState(
+        user: updatedUser,
+        token: token,
+        derivedRole: currentState.derivedRole,
+      );
+      state = AsyncData(updatedState);
+    } catch (error, stackTrace) {
+      state = AsyncData(currentState);
+      rethrow;
+    }
+  }
+
   Future<void> deleteAccount() async {
     final currentState = state.asData?.value;
     final int? userId = currentState?.user?.id;

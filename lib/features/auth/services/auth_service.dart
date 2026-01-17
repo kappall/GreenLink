@@ -178,6 +178,48 @@ class AuthService {
     }
   }
 
+  Future<void> patchUser({
+    required UserModel user,
+    final String? username,
+    final String? email,
+    final String? password,
+    required String token,
+  }) async {
+    late Uri uri;
+    if (user.role == AuthRole.user) {
+      uri = Uri.parse('$_baseUrl/user/${user.id}');
+    } else if (user.role == AuthRole.partner) {
+      uri = Uri.parse('$_baseUrl/partner/${user.id}');
+    }
+    try {
+      final payload = <String, dynamic>{};
+      payload['id'] = user.id;
+      if (username != null) payload['username'] = username;
+      if (email != null) payload['email'] = email;
+      if (password != null) payload['password'] = password;
+
+      final response = await http.put(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return;
+      }
+
+      FeedbackUtils.logError(
+        "User update failed (${response.statusCode}): ${response.body}",
+      );
+    } catch (e) {
+      FeedbackUtils.logError("Connection error during user update: $e");
+      rethrow;
+    }
+  }
+
   AuthResult _parseAuthResponse(String body) {
     final data = _safeDecode(body);
     final token = data['token'] as String?;

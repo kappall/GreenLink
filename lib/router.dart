@@ -28,6 +28,8 @@ import 'features/auth/pages/onboarding_page.dart';
 import 'features/auth/pages/partner_activation_page.dart';
 import 'features/auth/providers/onboarding_provider.dart';
 import 'features/feed/pages/create_post.dart';
+import 'features/settings/pages/change_password.dart';
+import 'features/user/pages/edit_profile_page.dart';
 import 'features/user/pages/profile_page.dart';
 
 CustomTransitionPage noAnimationPage(Widget child) {
@@ -213,6 +215,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ProfilePage(),
+        routes: [
+          GoRoute(
+            path: 'edit',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const EditProfilePage(),
+          ),
+        ],
       ),
       GoRoute(
         path: '/settings',
@@ -273,6 +282,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/create-event',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const CreateEventPage(),
+      ),
+      GoRoute(
+        path: '/change-password',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ChangePasswordPage(),
       ),
     ],
   );

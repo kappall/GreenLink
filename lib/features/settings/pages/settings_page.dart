@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/providers/theme_provider.dart';
 import 'package:greenlinkapp/features/legal/pages/privacy_policy_page.dart';
@@ -8,7 +9,6 @@ import 'package:greenlinkapp/features/settings/pages/change_location_page.dart';
 
 import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
-import 'change_password.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -52,11 +52,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   title: "Cambia Password",
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const ChangePasswordPage(),
-                      ),
-                    );
+                    context.push('/change-password');
                   },
                 ),
               ],

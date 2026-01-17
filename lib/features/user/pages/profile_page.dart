@@ -122,6 +122,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             style: TextStyle(color: Colors.white),
                           ),
                           actions: [
+                            TextButton(
+                              onPressed: () => context.push('/profile/edit'),
+                              child: const Text(
+                                'Edit Profile',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
                             IconButton(
                               icon: const Icon(
                                 Icons.settings,

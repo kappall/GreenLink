@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 
 import '../../../core/utils/feedback_utils.dart';
+import '../../user/providers/user_provider.dart';
 
-class ChangePasswordPage extends StatefulWidget {
+class ChangePasswordPage extends ConsumerStatefulWidget {
   const ChangePasswordPage({super.key});
 
   @override
-  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+  ConsumerState<ChangePasswordPage> createState() => _ChangePasswordPageState();
 }
 
-class _ChangePasswordPageState extends State<ChangePasswordPage> {
+class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -25,16 +28,33 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isSaving = true);
-      // TODO: aspetto che tom implementi controller
-      Future.delayed(const Duration(seconds: 2), () {
+      final currentPassword = _currentPasswordController.text;
+      final newPassword = _newPasswordController.text;
+
+      final user = ref.read(currentUserProvider).value;
+      if (user == null) return;
+
+      try {
+        await ref
+            .read(authProvider.notifier)
+            .patchUser(user: user, password: newPassword);
+
         if (mounted) {
+          FeedbackUtils.showSuccess(context, "Password changed successfully");
           Navigator.of(context).pop();
-          FeedbackUtils.showSuccess(context, "Password cambiata con successo");
         }
-      });
+      } catch (e) {
+        if (mounted) {
+          FeedbackUtils.showError(context, e.toString());
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isSaving = false);
+        }
+      }
     }
   }
 
@@ -100,7 +120,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text("SALVA MODIFICHE"),
+                    : const Text("SALVA MODIFICHE"),
               ),
             ],
           ),
