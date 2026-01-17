@@ -169,11 +169,15 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         'Impossibile eliminare l\'account senza utente autenticato.',
       );
     }
-
+    final role = currentState.derivedRole;
     state = const AsyncLoading();
 
     try {
-      await _authService.deleteAccount(userId: userId, token: token);
+      await _authService.deleteAccount(
+        userId: userId,
+        role: role!,
+        token: token,
+      );
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_tokenKey);
 

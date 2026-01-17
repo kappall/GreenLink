@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:greenlinkapp/core/utils/feedback_utils.dart';
+import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -145,9 +146,15 @@ class AuthService {
 
   Future<void> deleteAccount({
     required int userId,
+    required AuthRole role,
     required String token,
   }) async {
-    final uri = Uri.parse('$_baseUrl/user/${userId.toString()}');
+    late Uri uri;
+    if (role == AuthRole.user) {
+      uri = Uri.parse('$_baseUrl/user/$userId');
+    } else if (role == AuthRole.partner) {
+      uri = Uri.parse('$_baseUrl/partner/$userId');
+    }
     try {
       final response = await http.delete(
         uri,
