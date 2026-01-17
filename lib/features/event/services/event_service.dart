@@ -24,6 +24,8 @@ class EventService {
   }) async {
     final uri = Uri.parse('$_baseUrl/events').replace(
       queryParameters: {
+        'sort': 'id',
+        'order': 'desc',
         'skip': skip?.toString() ?? '0',
         'limit': limit?.toString() ?? '20',
       },
@@ -42,6 +44,7 @@ class EventService {
     final uri = Uri.parse('$_baseUrl/events').replace(
       queryParameters: {
         'sort': 'distance',
+        'order': 'asc',
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
         'skip': skip?.toString() ?? '0',
@@ -60,6 +63,8 @@ class EventService {
   }) {
     final uri = Uri.parse('$_baseUrl/events').replace(
       queryParameters: {
+        'sort': 'id',
+        'order': 'desc',
         'user': userId.toString(),
         'skip': skip?.toString() ?? '0',
         'limit': limit?.toString() ?? '20',
@@ -76,6 +81,8 @@ class EventService {
   }) async {
     final uri = Uri.parse('$_baseUrl/events').replace(
       queryParameters: {
+        'sort': 'id',
+        'order': 'desc',
         if (partnerId != null && partnerId > 0) 'partner': partnerId.toString(),
         'skip': skip?.toString() ?? '0',
         'limit': limit?.toString() ?? '20',
@@ -136,8 +143,10 @@ class EventService {
     required Uri uri,
     required String? token,
   }) async {
+    FeedbackUtils.logInfo("Fetching events from $uri");
     final cacheKey = uri.toString();
     if (_cache.containsKey(cacheKey)) {
+      FeedbackUtils.logInfo("Returning cached events from ${_cache[cacheKey]}");
       return _cache[cacheKey]!;
     }
 
@@ -177,7 +186,7 @@ class EventService {
           .whereType<Map<String, dynamic>>()
           .map(EventModel.fromJson)
           .toList();
-
+      FeedbackUtils.logInfo("first fetched ${events.first}");
       final result = PaginatedResult(items: events, totalItems: totalItems);
 
       _cache[cacheKey] = result;
@@ -189,7 +198,7 @@ class EventService {
     }
   }
 
-  Future<EventModel> createEvent({
+  Future<void> createEvent({
     required String token,
     required String title,
     required String description,
@@ -231,17 +240,7 @@ class EventService {
         );
       }
 
-      final decoded = jsonDecode(response.body);
-      final rawEvent = decoded is Map<String, dynamic>
-          ? decoded['event'] ?? decoded['data'] ?? decoded
-          : decoded;
-
-      if (rawEvent is! Map<String, dynamic>) {
-        FeedbackUtils.logError("Invalid event response: ${response.body}");
-        throw Exception('Errore nella risposta del server.');
-      }
       _clearCache();
-      return EventModel.fromJson(rawEvent);
     } catch (e) {
       if (e is Exception) rethrow;
       FeedbackUtils.logError("Exception during createEvent: $e");
