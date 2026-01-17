@@ -166,7 +166,7 @@ final class UserActionsProvider extends $NotifierProvider<UserActions, void> {
         argument: null,
         retry: null,
         name: r'userActionsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -187,7 +187,7 @@ final class UserActionsProvider extends $NotifierProvider<UserActions, void> {
   }
 }
 
-String _$userActionsHash() => r'4183391ed2fb7be8ac032a06b4a7df95774ada54';
+String _$userActionsHash() => r'c004fb0a0426e22c47ebab7315ada7a7bfe0544e';
 
 abstract class _$UserActions extends $Notifier<void> {
   void build();
@@ -218,7 +218,7 @@ final class PartnerProvider extends $NotifierProvider<Partner, void> {
         argument: null,
         retry: null,
         name: r'partnerProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -239,7 +239,7 @@ final class PartnerProvider extends $NotifierProvider<Partner, void> {
   }
 }
 
-String _$partnerHash() => r'd699a272a6f473bfd90ccd69f53a65ede4b7f6de';
+String _$partnerHash() => r'b05a45fc850d789f749f3af773d16e9129409fbb';
 
 abstract class _$Partner extends $Notifier<void> {
   void build();

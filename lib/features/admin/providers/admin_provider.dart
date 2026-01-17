@@ -125,7 +125,6 @@ class Users extends _$Users {
         skip: skip,
         limit: _pageSize,
       );
-
       final combined = [...users, ...partners];
 
       return PaginatedResult<UserModel>(
@@ -161,17 +160,9 @@ class Users extends _$Users {
       _isLoadingMore = false;
     }
   }
-
-  Future<void> blockUser({required int userId}) async {
-    try {
-      await _adminService.blockUser(userId);
-    } catch (e) {
-      FeedbackUtils.logError(e);
-    }
-  }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class UserActions extends _$UserActions {
   @override
   void build() {}
@@ -182,7 +173,7 @@ class UserActions extends _$UserActions {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Partner extends _$Partner {
   @override
   void build() {}

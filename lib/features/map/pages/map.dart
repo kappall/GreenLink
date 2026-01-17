@@ -113,7 +113,6 @@ class _MapPageState extends ConsumerState<MapPage> {
             left: 16,
             child: const MapSummary(),
           ),
-          //TODO: widget per selezionare la desnità dei contenuti, tipo 4 livelli di densità 1=20, 2=40, 3=80 4=160
         ],
       ),
     );

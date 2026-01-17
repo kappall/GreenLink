@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,7 +14,6 @@ final adminServiceProvider = Provider<AdminService>((ref) {
   return AdminService(token: token);
 });
 
-//TODO: skip and limit
 class AdminService {
   AdminService({required this.token});
   final String token;
@@ -239,7 +239,7 @@ class AdminService {
           'Authorization': 'Bearer $token',
         },
       );
-
+      FeedbackUtils.logInfo("Blocco user $userId: ${response.statusCode}, ${response.body}");
       if (response.statusCode != 200) {
         throw Exception(
           'Fallimento del blocco user $userId: ${response.statusCode}',
@@ -247,7 +247,8 @@ class AdminService {
       }
       _clearUserCache();
     } catch (e) {
-      throw Exception('Errore di connessione: $e');
+      FeedbackUtils.logError("Errore cancellazioen user: $e");
+      rethrow;
     }
   }
 
