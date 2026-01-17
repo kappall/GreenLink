@@ -138,7 +138,9 @@ class Events extends _$Events {
 
     return paginatedResult.copyWith(
       page: page,
-      hasMore: paginatedResult.items.length == _pageSize,
+      hasMore:
+          paginatedResult.items.isNotEmpty &&
+          paginatedResult.items.length == _pageSize,
     );
   }
 
@@ -417,7 +419,9 @@ class EventsByDistance extends _$EventsByDistance {
 
     return paginatedResult.copyWith(
       page: page,
-      hasMore: paginatedResult.items.length == _pageSize,
+      hasMore:
+          paginatedResult.items.isNotEmpty &&
+          paginatedResult.items.length == _pageSize,
     );
   }
 

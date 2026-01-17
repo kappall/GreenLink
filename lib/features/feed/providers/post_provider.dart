@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -314,10 +315,14 @@ class Posts extends _$Posts {
       skip: (page - 1) * _pageSize,
       limit: _pageSize,
     );
-
+    FeedbackUtils.logInfo(
+      "hasMore${paginatedResult.items.length}<${paginatedResult.totalItems}",
+    );
     return paginatedResult.copyWith(
       page: page,
-      hasMore: paginatedResult.items.length < paginatedResult.totalItems,
+      hasMore:
+          paginatedResult.items.isNotEmpty &&
+          paginatedResult.items.length < paginatedResult.totalItems,
     );
   }
 
@@ -471,7 +476,9 @@ class PostsByDistance extends _$PostsByDistance {
 
     return paginatedResult.copyWith(
       page: page,
-      hasMore: paginatedResult.items.length == _pageSize,
+      hasMore:
+          paginatedResult.items.isNotEmpty &&
+          paginatedResult.items.length == _pageSize,
     );
   }
 
