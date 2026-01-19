@@ -87,7 +87,7 @@ Future<List<EventModel>> mapEvents(Ref ref) async {
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         limit: 100,
-      )).items;
+      )).items.where((e) => e.startDate.isAfter(DateTime.now())).toList();
     },
     loading: () => [],
     error: (err, stack) {

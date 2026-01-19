@@ -13,11 +13,11 @@ class MapSummary extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.85),
+        color: Colors.white.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -30,7 +30,7 @@ class MapSummary extends ConsumerWidget {
             children: [
               const Icon(Icons.post_add, size: 16, color: Colors.blue),
               const SizedBox(width: 4),
-              Text('${posts.length} segnalazioni'),
+              Text('${posts.isNotEmpty ? posts.length : '-'} segnalazioni'),
             ],
           ),
           const SizedBox(width: 12),
@@ -38,7 +38,7 @@ class MapSummary extends ConsumerWidget {
             children: [
               const Icon(Icons.event, size: 16, color: Colors.green),
               const SizedBox(width: 4),
-              Text('${events.length} eventi'),
+              Text('${events.isNotEmpty ? events.length : '-'} eventi'),
             ],
           ),
         ],

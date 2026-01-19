@@ -50,7 +50,7 @@ final class EventsProvider
   }
 }
 
-String _$eventsHash() => r'dad0d05f7cdcc5a21c345585ea67b88be21383e0';
+String _$eventsHash() => r'f26af576dbfce36c67235ded2c3b1be25680230d';
 
 final class EventsFamily extends $Family
     with
@@ -331,7 +331,7 @@ final class EventsByDistanceProvider
   EventsByDistance create() => EventsByDistance();
 }
 
-String _$eventsByDistanceHash() => r'73f360dbfb201677c28e53d650f29288a04fa7b3';
+String _$eventsByDistanceHash() => r'1b1ba1b56d7dd397bfac72e96f7862864be0c168';
 
 abstract class _$EventsByDistance
     extends $AsyncNotifier<PaginatedResult<EventModel>> {

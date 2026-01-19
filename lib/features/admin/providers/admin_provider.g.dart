@@ -127,7 +127,7 @@ final class UsersProvider
   Users create() => Users();
 }
 
-String _$usersHash() => r'12ccc8c96a9d54761730980f7edf43e346d7bd01';
+String _$usersHash() => r'485937048e0a8815a6ed6b1058cb3ed5065b96c9';
 
 abstract class _$Users extends $AsyncNotifier<PaginatedResult<UserModel>> {
   FutureOr<PaginatedResult<UserModel>> build();
