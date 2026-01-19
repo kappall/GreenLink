@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
@@ -457,13 +458,10 @@ class EventsByDistance extends _$EventsByDistance {
 final sortedEventsProvider =
     Provider.autoDispose<AsyncValue<PaginatedResult<EventModel>>>((ref) {
       final criteria = ref.watch(eventSortCriteriaProvider);
-
-      final eventsAsync = criteria == EventSortCriteria.proximity
-          ? ref.watch(eventsByDistanceProvider)
-          : ref.watch(eventsProvider(null));
-
+      final eventsAsync = ref.watch(eventsProvider(null));
       final filter = ref.watch(eventFilterProvider);
       final query = ref.watch(eventsSearchQueryProvider).toLowerCase();
+      final location = ref.watch(userLocationProvider).value;
 
       final isPartner =
           ref.watch(authProvider).asData?.value.isPartner ?? false;
@@ -471,6 +469,7 @@ final sortedEventsProvider =
 
       return eventsAsync.whenData((paginated) {
         var filteredEvents = paginated.items;
+        final now = DateTime.now();
 
         if (filter.excludeParticipating) {
           filteredEvents = filteredEvents
@@ -480,7 +479,7 @@ final sortedEventsProvider =
 
         if (filter.excludeExpired) {
           filteredEvents = filteredEvents
-              .where((element) => element.startDate.isAfter(DateTime.now()))
+              .where((element) => element.endDate.isAfter(now))
               .toList();
         }
 
@@ -500,6 +499,54 @@ final sortedEventsProvider =
           }).toList();
         }
 
+        if (criteria == EventSortCriteria.proximity && location != null) {
+          final originLat = location.latitude;
+          final originLng = location.longitude;
+          filteredEvents = [...filteredEvents]
+            ..sort((a, b) {
+              final aDist = _distanceInMeters(
+                originLat,
+                originLng,
+                a.latitude,
+                a.longitude,
+              );
+              final bDist = _distanceInMeters(
+                originLat,
+                originLng,
+                b.latitude,
+                b.longitude,
+              );
+              return aDist.compareTo(bDist);
+            });
+        } else if (criteria == EventSortCriteria.date) {
+          filteredEvents = [...filteredEvents]
+            ..sort((a, b) {
+              final aCreated = a.createdAt ?? a.startDate;
+              final bCreated = b.createdAt ?? b.startDate;
+              return bCreated.compareTo(aCreated);
+            });
+        }
+
         return paginated.copyWith(items: filteredEvents);
       });
     });
+
+double _distanceInMeters(
+  double lat1,
+  double lon1,
+  double lat2,
+  double lon2,
+) {
+  const earthRadius = 6371000.0;
+  final dLat = _degToRad(lat2 - lat1);
+  final dLon = _degToRad(lon2 - lon1);
+  final a =
+      pow(sin(dLat / 2), 2) +
+      cos(_degToRad(lat1)) *
+          cos(_degToRad(lat2)) *
+          pow(sin(dLon / 2), 2);
+  final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  return earthRadius * c;
+}
+
+double _degToRad(double deg) => deg * (pi / 180.0);

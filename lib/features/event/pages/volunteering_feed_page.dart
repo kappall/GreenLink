@@ -33,12 +33,7 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      final criteria = ref.read(eventSortCriteriaProvider);
-      if (criteria == EventSortCriteria.proximity) {
-        ref.read(eventsByDistanceProvider.notifier).loadMore();
-      } else {
-        ref.read(eventsProvider(null).notifier).loadMore();
-      }
+      ref.read(eventsProvider(null).notifier).loadMore();
     }
   }
 
@@ -52,12 +47,7 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
 
     return RefreshIndicator(
       onRefresh: () {
-        final criteria = ref.read(eventSortCriteriaProvider);
-        if (criteria == EventSortCriteria.proximity) {
-          return ref.refresh(eventsByDistanceProvider.future);
-        } else {
-          return ref.refresh(eventsProvider(null).future);
-        }
+        return ref.refresh(eventsProvider(null).future);
       },
       child: CustomScrollView(
         controller: _scrollController,
@@ -131,7 +121,7 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
                                 const PopupMenuDivider(),
                                 CheckedPopupMenuItem<String>(
                                   value: 'excludeCreated',
-                                  checked: false,
+                                  checked: filter.excludeCreated,
                                   child: const Text('Nascondi eventi creati'),
                                 ),
                               ],
@@ -177,7 +167,7 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
                         ),
                         ButtonSegment(
                           value: EventSortCriteria.proximity,
-                          label: Text('Vicinanza'),
+                          label: Text('Vicini'),
                           icon: Icon(Icons.near_me),
                         ),
                       ],

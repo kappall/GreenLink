@@ -24,7 +24,7 @@ class EventService {
   }) async {
     final uri = Uri.parse('$_baseUrl/events').replace(
       queryParameters: {
-        'sort': 'id',
+        'sort': 'start_date',
         'order': 'desc',
         'skip': skip?.toString() ?? '0',
         'limit': limit?.toString() ?? '20',
