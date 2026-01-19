@@ -16,12 +16,14 @@ class MapTargetLocation {
   final double longitude;
   final double? zoom;
   final PostModel? post;
+  final EventModel? event;
 
   const MapTargetLocation({
     required this.latitude,
     required this.longitude,
     this.zoom,
     this.post,
+    this.event,
   });
 }
 
@@ -38,6 +40,7 @@ class _MapPageState extends ConsumerState<MapPage> {
   final LatLng _fallbackCenter = const LatLng(45.4398, 12.3319); // Venezia
   final MapController _mapController = MapController();
   bool _hasOpenedTargetSummary = false;
+  bool _isSummarySheetOpen = false;
 
   @override
   void initState() {
@@ -59,7 +62,8 @@ class _MapPageState extends ConsumerState<MapPage> {
     final targetChanged =
         newTarget?.latitude != oldTarget?.latitude ||
         newTarget?.longitude != oldTarget?.longitude ||
-        newTarget?.post?.id != oldTarget?.post?.id;
+      newTarget?.post?.id != oldTarget?.post?.id ||
+      newTarget?.event?.id != oldTarget?.event?.id;
 
     if (targetChanged && newTarget != null) {
       _hasOpenedTargetSummary = false;
@@ -88,10 +92,11 @@ class _MapPageState extends ConsumerState<MapPage> {
   void _maybeOpenTargetSummary() {
     if (_hasOpenedTargetSummary) return;
     final targetPost = widget.targetLocation?.post;
-    if (targetPost == null) return;
+    final targetEvent = widget.targetLocation?.event;
+    if (targetPost == null && targetEvent == null) return;
     _hasOpenedTargetSummary = true;
     if (!mounted) return;
-    _showSummarySheet(context, post: targetPost);
+    _showSummarySheet(context, post: targetPost, event: targetEvent);
   }
 
   void _centerMapOnUser() {
@@ -256,6 +261,10 @@ class _MapPageState extends ConsumerState<MapPage> {
         : (lat: event!.latitude, lng: event.longitude);
     final location = ref.watch(placeNameProvider(geoKey)).value;
 
+    if (_isSummarySheetOpen) {
+      Navigator.of(context).pop();
+    }
+    _isSummarySheetOpen = true;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -348,6 +357,8 @@ class _MapPageState extends ConsumerState<MapPage> {
           ),
         );
       },
-    );
+    ).whenComplete(() {
+      _isSummarySheetOpen = false;
+    });
   }
 }

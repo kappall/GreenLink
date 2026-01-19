@@ -7,6 +7,7 @@ import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/event/providers/event_provider.dart';
 import 'package:greenlinkapp/features/event/services/pdf_service.dart';
+import 'package:greenlinkapp/features/map/pages/map.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -30,6 +31,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
   @override
   Widget build(BuildContext context) {
     final event = widget.event;
+    final theme = Theme.of(context);
     final auth = ref.watch(authProvider).value;
     final isAdmin = auth?.isAdmin ?? false;
     final isAuthor = auth?.user?.id == event.author.id;
@@ -149,10 +151,52 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                       "${event.participantsCount}",
                     ),
                   const SizedBox(height: 12),
-                  _buildInfoRow(
-                    Icons.location_on_outlined,
+                  const Text(
                     "Posizione",
-                    locationName,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () {
+                      context.go(
+                        '/map',
+                        extra: MapTargetLocation(
+                          latitude: event.latitude,
+                          longitude: event.longitude,
+                          zoom: 15,
+                          event: event,
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              locationName,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.chevron_right,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   if (isAuthor) ...[
                     const SizedBox(height: 24),
