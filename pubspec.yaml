@@ -1,5 +1,5 @@
 name: greenlinkapp
-publish_to: 'none' 
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
@@ -58,10 +58,8 @@ flutter:
 flutter_native_splash:
   color: "#ffffff"
   image: assets/GreenLinkLogo.png
-
-  android_12:
-    image: assets/GreenLinkLogo.png
-    color: "#ffffff"
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
 
 # se modifichi esegui flutter pub run flutter_launcher_icons
 flutter_launcher_icons:
