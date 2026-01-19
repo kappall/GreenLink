@@ -58,7 +58,7 @@ Future<List<PostModel>> mapPosts(Ref ref) async {
         token: token,
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
-        limit: 30,
+        limit: 100,
       )).items;
     },
     loading: () => [],
@@ -86,7 +86,7 @@ Future<List<EventModel>> mapEvents(Ref ref) async {
         token: token,
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
-        limit: 30,
+        limit: 100,
       )).items;
     },
     loading: () => [],
