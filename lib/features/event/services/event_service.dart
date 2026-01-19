@@ -293,23 +293,40 @@ class EventService {
     required String token,
     required int eventId,
   }) async {
-    final uri = Uri.parse('$_baseUrl/event/$eventId/participation');
+    final joinUri = Uri.parse('$_baseUrl/event/$eventId/participation');
+    final eventUri = Uri.parse('$_baseUrl/event/$eventId');
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
     try {
-      final response = await http.post(
-        uri,
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+      final joinResponse = await http.post(
+        joinUri,
+        headers: {...headers, 'Content-Type': 'application/json'},
       );
+
+      if (joinResponse.statusCode >= 200 && joinResponse.statusCode < 300) {
+        final ticket = _extractTicket(joinResponse.body);
+        if (ticket.isNotEmpty) {
+          _clearCache();
+          return ticket;
+        }
+      } else {
+        final message = _errorMessage(joinResponse);
+        FeedbackUtils.logError(
+          "POST $joinUri failed (${joinResponse.statusCode}): $message",
+        );
+      }
+
+      final response = await http.get(eventUri, headers: headers);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         final message = _errorMessage(response);
         FeedbackUtils.logError(
-          "Participation failed for event $eventId: $message",
+          "GET $eventUri failed (${response.statusCode}): $message",
         );
         throw Exception(
-          'Non è stato possibile registrarti all\'evento. Riprova tra poco.',
+          'Non è stato possibile recuperare il ticket dell\'evento. Riprova tra poco.',
         );
       }
       final ticket = _extractTicket(response.body);
@@ -323,7 +340,7 @@ class EventService {
       return ticket;
     } catch (e) {
       FeedbackUtils.logError("Exception in participate: $e");
-      throw Exception('Errore durante l\'iscrizione all\'evento.');
+      throw Exception('Errore durante il recupero del ticket dell\'evento.');
     }
   }
 
@@ -386,13 +403,38 @@ class EventService {
     }
 
     if (decoded is Map) {
-      final value = decoded['ticket'] ?? decoded['data'] ?? decoded['code'];
-      if (value != null) {
-        return value.toString().trim();
+      final direct = decoded['ticket'] ?? decoded['code'];
+      if (direct != null) {
+        return direct.toString().trim();
+      }
+
+      final event = decoded['event'];
+      if (event is Map) {
+        final nested = event['ticket'] ?? event['code'];
+        if (nested != null) {
+          return nested.toString().trim();
+        }
+      }
+
+      final data = decoded['data'];
+      if (data is Map) {
+        final nested = data['ticket'] ?? data['code'];
+        if (nested != null) {
+          return nested.toString().trim();
+        }
+        final dataEvent = data['event'];
+        if (dataEvent is Map) {
+          final nestedEvent = dataEvent['ticket'] ?? dataEvent['code'];
+          if (nestedEvent != null) {
+            return nestedEvent.toString().trim();
+          }
+        }
+      } else if (data != null) {
+        return data.toString().trim();
       }
     }
 
-    return body.trim();
+    return '';
   }
 
   dynamic _tryDecode(String body) {

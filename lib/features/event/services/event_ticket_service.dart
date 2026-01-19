@@ -12,22 +12,41 @@ class EventTicketService {
   final String _baseUrl = 'https://greenlink.tommasodeste.it/api';
 
   Future<String> participate({required String eventId, String? token}) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/event/$eventId/participation'),
+    final response = await http.get(
+      Uri.parse('$_baseUrl/event/$eventId'),
       headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
     if (response.statusCode == 200) {
       try {
         final decoded = json.decode(response.body);
-        if (decoded is Map<String, dynamic> && decoded.containsKey('ticket')) {
-          return decoded['ticket'];
+        if (decoded is Map<String, dynamic>) {
+          final direct = decoded['ticket'] ?? decoded['code'];
+          if (direct != null) return direct.toString();
+
+          final event = decoded['event'];
+          if (event is Map) {
+            final nested = event['ticket'] ?? event['code'];
+            if (nested != null) return nested.toString();
+          }
+
+          final data = decoded['data'];
+          if (data is Map) {
+            final nested = data['ticket'] ?? data['code'];
+            if (nested != null) return nested.toString();
+            final eventData = data['event'];
+            if (eventData is Map) {
+              final nestedEvent = eventData['ticket'] ?? eventData['code'];
+              if (nestedEvent != null) return nestedEvent.toString();
+            }
+          }
+          if (data is String) return data;
         }
       } catch (e) {
         throw Exception('Failed to parse server response.');
       }
     }
 
-    throw Exception('Failed to participate in the event.');
+    throw Exception('Failed to fetch event ticket.');
   }
 
   Future<TicketValidationResult> checkTicket({
