@@ -49,8 +49,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               email: _emailController.text,
             );
         if (mounted) {
-          FeedbackUtils.showSuccess(context, 'Profile updated successfully!');
-          context.pop();
+          FeedbackUtils.showSuccess(context, 'Profilo aggiornato!');
         }
       } catch (e) {
         if (mounted) {
@@ -59,6 +58,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       } finally {
         if (mounted) {
           setState(() => _isSaving = false);
+          context.pop();
         }
       }
     }

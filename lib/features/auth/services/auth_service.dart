@@ -178,7 +178,8 @@ class AuthService {
     }
   }
 
-  Future<void> patchUser({
+  Future<UserModel> patchUser({
+    //TODO: metodo ritorna 200 ma non aggiorna nulla
     required UserModel user,
     final String? username,
     final String? email,
@@ -208,12 +209,10 @@ class AuthService {
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return;
+        return UserModel.fromJson(jsonDecode(response.body));
       }
 
-      FeedbackUtils.logError(
-        "User update failed (${response.statusCode}): ${response.body}",
-      );
+      throw Exception(response.body);
     } catch (e) {
       FeedbackUtils.logError("Connection error during user update: $e");
       rethrow;

@@ -329,8 +329,14 @@ class EventsByPartner extends _$EventsByPartner {
     try {
       final token = ref.watch(authProvider).asData?.value.token;
 
+      if (token == null) {
+        throw Exception(
+          'Utente non autenticato. ${ref.watch(authProvider).asData?.value}',
+        );
+      }
+
       final paginatedResult = await _eventService.fetchEvents(
-        token: token!,
+        token: token,
         partnerId: partnerId,
         skip: (page - 1) * _pageSize,
         limit: _pageSize,
@@ -342,7 +348,7 @@ class EventsByPartner extends _$EventsByPartner {
       );
     } catch (e, st) {
       FeedbackUtils.logError(e);
-      throw e;
+      rethrow;
     }
   }
 
@@ -531,20 +537,13 @@ final sortedEventsProvider =
       });
     });
 
-double _distanceInMeters(
-  double lat1,
-  double lon1,
-  double lat2,
-  double lon2,
-) {
+double _distanceInMeters(double lat1, double lon1, double lat2, double lon2) {
   const earthRadius = 6371000.0;
   final dLat = _degToRad(lat2 - lat1);
   final dLon = _degToRad(lon2 - lon1);
   final a =
       pow(sin(dLat / 2), 2) +
-      cos(_degToRad(lat1)) *
-          cos(_degToRad(lat2)) *
-          pow(sin(dLon / 2), 2);
+      cos(_degToRad(lat1)) * cos(_degToRad(lat2)) * pow(sin(dLon / 2), 2);
   final c = 2 * atan2(sqrt(a), sqrt(1 - a));
   return earthRadius * c;
 }

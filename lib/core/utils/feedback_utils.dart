@@ -6,8 +6,8 @@ import 'package:logger/logger.dart';
 class FeedbackUtils {
   static final Logger _logger = Logger(
     printer: PrettyPrinter(
-      methodCount: 5,
-      errorMethodCount: 8,
+      methodCount: 15,
+      errorMethodCount: 18,
       lineLength: 120,
       colors: true,
       printEmojis: true,

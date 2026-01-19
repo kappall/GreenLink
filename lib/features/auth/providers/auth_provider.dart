@@ -170,19 +170,17 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       );
     }
 
-    state = const AsyncLoading();
-
     try {
-      await _authService.patchUser(
+      final newUser = await _authService.patchUser(
         user: user,
         username: username,
         email: email,
         password: password,
         token: token,
       );
-      final updatedUser = await _authService.fetchCurrentUser(token: token);
+
       final updatedState = AuthState(
-        user: updatedUser,
+        user: newUser,
         token: token,
         derivedRole: currentState.derivedRole,
       );
