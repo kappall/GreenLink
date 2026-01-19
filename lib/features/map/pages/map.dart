@@ -322,9 +322,13 @@ class _MapPageState extends ConsumerState<MapPage> {
                   children: [
                     Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 4),
-                    Text(
-                      location ?? 'Caricamento posizione...',
-                      style: TextStyle(color: Colors.grey[600]),
+                    Expanded(
+                      child: Text(
+                        location ?? 'Caricamento posizione...',
+                        style: TextStyle(color: Colors.grey[600]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
