@@ -5,7 +5,9 @@ import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/widgets/comment_input_field.dart';
+import 'package:greenlinkapp/features/map/pages/map.dart';
 import 'package:greenlinkapp/features/user/providers/user_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/utils/feedback_utils.dart';
@@ -195,17 +197,38 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.green),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            locationName,
-                            style: const TextStyle(fontSize: 15),
+                    InkWell(
+                      onTap: () {
+                        context.go(
+                          '/map',
+                          extra: MapTargetLocation(
+                            latitude: post.latitude,
+                            longitude: post.longitude,
+                            zoom: 15,
+                            post: post,
                           ),
-                        ),
-                      ],
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  locationName,
+                                  style: const TextStyle(fontSize: 15),
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right, color: Colors.grey),
+                            ],
+                          ),
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Semantics(

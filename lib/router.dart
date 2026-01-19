@@ -159,7 +159,9 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/map',
-                builder: (context, state) => const MapPage(),
+                builder: (context, state) => MapPage(
+                  targetLocation: state.extra as MapTargetLocation?,
+                ),
               ),
             ],
           ),

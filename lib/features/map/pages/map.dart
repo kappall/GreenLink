@@ -11,8 +11,24 @@ import 'package:greenlinkapp/features/map/widgets/map_filter_drawer.dart';
 import 'package:greenlinkapp/features/map/widgets/map_summary.dart';
 import 'package:latlong2/latlong.dart';
 
+class MapTargetLocation {
+  final double latitude;
+  final double longitude;
+  final double? zoom;
+  final PostModel? post;
+
+  const MapTargetLocation({
+    required this.latitude,
+    required this.longitude,
+    this.zoom,
+    this.post,
+  });
+}
+
 class MapPage extends ConsumerStatefulWidget {
-  const MapPage({super.key});
+  final MapTargetLocation? targetLocation;
+
+  const MapPage({super.key, this.targetLocation});
 
   @override
   ConsumerState<MapPage> createState() => _MapPageState();
@@ -21,13 +37,61 @@ class MapPage extends ConsumerStatefulWidget {
 class _MapPageState extends ConsumerState<MapPage> {
   final LatLng _fallbackCenter = const LatLng(45.4398, 12.3319); // Venezia
   final MapController _mapController = MapController();
+  bool _hasOpenedTargetSummary = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _centerMapOnUser();
+      _centerMapInitial();
+      _maybeOpenTargetSummary();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant MapPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final newTarget = widget.targetLocation;
+    final oldTarget = oldWidget.targetLocation;
+
+    // Detect a different target (by coords or post id) and recenter/open sheet.
+    final targetChanged =
+        newTarget?.latitude != oldTarget?.latitude ||
+        newTarget?.longitude != oldTarget?.longitude ||
+        newTarget?.post?.id != oldTarget?.post?.id;
+
+    if (targetChanged && newTarget != null) {
+      _hasOpenedTargetSummary = false;
+      _mapController.move(
+        LatLng(newTarget.latitude, newTarget.longitude),
+        newTarget.zoom ?? 14.0,
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _maybeOpenTargetSummary();
+      });
+    }
+  }
+
+  void _centerMapInitial() {
+    final target = widget.targetLocation;
+    if (target != null) {
+      _mapController.move(
+        LatLng(target.latitude, target.longitude),
+        target.zoom ?? 14.0,
+      );
+      return;
+    }
+    _centerMapOnUser();
+  }
+
+  void _maybeOpenTargetSummary() {
+    if (_hasOpenedTargetSummary) return;
+    final targetPost = widget.targetLocation?.post;
+    if (targetPost == null) return;
+    _hasOpenedTargetSummary = true;
+    if (!mounted) return;
+    _showSummarySheet(context, post: targetPost);
   }
 
   void _centerMapOnUser() {
@@ -49,6 +113,8 @@ class _MapPageState extends ConsumerState<MapPage> {
     final events = ref.watch(filteredMapEventsProvider);
     final userLocAsync = ref.watch(userLocationProvider);
 
+    final target = widget.targetLocation;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -56,10 +122,12 @@ class _MapPageState extends ConsumerState<MapPage> {
             data: (userLoc) => FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                initialCenter: userLoc != null
-                    ? LatLng(userLoc.latitude, userLoc.longitude)
-                    : _fallbackCenter,
-                initialZoom: 12.0,
+                initialCenter: target != null
+                    ? LatLng(target.latitude, target.longitude)
+                    : userLoc != null
+                        ? LatLng(userLoc.latitude, userLoc.longitude)
+                        : _fallbackCenter,
+                initialZoom: target?.zoom ?? 12.0,
                 minZoom: 3.0,
                 maxZoom: 18.0,
               ),
