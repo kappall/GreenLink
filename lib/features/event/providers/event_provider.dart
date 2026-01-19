@@ -479,7 +479,7 @@ final sortedEventsProvider =
 
         if (filter.excludeExpired) {
           filteredEvents = filteredEvents
-              .where((element) => element.endDate.isAfter(now))
+              .where((element) => element.startDate.isAfter(now))
               .toList();
         }
 
