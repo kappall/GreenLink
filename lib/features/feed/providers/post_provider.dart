@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
-import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 import 'package:greenlinkapp/features/location/providers/location_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,26 +16,18 @@ part 'post_provider.g.dart';
 enum PostSortCriteria { date, votes, proximity }
 
 class PostFilter {
-  final int minVotes;
   final String locationQuery;
   final LatLng? resolvedLocation;
   final DateTime? startDate;
 
-  PostFilter({
-    this.minVotes = 0,
-    this.locationQuery = '',
-    this.resolvedLocation,
-    this.startDate,
-  });
+  PostFilter({this.locationQuery = '', this.resolvedLocation, this.startDate});
 
   PostFilter copyWith({
-    int? minVotes,
     String? locationQuery,
     LatLng? resolvedLocation,
     DateTime? startDate,
   }) {
     return PostFilter(
-      minVotes: minVotes ?? this.minVotes,
       locationQuery: locationQuery ?? this.locationQuery,
       resolvedLocation: resolvedLocation ?? this.resolvedLocation,
       startDate: startDate ?? this.startDate,
@@ -61,7 +52,6 @@ class PostFilterNotifier extends Notifier<PostFilter> {
   }
 
   Future<void> updateFilter({
-    int? minVotes,
     String? locationQuery,
     DateTime? startDate,
     bool clearDate = false,
@@ -87,7 +77,6 @@ class PostFilterNotifier extends Notifier<PostFilter> {
     }
 
     state = state.copyWith(
-      minVotes: minVotes,
       locationQuery: locationQuery,
       resolvedLocation: resolved,
       startDate: clearDate ? null : startDate,
@@ -315,9 +304,7 @@ class Posts extends _$Posts {
       skip: (page - 1) * _pageSize,
       limit: _pageSize,
     );
-    FeedbackUtils.logInfo(
-      "hasMore${paginatedResult.items.length}<${paginatedResult.totalItems}",
-    );
+
     return paginatedResult.copyWith(
       page: page,
       hasMore:
@@ -524,16 +511,17 @@ final sortedPostsProvider =
 
       return postsAsync.whenData((paginated) {
         final filteredPosts = paginated.items.where((post) {
-          final matchesVotes = post.votesCount >= filter.minVotes;
           final matchesDate =
               filter.startDate == null ||
               (post.createdAt != null &&
                   post.createdAt!.isAfter(filter.startDate!));
-          return matchesVotes && matchesDate;
+          return matchesDate;
         }).toList();
 
         if (criteria == PostSortCriteria.votes) {
-          filteredPosts.sort((a, b) => b.votesCount.compareTo(a.votesCount));
+          filteredPosts.sort(
+            (a, b) => b.votesCount.compareTo(a.votesCount),
+          ); // TODO: return ref.watch(postsByVotesProvider);
         }
 
         return paginated.copyWith(items: filteredPosts);

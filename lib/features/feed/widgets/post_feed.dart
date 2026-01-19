@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
 import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/widgets/post_card.dart';
 
@@ -17,7 +18,7 @@ class PostFeed extends ConsumerWidget {
           ? const SliverFillRemaining(
               child: Center(child: Text("Nessun post da visualizzare.")),
             )
-            : SliverPadding(
+          : SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               sliver: SliverList.separated(
                 itemCount: page.items.length,
@@ -38,9 +39,12 @@ class PostFeed extends ConsumerWidget {
       loading: () => const SliverFillRemaining(
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (error, stackTrace) => SliverFillRemaining(
-        child: Center(child: Text("Errore nel caricamento")),
-      ),
+      error: (error, stackTrace) {
+        FeedbackUtils.logInfo(error);
+        return SliverFillRemaining(
+          child: Center(child: Text("Nessuna Segnalazione")),
+        );
+      },
     );
   }
 }

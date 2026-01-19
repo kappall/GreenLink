@@ -7,10 +7,8 @@ void showFilterDialog(
   BuildContext context,
   WidgetRef ref,
   PostFilter currentFilter,
+  VoidCallback fun,
 ) {
-  final votesController = TextEditingController(
-    text: currentFilter.minVotes.toString(),
-  );
   final locationController = TextEditingController(
     text: currentFilter.locationQuery,
   );
@@ -27,12 +25,6 @@ void showFilterDialog(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    controller: votesController,
-                    decoration: const InputDecoration(labelText: "Voti minimi"),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 16),
                   TextField(
                     controller: locationController,
                     decoration: const InputDecoration(
@@ -78,16 +70,16 @@ void showFilterDialog(
                 child: const Text("Annulla"),
               ),
               ElevatedButton(
-                onPressed: () {
-                  ref
+                onPressed: () async {
+                  await ref
                       .read(postFilterProvider.notifier)
                       .updateFilter(
-                        minVotes: int.tryParse(votesController.text) ?? 0,
                         locationQuery: locationController.text,
                         startDate: selectedDate,
                         clearDate: selectedDate == null,
                       );
-                  Navigator.pop(context);
+                  fun();
+                  if (context.mounted) Navigator.pop(context);
                 },
                 child: const Text("Applica"),
               ),

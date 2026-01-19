@@ -104,7 +104,7 @@ final class PostsProvider
   }
 }
 
-String _$postsHash() => r'3d78fb13587bdda22722c4a6f18311c0c04b2981';
+String _$postsHash() => r'd6165414d61554e6d30b7daca0823ed4a6dce90b';
 
 final class PostsFamily extends $Family
     with
@@ -186,7 +186,7 @@ final class PostsByDistanceProvider
   PostsByDistance create() => PostsByDistance();
 }
 
-String _$postsByDistanceHash() => r'050f9c329d65678cf9521d40b4d97a19e1cdd610';
+String _$postsByDistanceHash() => r'8871478efcb770795ed08f8be10a6c75d3c39c43';
 
 abstract class _$PostsByDistance
     extends $AsyncNotifier<PaginatedResult<PostModel>> {
