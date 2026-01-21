@@ -58,7 +58,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         }
       } catch (e) {
         if (mounted) {
-          FeedbackUtils.showError(context, e.toString());
+          FeedbackUtils.showError(
+            context,
+            'Si è verificato un errore durante l\'aggiornamento del profilo. Riprova.',
+          );
         }
       } finally {
         if (mounted) {
@@ -76,7 +79,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       appBar: AppBar(title: const Text('Modifica Profilo')),
       body: userAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Errore: $err')),
+        error: (err, stack) => const Center(
+          child: Text('Si è verificato un errore nel caricamento del profilo.'),
+        ),
         data: (user) {
           if (user == null) {
             return const Center(child: Text('Utente non trovato'));

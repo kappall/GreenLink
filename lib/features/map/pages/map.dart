@@ -62,8 +62,8 @@ class _MapPageState extends ConsumerState<MapPage> {
     final targetChanged =
         newTarget?.latitude != oldTarget?.latitude ||
         newTarget?.longitude != oldTarget?.longitude ||
-      newTarget?.post?.id != oldTarget?.post?.id ||
-      newTarget?.event?.id != oldTarget?.event?.id;
+        newTarget?.post?.id != oldTarget?.post?.id ||
+        newTarget?.event?.id != oldTarget?.event?.id;
 
     if (targetChanged && newTarget != null) {
       _hasOpenedTargetSummary = false;
@@ -130,8 +130,8 @@ class _MapPageState extends ConsumerState<MapPage> {
                 initialCenter: target != null
                     ? LatLng(target.latitude, target.longitude)
                     : userLoc != null
-                        ? LatLng(userLoc.latitude, userLoc.longitude)
-                        : _fallbackCenter,
+                    ? LatLng(userLoc.latitude, userLoc.longitude)
+                    : _fallbackCenter,
                 initialZoom: target?.zoom ?? 12.0,
                 minZoom: 3.0,
                 maxZoom: 18.0,
@@ -161,7 +161,8 @@ class _MapPageState extends ConsumerState<MapPage> {
               ],
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(child: Text('Errore: $err')),
+            error: (err, stack) =>
+                Center(child: Text('Errore caricamento mappa')),
           ),
           Align(
             alignment: Alignment.bottomRight,
