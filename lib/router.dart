@@ -52,10 +52,14 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   // Listener per forzare il refresh del router quando cambia l'auth o l'onboarding
   final routerListenable = ValueNotifier<bool>(true);
-  ref.listen(
-    authProvider,
-    (_, __) => routerListenable.value = !routerListenable.value,
-  );
+  ref.listen(authProvider, (previous, next) {
+    final prevIsAuthenticated = previous?.value?.isAuthenticated ?? false;
+    final nextIsAuthenticated = next.value?.isAuthenticated ?? false;
+
+    if (prevIsAuthenticated != nextIsAuthenticated) {
+      routerListenable.value = !routerListenable.value;
+    }
+  });
   ref.listen(
     onboardingProvider,
     (_, __) => routerListenable.value = !routerListenable.value,
@@ -159,9 +163,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/map',
-                builder: (context, state) => MapPage(
-                  targetLocation: state.extra as MapTargetLocation?,
-                ),
+                builder: (context, state) =>
+                    MapPage(targetLocation: state.extra as MapTargetLocation?),
               ),
             ],
           ),

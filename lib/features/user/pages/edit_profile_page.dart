@@ -54,6 +54,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             );
         if (mounted) {
           FeedbackUtils.showSuccess(context, 'Profilo aggiornato!');
+          context.pop();
         }
       } catch (e) {
         if (mounted) {
@@ -62,7 +63,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       } finally {
         if (mounted) {
           setState(() => _isSaving = false);
-          context.pop();
         }
       }
     }

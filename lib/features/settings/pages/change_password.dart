@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/features/auth/providers/auth_provider.dart';
 
 import '../../../core/utils/feedback_utils.dart';
@@ -44,7 +45,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
 
         if (mounted) {
           FeedbackUtils.showSuccess(context, "Password changed successfully");
-          Navigator.of(context).pop();
+          context.pop();
         }
       } catch (e) {
         if (mounted) {
