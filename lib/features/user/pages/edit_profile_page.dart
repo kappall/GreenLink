@@ -16,6 +16,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _usernameController;
   late TextEditingController _emailController;
+  late TextEditingController _passwordController;
   bool _isSaving = false;
 
   @override
@@ -24,12 +25,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final user = ref.read(currentUserProvider).value;
     _usernameController = TextEditingController(text: user?.username ?? '');
     _emailController = TextEditingController(text: user?.email ?? '');
+    _passwordController = TextEditingController();
   }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -47,6 +50,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               user: user,
               username: _usernameController.text,
               email: _emailController.text,
+              password: _passwordController.text,
             );
         if (mounted) {
           FeedbackUtils.showSuccess(context, 'Profilo aggiornato!');
@@ -69,13 +73,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final userAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(title: const Text('Modifica Profilo')),
       body: userAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(child: Text('Errore: $err')),
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('User not found'));
+            return const Center(child: Text('Utente non trovato'));
           }
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -88,7 +92,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     decoration: const InputDecoration(labelText: 'Username'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a username';
+                        return 'Inserisci username';
                       }
                       return null;
                     },
@@ -99,7 +103,21 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     decoration: const InputDecoration(labelText: 'Email'),
                     validator: (value) {
                       if (value == null || !value.contains('@')) {
-                        return 'Please enter a valid email';
+                        return 'Inserisci una mail valida';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Password Corrente',
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Inserisci la tua password attuale per salvare';
                       }
                       return null;
                     },

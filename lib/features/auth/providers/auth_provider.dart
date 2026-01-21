@@ -159,7 +159,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     required UserModel user,
     final String? username,
     final String? email,
-    final String? password,
+    required String password,
   }) async {
     final currentState = state.asData?.value;
     final token = currentState?.token;

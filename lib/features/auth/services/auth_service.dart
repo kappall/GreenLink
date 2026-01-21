@@ -179,11 +179,10 @@ class AuthService {
   }
 
   Future<UserModel> patchUser({
-    //TODO: metodo ritorna 200 ma non aggiorna nulla
     required UserModel user,
     final String? username,
     final String? email,
-    final String? password,
+    required String password,
     required String token,
   }) async {
     late Uri uri;
@@ -197,12 +196,13 @@ class AuthService {
       payload['id'] = user.id;
       if (username != null) payload['username'] = username;
       if (email != null) payload['email'] = email;
-      if (password != null) payload['password'] = password;
+      payload['password'] = password;
 
       final response = await http.put(
         uri,
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode(payload),

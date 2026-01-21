@@ -125,7 +125,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             TextButton(
                               onPressed: () => context.push('/profile/edit'),
                               child: const Text(
-                                'Edit Profile',
+                                'Modifica Profilo',
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
