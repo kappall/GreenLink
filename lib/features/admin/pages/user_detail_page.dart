@@ -23,6 +23,7 @@ class UserDetailPage extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final userPostsPage = ref.watch(postsProvider(user.id));
     final userEvents = ref.watch(eventsByUserProvider(user.id));
+    final partnerEvents = ref.watch(eventsByPartnerProvider(user.id));
     final userComments = ref.watch(commentsByUserIdProvider(user.id));
 
     return Scaffold(
@@ -51,21 +52,13 @@ class UserDetailPage extends ConsumerWidget {
           children: [
             _buildUserInfoCard(context, user),
             const SizedBox(height: 20),
-            Text(
-              "Metriche Attività",
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
             _buildStatsGrid(
               user,
               userPostsPage.asData?.value.items.length ?? 0,
-              userEvents.asData?.value.items.length ?? 0,
+              user.role == AuthRole.partner
+                  ? partnerEvents.asData?.value.items.length ?? 0
+                  : userEvents.asData?.value.items.length ?? 0,
               userComments.asData?.value.length ?? 0,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "Contenuti Pubblicati",
-              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             userPostsPage.when(
@@ -85,7 +78,7 @@ class UserDetailPage extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text("No posts"),
+              error: (e, _) => Text("Nessun post pubblicato"),
             ),
             const SizedBox(height: 20),
             if (user.role == AuthRole.partner) ...[
@@ -94,8 +87,7 @@ class UserDetailPage extends ConsumerWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 12),
-              userEvents.when(
-                //TODO: partner events
+              partnerEvents.when(
                 data: (page) {
                   final events = page.items;
                   if (events.isEmpty) {
@@ -106,7 +98,7 @@ class UserDetailPage extends ConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: events.length,
                     itemBuilder: (context, index) =>
-                        EventCard(event: events[index]),
+                        UiCard(child: EventCard(event: events[index])),
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),
                   );
@@ -115,31 +107,26 @@ class UserDetailPage extends ConsumerWidget {
                 error: (e, _) => Text("Errore: $e"),
               ),
               const SizedBox(height: 20),
-            ],
-            if (user.role == AuthRole.user) ...[
+            ] else ...[
               Text(
                 "Eventi a cui Partecipa",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 12),
               userEvents.when(
-                //TODO: partner events
                 data: (page) {
                   final events = page.items;
                   if (events.isEmpty) {
                     return const Text("Nessun evento creato.");
                   }
-                  return UiCard(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: events.length,
-                      itemBuilder: (context, index) => EventCard(
-                        event: events[index],
-                      ), // TODO: non si vedono dettagli on tap
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 10),
-                    ),
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: events.length,
+                    itemBuilder: (context, index) =>
+                        UiCard(child: EventCard(event: events[index])),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -244,7 +231,9 @@ class UserDetailPage extends ConsumerWidget {
           color: Colors.green,
         ),
         _StatItem(
-          label: "Eventi Creati",
+          label: user.role == AuthRole.partner
+              ? "Eventi Creati"
+              : "Eventi a cui Partecipa",
           value: eventCount.toString(),
           color: Colors.blue,
         ),

@@ -153,24 +153,23 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                   const SizedBox(height: 12),
                   const Text(
                     "Posizione",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   InkWell(
-                    onTap: () {
-                      context.go(
-                        '/map',
-                        extra: MapTargetLocation(
-                          latitude: event.latitude,
-                          longitude: event.longitude,
-                          zoom: 15,
-                          event: event,
-                        ),
-                      );
-                    },
+                    onTap: isAdmin
+                        ? null
+                        : () {
+                            context.go(
+                              '/map',
+                              extra: MapTargetLocation(
+                                latitude: event.latitude,
+                                longitude: event.longitude,
+                                zoom: 15,
+                                event: event,
+                              ),
+                            );
+                          },
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -190,10 +189,8 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
                               ),
                             ),
                           ),
-                          const Icon(
-                            Icons.chevron_right,
-                            color: Colors.grey,
-                          ),
+                          if (!isAdmin)
+                            const Icon(Icons.chevron_right, color: Colors.grey),
                         ],
                       ),
                     ),
@@ -241,73 +238,75 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: (isAuthor && isToday)
-                      ? ElevatedButton.icon(
-                          onPressed: () {
-                            final eventId = event.id?.toString();
-                            if (eventId != null) {
-                              context.push('/event/$eventId/scanner');
-                            }
-                          },
-                          icon: const Icon(Icons.qr_code_scanner),
-                          label: const Text('Valida Biglietti'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            foregroundColor: Theme.of(
-                              context,
-                            ).colorScheme.onPrimary,
-                          ),
-                        )
-                      : FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: isActionDisabled
-                                ? Colors.grey[400]
-                                : Theme.of(context).colorScheme.primary,
-                          ),
-                          onPressed: isActionDisabled
-                              ? null
-                              : (isParticipating
-                                    ? () => _requestQrCode(context, ref)
-                                    : () => _participateEvent(context, ref)),
-                          child: Text(
-                            isExpired
-                                ? "EVENTO SCADUTO"
-                                : isAuthor
-                                ? "HAI CREATO QUESTO EVENTO"
-                                : isParticipating
-                                ? "OTTIENI QR CODE"
-                                : "PARTECIPA ALL'EVENTO",
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                ),
-                if (showQrAction) ...[
-                  const SizedBox(height: 8),
+          if (!isAdmin) ...[
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   SizedBox(
                     width: double.infinity,
-                    child: TextButton(
-                      onPressed: () => _leaveEvent(context, ref),
-                      child: const Text("DISISCRIVITI"),
-                    ),
+                    height: 54,
+                    child: (isAuthor && isToday)
+                        ? ElevatedButton.icon(
+                            onPressed: () {
+                              final eventId = event.id?.toString();
+                              if (eventId != null) {
+                                context.push('/event/$eventId/scanner');
+                              }
+                            },
+                            icon: const Icon(Icons.qr_code_scanner),
+                            label: const Text('Valida Biglietti'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary,
+                            ),
+                          )
+                        : FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: isActionDisabled
+                                  ? Colors.grey[400]
+                                  : Theme.of(context).colorScheme.primary,
+                            ),
+                            onPressed: isActionDisabled
+                                ? null
+                                : (isParticipating
+                                      ? () => _requestQrCode(context, ref)
+                                      : () => _participateEvent(context, ref)),
+                            child: Text(
+                              isExpired
+                                  ? "EVENTO SCADUTO"
+                                  : isAuthor
+                                  ? "HAI CREATO QUESTO EVENTO"
+                                  : isParticipating
+                                  ? "OTTIENI QR CODE"
+                                  : "PARTECIPA ALL'EVENTO",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
                   ),
+                  if (showQrAction) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: () => _leaveEvent(context, ref),
+                        child: const Text("DISISCRIVITI"),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

@@ -197,17 +197,19 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                     ),
                     const SizedBox(height: 8),
                     InkWell(
-                      onTap: () {
-                        context.go(
-                          '/map',
-                          extra: MapTargetLocation(
-                            latitude: post.latitude,
-                            longitude: post.longitude,
-                            zoom: 15,
-                            post: post,
-                          ),
-                        );
-                      },
+                      onTap: isAdmin
+                          ? null
+                          : () {
+                              context.go(
+                                '/map',
+                                extra: MapTargetLocation(
+                                  latitude: post.latitude,
+                                  longitude: post.longitude,
+                                  zoom: 15,
+                                  post: post,
+                                ),
+                              );
+                            },
                       borderRadius: BorderRadius.circular(8),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -224,7 +226,12 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                                 style: const TextStyle(fontSize: 15),
                               ),
                             ),
-                            const Icon(Icons.chevron_right, color: Colors.grey),
+                            if (!isAdmin) ...[
+                              const Icon(
+                                Icons.chevron_right,
+                                color: Colors.grey,
+                              ),
+                            ],
                           ],
                         ),
                       ),
