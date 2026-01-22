@@ -102,13 +102,13 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                         CircleAvatar(
                           radius: 20,
                           backgroundColor: Colors.grey[200],
-                          child: Text(
-                            post.author == null
-                                ? ""
-                                : post.author!.displayName.isNotEmpty == true
-                                ? post.author!.displayName[0].toUpperCase()
-                                : '?',
-                          ),
+                          child: post.author != null
+                              ? Text(post.author!.displayName[0].toUpperCase())
+                              : Icon(
+                                  Icons.person_off,
+                                  size: 28,
+                                  color: Colors.black54,
+                                ),
                         ),
                         const SizedBox(width: 12),
                         Column(
