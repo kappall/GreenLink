@@ -14,6 +14,7 @@ import 'package:pdf/widgets.dart' as pw;
 import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../event/providers/event_provider.dart';
+import '../../feed/providers/comment_provider.dart';
 import '../../feed/providers/post_provider.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -294,6 +295,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
     final userPosts = ref.read(postsProvider(user.id)).asData?.value;
     final userEvents = ref.read(eventsByUserProvider(user.id)).asData?.value;
+    final userComments = ref
+        .read(commentsByUserIdProvider(user.id))
+        .asData
+        ?.value;
 
     final pdf = pw.Document();
 
@@ -357,6 +362,31 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 );
               },
               itemCount: userEvents.totalItems,
+            ),
+          ],
+          pw.SizedBox(height: 20),
+          pw.Divider(),
+          pw.SizedBox(height: 20),
+          if (userComments != null) ...[
+            pw.Text(
+              "Commenti pubblicati (non eliminati)",
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.ListView.builder(
+              itemBuilder: (context, index) {
+                final comment = userComments[index];
+                return pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Commento id: ${comment.id}"),
+                    pw.Text("Post id: ${comment.contentId}"),
+                    pw.Text("Descrizione: ${comment.description}"),
+                    pw.Text("Creato in data: ${comment.createdAt}"),
+                    pw.Divider(),
+                  ],
+                );
+              },
+              itemCount: userComments.length,
             ),
           ],
         ],
