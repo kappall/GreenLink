@@ -7,7 +7,6 @@ import '../../auth/utils/role_parser.dart';
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
-//TODO: questo va cambiato appena quelli il backend completa la parte di user
 @freezed
 abstract class UserModel with _$UserModel {
   const UserModel._();

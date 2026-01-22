@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:greenlinkapp/core/providers/theme_provider.dart';
 import 'package:greenlinkapp/core/services/socket_service.dart';
 import 'package:greenlinkapp/router.dart';
 import 'package:intl/date_symbol_data_local.dart';

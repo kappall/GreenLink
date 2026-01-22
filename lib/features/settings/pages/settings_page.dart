@@ -1,14 +1,20 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:greenlinkapp/core/common/widgets/card.dart';
-import 'package:greenlinkapp/core/providers/theme_provider.dart';
 import 'package:greenlinkapp/features/legal/pages/privacy_policy_page.dart';
 import 'package:greenlinkapp/features/legal/pages/terms_and_conditions_page.dart';
 import 'package:greenlinkapp/features/settings/pages/change_location_page.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 import '../../../core/utils/feedback_utils.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../event/providers/event_provider.dart';
+import '../../feed/providers/post_provider.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -23,10 +29,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    final currentThemeMode = ref.watch(themeProvider);
-
-    final isDark = currentThemeMode == ThemeMode.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -78,19 +80,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     );
                   },
                 ),
-                const Divider(height: 1),
-                _buildSettingsItem(
-                  context,
-                  title: "Tema Scuro",
-                  trailing: Switch.adaptive(
-                    value: isDark,
-                    onChanged: (val) {
-                      ref
-                          .read(themeProvider.notifier)
-                          .setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
-                    },
-                  ),
-                ),
               ],
             ),
 
@@ -126,6 +115,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       ),
                     );
                   },
+                ),
+                const Divider(height: 1),
+                _buildSettingsItem(
+                  context,
+                  title: "Esporta Dati",
+                  icon: Icons.download_outlined,
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                  onTap: () => _exportUserData(context, ref),
                 ),
                 const Divider(height: 1),
                 _buildSettingsItem(
@@ -286,5 +283,94 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ],
       ),
     );
+  }
+
+  void _exportUserData(BuildContext context, WidgetRef ref) async {
+    final user = ref.read(authProvider).asData?.value.user;
+
+    if (user == null) {
+      FeedbackUtils.showError(context, "Utente non autenticato.");
+      return;
+    }
+    final userPosts = ref.read(postsProvider(user.id)).asData?.value;
+    final userEvents = ref.read(eventsByUserProvider(user.id)).asData?.value;
+
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.MultiPage(
+        build: (pw.Context context) => [
+          pw.Text(
+            'Dati Utente',
+            style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.Divider(),
+          pw.SizedBox(height: 20),
+          pw.Text('ID: ${user.id}'),
+          pw.Text('Email: ${user.email}'),
+          pw.Text('Username: ${user.username ?? 'Sconosciuto'}'),
+          pw.Text('Ruolo: ${user.role?.name ?? 'Sconosciuto'}'),
+          pw.SizedBox(height: 20),
+          pw.Divider(),
+          pw.SizedBox(height: 20),
+          if (userPosts != null) ...[
+            pw.Text(
+              "Post pubblicati (non eliminati)",
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.ListView.builder(
+              itemBuilder: (context, index) {
+                final post = userPosts.items[index];
+                return pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Post id: ${post.id}"),
+                    pw.Text("Descrizione: ${post.description}"),
+                    pw.Text("Numero media: ${post.media.length}"),
+                    pw.Text("Creato in data: ${post.createdAt}"),
+                    pw.Divider(),
+                  ],
+                );
+              },
+              itemCount: userPosts.totalItems,
+            ),
+          ],
+          pw.SizedBox(height: 20),
+          pw.Divider(),
+          pw.SizedBox(height: 20),
+          if (userEvents != null) ...[
+            pw.Text(
+              "Eventi partecipati (non eliminati)",
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.ListView.builder(
+              itemBuilder: (context, index) {
+                final event = userEvents.items[index];
+                return pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Event id: ${event.id}"),
+                    pw.Text("titolo: ${event.title}"),
+                    pw.Text("Descrizione: ${event.description}"),
+                    pw.Divider(),
+                  ],
+                );
+              },
+              itemCount: userEvents.totalItems,
+            ),
+          ],
+        ],
+      ),
+    );
+
+    try {
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/user_data.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      OpenFile.open(file.path);
+    } catch (e) {
+      FeedbackUtils.showError(context, "Impossibile esportare i dati: $e");
+    }
   }
 }
