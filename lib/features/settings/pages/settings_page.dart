@@ -300,6 +300,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         .asData
         ?.value;
 
+    final createdEvents = ref
+        .read(eventsByPartnerProvider(user.id))
+        .asData
+        ?.value;
+
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -332,7 +337,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     pw.Text("Post id: ${post.id}"),
                     pw.Text("Descrizione: ${post.description}"),
                     pw.Text("Numero media: ${post.media.length}"),
-                    pw.Text("Creato in data: ${post.createdAt}"),
+                    pw.Text("Data creazione: ${post.createdAt}"),
                     pw.Divider(),
                   ],
                 );
@@ -357,11 +362,40 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     pw.Text("Event id: ${event.id}"),
                     pw.Text("titolo: ${event.title}"),
                     pw.Text("Descrizione: ${event.description}"),
+                    pw.Text("Data inizio evento: ${event.startDate}"),
+                    pw.Text("Data fine evento: ${event.endDate}"),
                     pw.Divider(),
                   ],
                 );
               },
               itemCount: userEvents.totalItems,
+            ),
+          ],
+          pw.SizedBox(height: 20),
+          pw.Divider(),
+          pw.SizedBox(height: 20),
+          if (createdEvents != null) ...[
+            pw.Text(
+              "Eventi Creati (non eliminati)",
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.ListView.builder(
+              itemBuilder: (context, index) {
+                final event = createdEvents.items[index];
+                return pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text("Event id: ${event.id}"),
+                    pw.Text("titolo: ${event.title}"),
+                    pw.Text("Descrizione: ${event.description}"),
+                    pw.Text("Data creazione: ${event.createdAt}"),
+                    pw.Text("Data inizio evento: ${event.startDate}"),
+                    pw.Text("Data fine evento: ${event.endDate}"),
+                    pw.Divider(),
+                  ],
+                );
+              },
+              itemCount: createdEvents.totalItems,
             ),
           ],
           pw.SizedBox(height: 20),
@@ -381,7 +415,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     pw.Text("Commento id: ${comment.id}"),
                     pw.Text("Post id: ${comment.contentId}"),
                     pw.Text("Descrizione: ${comment.description}"),
-                    pw.Text("Creato in data: ${comment.createdAt}"),
+                    pw.Text("Data creazione: ${comment.createdAt}"),
                     pw.Divider(),
                   ],
                 );
