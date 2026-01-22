@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -156,9 +158,16 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                               setState(() => _currentPage = index);
                             },
                             itemBuilder: (context, index) {
-                              return Image.memory(
-                                post.media[index],
-                                fit: BoxFit.cover,
+                              return GestureDetector(
+                                onTap: () => _openImageViewer(
+                                  context,
+                                  images: post.media,
+                                  initialIndex: index,
+                                ),
+                                child: Image.memory(
+                                  post.media[index],
+                                  fit: BoxFit.cover,
+                                ),
                               );
                             },
                           ),
@@ -399,5 +408,67 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
         }
       }
     }
+  }
+
+  void _openImageViewer(
+    BuildContext context, {
+    required List<Uint8List> images,
+    required int initialIndex,
+  }) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.all(12),
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            PageView.builder(
+              controller: PageController(initialPage: initialIndex),
+              itemCount: images.length,
+              itemBuilder: (context, index) {
+                return Stack(
+                  children: [
+                    InteractiveViewer(
+                      minScale: 1,
+                      maxScale: 4,
+                      child: Center(child: Image.memory(images[index])),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        color: Colors.black.withValues(alpha: 0.6),
+                        child: Text(
+                          'Immagine ${index + 1} di ${images.length}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
