@@ -72,6 +72,7 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                     onChanged: (val) => ref
                         .read(usersSearchQueryProvider.notifier)
                         .setSearchQuery(val),
+                    textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
                       hintText: "Cerca per nome o email...",
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),

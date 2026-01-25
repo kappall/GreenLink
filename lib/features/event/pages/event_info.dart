@@ -451,6 +451,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
         if (mounted) {
           Navigator.pop(context);
         }
+        FeedbackUtils.showSuccess(context, "Evento eliminato con successo");
       } catch (e) {
         if (mounted) {
           FeedbackUtils.showError(context, e);

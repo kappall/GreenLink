@@ -1,3 +1,5 @@
+import 'package:elegant_notification/elegant_notification.dart';
+import 'package:elegant_notification/resources/arrays.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,61 +28,73 @@ class MainWrapper extends ConsumerWidget {
       final notification = next.value;
       if (notification != null && context.mounted) {
         final type = notification['type'];
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.notifications_active, color: Colors.white),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text('Nuova segnalazione ($type) nelle vicinanze'),
+        void handleTap() async {
+          try {
+            if (type == 'Post') {
+              final post = PostModel.fromJson(notification);
+              if (context.mounted) {
+                context.push('/post-info', extra: post);
+              }
+            } else if (type == 'Event') {
+              final event = EventModel.fromJson(notification);
+              if (context.mounted) {
+                context.push('/event-info', extra: event);
+              }
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ElegantNotification.error(
+                title: const Text("Errore"),
+                description: Text(
+                  "Impossibile aprire la notifica: ${e.toString()}",
                 ),
-              ],
-            ),
-            action: SnackBarAction(
-              label: 'VEDI',
-              onPressed: () async {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    const SnackBar(content: Text('Caricamento...')),
-                  );
+              ).show(context);
+            }
+          }
+        }
 
-                try {
-                  if (type == 'Post') {
-                    final post = PostModel.fromJson(notification);
-                    if (context.mounted) {
-                      context.push('/post-info', extra: post);
-                    }
-                  } else if (type == 'Event') {
-                    final event = EventModel.fromJson(notification);
-
-                    if (context.mounted) {
-                      context.push('/event-info', extra: event);
-                    }
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Errore: ${e.toString()}')),
-                    );
-                  }
-                } finally {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  }
-                }
-              },
+        if (type == 'Post') {
+          ElegantNotification.info(
+            animation: AnimationType.fromTop,
+            position: Alignment.topCenter,
+            height: 100,
+            toastDuration: Duration(milliseconds: 6000),
+            verticalDividerColor: Colors.white,
+            background: Colors.red,
+            title: null,
+            description: const Text("Nuova Segnalazione nelle vicinanze"),
+            action: TextButton(
+              onPressed: handleTap,
+              child: const Text(
+                "VEDI",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
+          ).show(context);
+        } else if (type == 'Event') {
+          ElegantNotification.info(
+            animation: AnimationType.fromTop,
+            position: Alignment.topCenter,
+            height: 100,
+            verticalDividerColor: Colors.white,
+            background: Colors.green,
+            title: null,
+            description: const Text("Nuovo Evento nelle vicinanze"),
+            action: TextButton(
+              onPressed: handleTap,
+              child: const Text(
+                "VEDI",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            duration: const Duration(seconds: 5),
-          ),
-        );
+          ).show(context);
+        }
       }
     });
     final todaysEvents = ref.watch(todaysEventsProvider);
@@ -116,6 +130,7 @@ class MainWrapper extends ConsumerWidget {
       ),
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
+        height: 60,
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: _goBranch,
         destinations: const [

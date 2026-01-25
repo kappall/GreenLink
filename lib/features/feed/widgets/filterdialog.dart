@@ -27,6 +27,7 @@ void showFilterDialog(
                 children: [
                   TextField(
                     controller: locationController,
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(
                       labelText: "Posizione (es. Milano)",
                       hintText: "Inserisci città per la vicinanza",

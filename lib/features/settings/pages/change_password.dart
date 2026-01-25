@@ -72,6 +72,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
             children: [
               TextFormField(
                 controller: _currentPasswordController,
+                textInputAction: TextInputAction.done,
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: "Password Attuale",
@@ -83,6 +84,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _newPasswordController,
+                textInputAction: TextInputAction.done,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: "Nuova Password"),
                 validator: (value) {
@@ -98,6 +100,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _confirmPasswordController,
+                textInputAction: TextInputAction.done,
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: "Conferma Nuova Password",

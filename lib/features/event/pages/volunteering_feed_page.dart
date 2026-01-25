@@ -67,6 +67,7 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
                                       .read(eventsSearchQueryProvider.notifier)
                                       .state =
                                   val,
+                          textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             hintText: 'Cerca eventi di volontariato...',
                             prefixIcon: const Icon(Icons.search),

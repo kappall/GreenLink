@@ -75,6 +75,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
         title: const Text("Inserisci Indirizzo"),
         content: TextField(
           controller: controller,
+          textInputAction: TextInputAction.done,
           decoration: const InputDecoration(
             hintText: "Es: Via Roma 1, Milano",
             helperText: "Specifica città e via per risultati migliori",
@@ -193,8 +194,9 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
         : 0;
     final controller = FixedExtentScrollController(initialItem: initialIndex);
     int tempSelection = fieldState.value ?? options.first;
-    final textController =
-        TextEditingController(text: tempSelection.toString());
+    final textController = TextEditingController(
+      text: tempSelection.toString(),
+    );
 
     final selected = await showModalBottomSheet<int>(
       context: context,
@@ -220,10 +222,13 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: TextField(
                   controller: textController,
+                  textInputAction: TextInputAction.done,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: const InputDecoration(
@@ -231,9 +236,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                   ),
                   onChanged: (value) {
                     final parsed = int.tryParse(value);
-                    if (parsed != null &&
-                        parsed >= 1 &&
-                        parsed <= 7000000000) {
+                    if (parsed != null && parsed >= 1 && parsed <= 7000000000) {
                       tempSelection = parsed;
                     }
                   },
@@ -335,6 +338,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
             const SizedBox(height: 20),
             TextFormField(
               controller: _titleController,
+              textInputAction: TextInputAction.done,
               decoration: const InputDecoration(
                 labelText: "Titolo",
                 border: OutlineInputBorder(),
@@ -345,6 +349,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
             const SizedBox(height: 20),
             TextFormField(
               controller: _descriptionController,
+              textInputAction: TextInputAction.done,
               decoration: const InputDecoration(
                 labelText: "Descrizione",
                 border: OutlineInputBorder(),
@@ -358,8 +363,9 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
               initialValue: _maxParticipants,
               validator: (v) => v == null ? "Seleziona un numero" : null,
               builder: (state) {
-                final displayValue =
-                    state.value != null ? state.value.toString() : "Seleziona";
+                final displayValue = state.value != null
+                    ? state.value.toString()
+                    : "Seleziona";
                 final textStyle = TextStyle(
                   color: state.value == null
                       ? Theme.of(context).hintColor

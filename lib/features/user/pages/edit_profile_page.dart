@@ -94,6 +94,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 children: [
                   TextFormField(
                     controller: _usernameController,
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(labelText: 'Username'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -105,6 +106,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _emailController,
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(labelText: 'Email'),
                     validator: (value) {
                       if (value == null || !value.contains('@')) {
@@ -116,6 +118,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(
                       labelText: 'Password Corrente',
                     ),

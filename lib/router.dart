@@ -70,75 +70,48 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: true,
-    initialLocation: '/home',
+    initialLocation: '/login',
     refreshListenable: routerListenable,
     redirect: (context, state) {
       final authAsync = ref.read(authProvider);
       final hasCompletedOnboarding = ref.read(onboardingProvider);
 
-      // Se sta caricando l'autenticazione, non fare nulla (resta sulla splash)
+      // If auth is loading, don't redirect (stay on splash screen)
       if (authAsync.isLoading) return null;
 
       final authState = authAsync.value;
-      final isLoggedIn = authState?.isLoggedIn ?? false;
       final isAuthenticated = authState?.isAuthenticated ?? false;
-      final isAdmin = authState?.isAdmin ?? false;
 
       final path = state.uri.path;
-      final isLoggingIn = path == '/login';
-      final isRegistering = path == '/register';
-      final isPartnerActivation = path == '/partner-token';
-      final isIntro = path == '/onboarding';
-      final isAdminRoute = path.startsWith('/admin');
+      final isAuthRoute = [
+        '/login',
+        '/register',
+        '/partner-token',
+        '/onboarding',
+      ].contains(path);
 
+      // If user is not authenticated, redirect to login unless they are on an auth route
+      if (!isAuthenticated) {
+        return isAuthRoute ? null : '/login';
+      }
+
+      // If user is authenticated, handle redirects for admin, onboarding, and auth routes
+      final isAdmin = authState?.isAdmin ?? false;
       final isSharedRoute = [
         '/profile',
         '/settings',
         '/post-info',
         '/event-info',
       ].contains(path);
+      final isAdminRoute = path.startsWith('/admin');
 
-      // 1. UTENTE NON AUTENTICATO (Anonimo o non loggato)
-      if (!isAuthenticated) {
-        // Se è anonimo (isLoggedIn), può navigare nelle sezioni principali
-        if (isLoggedIn) {
-          // Se è già "loggato" come anonimo e prova ad andare su auth, mandalo a home
-          if (isLoggingIn || isRegistering || isPartnerActivation) {
-            return '/home';
-          }
-          return null;
-        }
-
-        // Se non è nemmeno anonimo e sta cercando di andare in pagine di auth, lo lasciamo fare
-        if (isLoggingIn || isRegistering || isPartnerActivation) return null;
-
-        // Altrimenti forza il login
-        return '/login';
-      }
-
-      // 2. UTENTE AUTENTICATO - GESTIONE ADMIN
       if (isAdmin) {
-        if (isLoggingIn ||
-            isRegistering ||
-            isPartnerActivation ||
-            (!isAdminRoute && !isSharedRoute)) {
+        if (!isAdminRoute && !isSharedRoute) {
           return '/admin/reports';
         }
-        return null;
-      }
-
-      // 3. UTENTE AUTENTICATO - GESTIONE ONBOARDING (Solo per chi ha un account reale)
-      if (!hasCompletedOnboarding) {
-        if (isIntro) return null;
-        return '/onboarding';
-      }
-
-      // 4. UTENTE AUTENTICATO - PREVIENI RITORNO AD AUTH/ONBOARDING
-      if (isLoggingIn ||
-          isRegistering ||
-          isPartnerActivation ||
-          isIntro ||
-          isAdminRoute) {
+      } else if (!hasCompletedOnboarding) {
+        if (path != '/onboarding') return '/onboarding';
+      } else if (isAuthRoute || isAdminRoute) {
         return '/home';
       }
 

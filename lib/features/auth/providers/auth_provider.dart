@@ -7,6 +7,7 @@ import 'package:greenlinkapp/features/auth/services/auth_service.dart';
 import 'package:greenlinkapp/features/auth/utils/auth_validators.dart';
 import 'package:greenlinkapp/features/auth/utils/role_parser.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthState> {
@@ -22,7 +23,8 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(_tokenKey);
 
-    if (token == null || token.isEmpty) {
+    if (token == null || token.isEmpty || JwtDecoder.isExpired(token)) {
+      await prefs.remove(_tokenKey);
       return AuthState.unauthenticated();
     }
 

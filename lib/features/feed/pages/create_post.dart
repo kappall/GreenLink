@@ -21,6 +21,14 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final TextEditingController _descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _descriptionController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
@@ -194,6 +202,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                 controller: _descriptionController,
                 maxLength: 2000,
                 maxLines: 10,
+                textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
                   hintText: 'Descrivi la situazione...',
                   border: OutlineInputBorder(

@@ -1,5 +1,3 @@
-import 'package:elegant_notification/elegant_notification.dart';
-import 'package:elegant_notification/resources/arrays.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -14,25 +12,50 @@ class FeedbackUtils {
     ),
   );
 
-  /// Mostra un messaggio di successo in alto
+  static void _showSnackBar(
+    BuildContext context,
+    String message, {
+    Color? backgroundColor,
+    IconData? icon,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 16),
+              ],
+              Expanded(child: Text(message)),
+            ],
+          ),
+          backgroundColor: backgroundColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        ),
+      );
+  }
+
+  /// Mostra un messaggio di successo con SnackBar
   static void showSuccess(
     BuildContext context,
     String message, {
     String? title,
   }) {
-    ElegantNotification.success(
-      width: 360,
-      position: Alignment.topCenter,
-      animation: AnimationType.fromTop,
-      title: Text(
-        title ?? 'Ottimo!',
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      description: Text(message),
-    ).show(context);
+    _showSnackBar(
+      context,
+      message,
+      backgroundColor: Colors.green.shade600,
+      icon: Icons.check_circle_outline,
+    );
   }
 
-  /// Mostra un messaggio di errore in alto, pulendo automaticamente il testo
+  /// Mostra un messaggio di errore con SnackBar
   static void showError(
     BuildContext context,
     dynamic error, {
@@ -45,30 +68,17 @@ class FeedbackUtils {
         .replaceAll('Error: ', '')
         .trim();
 
-    ElegantNotification.error(
-      width: 360,
-      position: Alignment.topCenter,
-      animation: AnimationType.fromTop,
-      title: Text(
-        title ?? 'Ops!',
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      description: Text(message),
-    ).show(context);
+    _showSnackBar(
+      context,
+      message,
+      backgroundColor: Theme.of(context).colorScheme.error,
+      icon: Icons.error_outline,
+    );
   }
 
-  /// Mostra un messaggio informativo
+  /// Mostra un messaggio informativo con SnackBar
   static void showInfo(BuildContext context, String message, {String? title}) {
-    ElegantNotification.info(
-      width: 360,
-      position: Alignment.topCenter,
-      animation: AnimationType.fromTop,
-      title: Text(
-        title ?? 'Info',
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      description: Text(message),
-    ).show(context);
+    _showSnackBar(context, message, icon: Icons.info_outline);
   }
 
   static void logDebug(dynamic message) => _logger.d(message.toString());

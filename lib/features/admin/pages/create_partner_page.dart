@@ -140,6 +140,7 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
               const SizedBox(height: 32),
               TextFormField(
                 controller: _usernameController,
+                textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(
                   labelText: 'Nome Partner / Ragione Sociale',
                   prefixIcon: Icon(Icons.business),
@@ -155,6 +156,7 @@ class _CreatePartnerPageState extends ConsumerState<CreatePartnerPage> {
               const SizedBox(height: 20),
               TextFormField(
                 controller: _emailController,
+                textInputAction: TextInputAction.done,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: 'Email Istituzionale',

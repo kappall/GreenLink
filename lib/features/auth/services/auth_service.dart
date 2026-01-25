@@ -115,6 +115,7 @@ class AuthService {
   }
 
   Future<UserModel> fetchCurrentUser({required String token}) async {
+    FeedbackUtils.logInfo("Fetching user");
     final uri = Uri.parse('$_baseUrl/me');
     try {
       final response = await http.get(
@@ -123,6 +124,9 @@ class AuthService {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
+      );
+      FeedbackUtils.logInfo(
+        "Response status code: ${response.statusCode}; Response body: ${response.body}",
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {

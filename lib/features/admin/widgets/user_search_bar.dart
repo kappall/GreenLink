@@ -13,6 +13,7 @@ class UsersSearchBar extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       child: TextField(
         onChanged: (v) => ref.read(usersSearchQueryProvider.notifier).state = v,
+        textInputAction: TextInputAction.done,
         decoration: InputDecoration(
           hintText: "Cerca per nome o email...",
           prefixIcon: const Icon(Icons.search),

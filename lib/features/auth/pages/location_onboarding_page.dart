@@ -239,6 +239,7 @@ class _LocationOnboardingPageState
                   Expanded(
                     child: TextField(
                       controller: _addressController,
+                      textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                         hintText: "Città, Via...",
                         border: OutlineInputBorder(

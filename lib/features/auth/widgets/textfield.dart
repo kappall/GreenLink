@@ -24,6 +24,7 @@ class AuthTextField extends StatelessWidget {
       keyboardType: keyboardType,
       controller: controller,
       obscureText: obscure,
+      textInputAction: TextInputAction.done,
       validator: validator,
       decoration: InputDecoration(
         hintText: hint,
