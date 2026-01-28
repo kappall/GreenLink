@@ -25,11 +25,9 @@ final socketServiceProvider = Provider<SocketService>((ref) {
   });
 
   ref.listen(authProvider, (_, next) {
-    final isAuthenticated = next.asData?.value.isAuthenticated ?? false;
-    FeedbackUtils.logInfo(
-      'authProvider changed: isAuthenticated: $isAuthenticated',
-    );
-    if (isAuthenticated) {
+    final isLoggedIn = next.asData?.value.isLoggedIn ?? false;
+    FeedbackUtils.logInfo('authProvider changed: isLoggedIn: $isLoggedIn');
+    if (isLoggedIn) {
       service.connect();
     } else {
       service.disconnect();

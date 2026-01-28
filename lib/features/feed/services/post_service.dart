@@ -234,16 +234,18 @@ class PostService {
       final filename = '${_stripExtension(file.name)}.$extension';
       final tempPath =
           '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}_$filename';
-      final tempFile = await File(tempPath).writeAsBytes(
-        encodedBytes,
-        flush: true,
-      );
+      final tempFile = await File(
+        tempPath,
+      ).writeAsBytes(encodedBytes, flush: true);
 
       return http.MultipartFile.fromPath(
         fieldName,
         tempFile.path,
         filename: filename,
-        contentType: http.MediaType('image', extension == 'png' ? 'png' : 'jpeg'),
+        contentType: http.MediaType(
+          'image',
+          extension == 'png' ? 'png' : 'jpeg',
+        ),
       );
     } catch (_) {
       return http.MultipartFile.fromPath(
@@ -304,10 +306,7 @@ class PostService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({
-        "reason": reason,
-        "content": {"id": contentId},
-      }),
+      body: jsonEncode({"reason": reason, "content": contentId}),
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {

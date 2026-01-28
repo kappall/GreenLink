@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/auth/models/auth_state.dart';
 import 'package:greenlinkapp/features/auth/providers/onboarding_provider.dart';
 import 'package:greenlinkapp/features/auth/services/auth_service.dart';
@@ -67,6 +68,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }
 
   void loginAnonymous() {
+    FeedbackUtils.logInfo("Attempting anonymous login");
     state = const AsyncData(
       AuthState(
         user: UserModel(id: -1, email: '', username: 'Ospite'),

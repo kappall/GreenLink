@@ -53,10 +53,13 @@ final routerProvider = Provider<GoRouter>((ref) {
   // Listener per forzare il refresh del router quando cambia l'auth o l'onboarding
   final routerListenable = ValueNotifier<bool>(true);
   ref.listen(authProvider, (previous, next) {
+    final prevIsLoggedIn = previous?.value?.isLoggedIn ?? false;
+    final nextIsLoggedIn = next.value?.isLoggedIn ?? false;
     final prevIsAuthenticated = previous?.value?.isAuthenticated ?? false;
     final nextIsAuthenticated = next.value?.isAuthenticated ?? false;
 
-    if (prevIsAuthenticated != nextIsAuthenticated) {
+    if (prevIsLoggedIn != nextIsLoggedIn ||
+        prevIsAuthenticated != nextIsAuthenticated) {
       routerListenable.value = !routerListenable.value;
     }
   });
@@ -76,42 +79,75 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authAsync = ref.read(authProvider);
       final hasCompletedOnboarding = ref.read(onboardingProvider);
 
-      // If auth is loading, don't redirect (stay on splash screen)
+      // Se sta caricando l'autenticazione, non fare nulla (resta sulla splash)
       if (authAsync.isLoading) return null;
 
       final authState = authAsync.value;
+      final isLoggedIn = authState?.isLoggedIn ?? false;
       final isAuthenticated = authState?.isAuthenticated ?? false;
+      final isAdmin = authState?.isAdmin ?? false;
 
       final path = state.uri.path;
-      final isAuthRoute = [
-        '/login',
-        '/register',
-        '/partner-token',
-        '/onboarding',
-      ].contains(path);
+      final isLoggingIn = path == '/login';
+      final isRegistering = path == '/register';
+      final isPartnerActivation = path == '/partner-token';
+      final isIntro = path == '/onboarding';
+      final isAdminRoute = path.startsWith('/admin');
 
-      // If user is not authenticated, redirect to login unless they are on an auth route
-      if (!isAuthenticated) {
-        return isAuthRoute ? null : '/login';
-      }
-
-      // If user is authenticated, handle redirects for admin, onboarding, and auth routes
-      final isAdmin = authState?.isAdmin ?? false;
       final isSharedRoute = [
         '/profile',
         '/settings',
         '/post-info',
         '/event-info',
       ].contains(path);
-      final isAdminRoute = path.startsWith('/admin');
 
+      // 1. UTENTE NON AUTENTICATO (isAuthenticated is false). Questo include gli anonimi.
+      if (!isAuthenticated) {
+        // CASO A: L'utente è anonimo (isLoggedIn è true)
+        if (isLoggedIn) {
+          // Se un utente anonimo prova ad accedere a login/register, mandalo alla home.
+          if (isLoggingIn || isRegistering || isPartnerActivation) {
+            return '/home';
+          }
+          // Altrimenti può navigare liberamente.
+          return null;
+        }
+
+        // CASO B: L'utente è completamente disconnesso (isLoggedIn è false)
+        // Se sta tentando di accedere a una pagina di autenticazione, va bene.
+        if (isLoggingIn || isRegistering || isPartnerActivation) {
+          return null;
+        }
+
+        // Altrimenti, reindirizzalo al login.
+        return '/login';
+      }
+
+      // 2. UTENTE AUTENTICATO (isAuthenticated is true)
+      // GESTIONE ADMIN
       if (isAdmin) {
-        if (!isAdminRoute && !isSharedRoute) {
+        if (isLoggingIn ||
+            isRegistering ||
+            isPartnerActivation ||
+            (!isAdminRoute && !isSharedRoute)) {
           return '/admin/reports';
         }
-      } else if (!hasCompletedOnboarding) {
-        if (path != '/onboarding') return '/onboarding';
-      } else if (isAuthRoute || isAdminRoute) {
+        return null;
+      }
+
+      // GESTIONE ONBOARDING (solo per utenti reali)
+      if (!hasCompletedOnboarding) {
+        if (isIntro) return null; // Già in onboarding
+        return '/onboarding'; // Forza l'onboarding
+      }
+
+      // Se un utente autenticato prova a tornare a login/register/onboarding,
+      // reindirizzalo alla home.
+      if (isLoggingIn ||
+          isRegistering ||
+          isPartnerActivation ||
+          isIntro ||
+          isAdminRoute) {
         return '/home';
       }
 
