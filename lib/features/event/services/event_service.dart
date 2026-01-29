@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
-import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/event/models/event_model.dart';
 import 'package:greenlinkapp/features/user/models/user_model.dart';
 import 'package:http/http.dart' as http;
@@ -45,34 +44,22 @@ class EventService {
       headers['Authorization'] = 'Bearer $token';
     }
 
-    try {
-      final response = await http.get(uri, headers: headers);
+    final response = await http.get(uri, headers: headers);
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        final message = _errorMessage(response);
-        FeedbackUtils.logError(
-          "GET $uri failed (${response.statusCode}): $message",
-        );
-        throw Exception(
-          'Non è stato possibile recuperare l\'evento. Riprova più tardi.',
-        );
-      }
-
-      final decoded = jsonDecode(response.body);
-      final dynamic rawEvent = decoded is Map<String, dynamic>
-          ? decoded['event'] ?? decoded['data'] ?? decoded
-          : decoded;
-
-      if (rawEvent is Map<String, dynamic>) {
-        return EventModel.fromJson(rawEvent);
-      }
-
-      throw Exception('Formato dei dati dell\'evento non valido.');
-    } catch (e) {
-      if (e is Exception) rethrow;
-      FeedbackUtils.logError("Connection error on $uri: $e");
-      throw Exception('Controlla la tua connessione internet e riprova.');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw response;
     }
+
+    final decoded = jsonDecode(response.body);
+    final dynamic rawEvent = decoded is Map<String, dynamic>
+        ? decoded['event'] ?? decoded['data'] ?? decoded
+        : decoded;
+
+    if (rawEvent is Map<String, dynamic>) {
+      return EventModel.fromJson(rawEvent);
+    }
+
+    throw Exception('Invalid event data format.');
   }
 
   Future<PaginatedResult<EventModel>> fetchEventsByDistance({
@@ -134,57 +121,44 @@ class EventService {
   }
 
   Future<List<UserModel>> fetchEventParticipants({
-    required String? token,
+    required String token,
     required int eventId,
   }) async {
     final uri = Uri.parse('$_baseUrl/event/$eventId');
 
-    final headers = {'Accept': 'application/json'};
-    if (token != null && token.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $token';
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw response;
     }
 
-    try {
-      final response = await http.get(uri, headers: headers);
+    final decoded = jsonDecode(response.body);
+    final dynamic rawEvent = decoded is Map<String, dynamic>
+        ? decoded['event'] ?? decoded['data'] ?? decoded
+        : decoded;
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        final message = _errorMessage(response);
-        FeedbackUtils.logError(
-          "GET $uri failed (${response.statusCode}): $message",
-        );
-        throw Exception(
-          'Non è stato possibile recuperare i partecipanti. Riprova più tardi.',
-        );
+    if (rawEvent is Map<String, dynamic>) {
+      final participants = rawEvent['participants'];
+      if (participants is List) {
+        return participants
+            .whereType<Map<String, dynamic>>()
+            .map(UserModel.fromJson)
+            .toList();
       }
-
-      final decoded = jsonDecode(response.body);
-      final dynamic rawEvent = decoded is Map<String, dynamic>
-          ? decoded['event'] ?? decoded['data'] ?? decoded
-          : decoded;
-
-      if (rawEvent is Map<String, dynamic>) {
-        final participants = rawEvent['participants'];
-        if (participants is List) {
-          return participants
-              .whereType<Map<String, dynamic>>()
-              .map(UserModel.fromJson)
-              .toList();
-        }
-      }
-
-      return [];
-    } catch (e) {
-      if (e is Exception) rethrow;
-      FeedbackUtils.logError("Connection error on $uri: $e");
-      throw Exception('Controlla la tua connessione internet e riprova.');
     }
+
+    return [];
   }
 
   Future<PaginatedResult<EventModel>> _requestEvents({
     required Uri uri,
     required String? token,
   }) async {
-    FeedbackUtils.logInfo("Fetching events from $uri");
     final cacheKey = uri.toString();
     if (_cache.containsKey(cacheKey)) {
       return _cache[cacheKey]!;
@@ -195,46 +169,32 @@ class EventService {
       headers['Authorization'] = 'Bearer $token';
     }
 
-    try {
-      final response = await http.get(uri, headers: headers);
+    final response = await http.get(uri, headers: headers);
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        final message = _errorMessage(response);
-        FeedbackUtils.logError(
-          "GET $uri failed (${response.statusCode}): $message",
-        );
-        throw Exception(
-          'Si è verificato un errore nel caricamento degli eventi. Riprova più tardi.',
-        );
-      }
-
-      final totalItems =
-          int.tryParse(response.headers['total-items'] ?? '') ?? 0;
-
-      final decoded = jsonDecode(response.body);
-      final dynamic rawList = switch (decoded) {
-        final Map<String, dynamic> map => map['events'] ?? map['data'] ?? map,
-        final List<dynamic> list => list,
-        _ => decoded,
-      };
-
-      if (rawList is! List) {
-        FeedbackUtils.logError("Unexpected format from $uri: ${response.body}");
-        throw Exception('Errore nel formato dei dati riceveuti.');
-      }
-      final events = rawList
-          .whereType<Map<String, dynamic>>()
-          .map(EventModel.fromJson)
-          .toList();
-      final result = PaginatedResult(items: events, totalItems: totalItems);
-
-      _cache[cacheKey] = result;
-      return result;
-    } catch (e) {
-      if (e is Exception) rethrow;
-      FeedbackUtils.logError("Connection error on $uri: $e");
-      throw Exception('Controlla la tua connessione internet e riprova.');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw response;
     }
+
+    final totalItems = int.tryParse(response.headers['total-items'] ?? '') ?? 0;
+
+    final decoded = jsonDecode(response.body);
+    final dynamic rawList = switch (decoded) {
+      final Map<String, dynamic> map => map['events'] ?? map['data'] ?? map,
+      final List<dynamic> list => list,
+      _ => decoded,
+    };
+
+    if (rawList is! List) {
+      throw Exception('Unexpected format from $uri: ${response.body}');
+    }
+    final events = rawList
+        .whereType<Map<String, dynamic>>()
+        .map(EventModel.fromJson)
+        .toList();
+    final result = PaginatedResult(items: events, totalItems: totalItems);
+
+    _cache[cacheKey] = result;
+    return result;
   }
 
   Future<void> createEvent({
@@ -249,44 +209,30 @@ class EventService {
     required DateTime endDate,
   }) async {
     final uri = Uri.parse('$_baseUrl/event');
-    try {
-      final response = await http.post(
-        uri,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'title': title,
-          'description': description,
-          'latitude': latitude,
-          'longitude': longitude,
-          'event_type': eventType.name,
-          'max_participants': maxParticipants,
-          'start_date': startDate.toIso8601String(),
-          'end_date': endDate.toIso8601String(),
-        }),
-      );
+    final response = await http.post(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'title': title,
+        'description': description,
+        'latitude': latitude,
+        'longitude': longitude,
+        'event_type': eventType.name,
+        'max_participants': maxParticipants,
+        'start_date': startDate.toIso8601String(),
+        'end_date': endDate.toIso8601String(),
+      }),
+    );
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        final message = _errorMessage(response);
-        FeedbackUtils.logError(
-          "POST $uri failed (${response.statusCode}): $message",
-        );
-        throw Exception(
-          'Non è stato possibile creare l\'evento. Verifica i dati inseriti.',
-        );
-      }
-
-      _clearCache();
-    } catch (e) {
-      if (e is Exception) rethrow;
-      FeedbackUtils.logError("Exception during createEvent: $e");
-      throw Exception(
-        'Si è verificato un errore imprevisto durante la creazione.',
-      );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw response;
     }
+
+    _clearCache();
   }
 
   Future<String> participate({
@@ -299,49 +245,33 @@ class EventService {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token',
     };
-    try {
-      final joinResponse = await http.post(
-        joinUri,
-        headers: {...headers, 'Content-Type': 'application/json'},
-      );
 
-      if (joinResponse.statusCode >= 200 && joinResponse.statusCode < 300) {
-        final ticket = _extractTicket(joinResponse.body);
-        if (ticket.isNotEmpty) {
-          _clearCache();
-          return ticket;
-        }
-      } else {
-        final message = _errorMessage(joinResponse);
-        FeedbackUtils.logError(
-          "POST $joinUri failed (${joinResponse.statusCode}): $message",
-        );
-      }
+    final joinResponse = await http.post(
+      joinUri,
+      headers: {...headers, 'Content-Type': 'application/json'},
+    );
 
-      final response = await http.get(eventUri, headers: headers);
-
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        final message = _errorMessage(response);
-        FeedbackUtils.logError(
-          "GET $eventUri failed (${response.statusCode}): $message",
-        );
-        throw Exception(
-          'Non è stato possibile recuperare il ticket dell\'evento. Riprova tra poco.',
-        );
+    if (joinResponse.statusCode >= 200 && joinResponse.statusCode < 300) {
+      final ticket = _extractTicket(joinResponse.body);
+      if (ticket.isNotEmpty) {
+        _clearCache();
+        return ticket;
       }
-      final ticket = _extractTicket(response.body);
-      if (ticket.isEmpty) {
-        FeedbackUtils.logError(
-          'Ticket mancante nella risposta: ${response.body}',
-        );
-        throw Exception('Ticket non valido nella risposta del server.');
-      }
-      _clearCache();
-      return ticket;
-    } catch (e) {
-      FeedbackUtils.logError("Exception in participate: $e");
-      throw Exception('Errore durante il recupero del ticket dell\'evento.');
+    } else {
+      throw joinResponse;
     }
+
+    final response = await http.get(eventUri, headers: headers);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw response;
+    }
+    final ticket = _extractTicket(response.body);
+    if (ticket.isEmpty) {
+      throw Exception('Missing ticket in response: ${response.body}');
+    }
+    _clearCache();
+    return ticket;
   }
 
   Future<void> deleteEvent({
@@ -354,13 +284,7 @@ class EventService {
       headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      FeedbackUtils.logError(
-        "DELETE $uri failed (${response.statusCode}): $message",
-      );
-      throw Exception(
-        'Non è stato possibile eliminare l\'evento. Riprova più tardi.',
-      );
+      throw response;
     }
     _clearCache();
   }
@@ -370,29 +294,16 @@ class EventService {
     required int eventId,
   }) async {
     final uri = Uri.parse('$_baseUrl/event/$eventId/participation');
-    try {
-      final response = await http.delete(
-        uri,
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        final message = _errorMessage(response);
-        FeedbackUtils.logError(
-          "Cancel participation failed for event $eventId: $message",
-        );
-        throw Exception(
-          'Non è stato possibile annullare la partecipazione. Riprova tra poco.',
-        );
-      }
-      _clearCache();
-    } catch (e) {
-      FeedbackUtils.logError("Exception in cancelParticipation: $e");
-      throw Exception('Errore durante la disiscrizione dall\'evento.');
+    final response = await http.delete(
+      uri,
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw response;
     }
+    _clearCache();
   }
 
   String _extractTicket(String body) {
@@ -442,15 +353,6 @@ class EventService {
       return jsonDecode(body);
     } catch (_) {
       return body;
-    }
-  }
-
-  String _errorMessage(http.Response response) {
-    try {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      return data['message']?.toString() ?? response.body;
-    } catch (_) {
-      return response.body;
     }
   }
 }

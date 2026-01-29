@@ -218,7 +218,7 @@ class Events extends _$Events {
   Future<String> participate({required int eventId}) async {
     final authState = ref.read(authProvider).value;
     if (authState == null || authState.token == null) {
-      throw Exception('User not authenticated');
+      throw Exception('Utente non autenticato');
     }
 
     try {
@@ -239,7 +239,7 @@ class Events extends _$Events {
   Future<void> cancelParticipation({required int eventId}) async {
     final authState = ref.read(authProvider).value;
     if (authState == null || authState.token == null) {
-      throw Exception('User not authenticated');
+      throw Exception('Utente non autenticato');
     }
 
     try {
@@ -380,6 +380,12 @@ final eventParticipantsProvider = FutureProvider.family<List<UserModel>, int>((
 ) async {
   final authState = ref.watch(authProvider);
   final token = authState.asData?.value.token;
+
+  if (token == null) {
+    ref.read(authProvider.notifier).logout();
+    throw Exception('Utente non autenticato');
+  }
+
   return EventService.instance.fetchEventParticipants(
     token: token,
     eventId: eventId,

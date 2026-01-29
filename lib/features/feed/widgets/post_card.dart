@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenlinkapp/core/common/widgets/badge.dart';
 import 'package:greenlinkapp/core/providers/geocoding_provider.dart';
+import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:greenlinkapp/features/feed/providers/post_provider.dart';
 import 'package:greenlinkapp/features/feed/utils/time_passed_by.dart';
@@ -114,10 +115,14 @@ class PostCard extends ConsumerWidget {
               button: true,
               onTapHint: "Clicca per aggiungere il tuo voto",
               child: InkWell(
-                onTap: () {
-                  ref
-                      .read(postsProvider(null).notifier)
-                      .votePost(post.id!, post.hasVoted);
+                onTap: () async {
+                  try {
+                    await ref
+                        .read(postsProvider(null).notifier)
+                        .votePost(post.id!, post.hasVoted);
+                  } catch (e) {
+                    FeedbackUtils.showError(context, e);
+                  }
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(

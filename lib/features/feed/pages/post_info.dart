@@ -253,10 +253,14 @@ class _PostInfoPageState extends ConsumerState<PostInfoPage> {
                       button: true,
                       onTapHint: "Tocca per votare",
                       child: InkWell(
-                        onTap: () {
-                          ref
-                              .read(postsProvider(null).notifier)
-                              .votePost(post.id!, post.hasVoted);
+                        onTap: () async {
+                          try {
+                            await ref
+                                .read(postsProvider(null).notifier)
+                                .votePost(post.id!, post.hasVoted);
+                          } catch (e) {
+                            FeedbackUtils.showError(context, e);
+                          }
                         },
                         borderRadius: BorderRadius.circular(20),
                         child: Padding(

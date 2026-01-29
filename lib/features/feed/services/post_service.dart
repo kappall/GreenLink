@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:greenlinkapp/core/common/widgets/paginated_result.dart';
-import 'package:greenlinkapp/core/utils/feedback_utils.dart';
 import 'package:greenlinkapp/features/feed/models/post_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
@@ -84,8 +82,7 @@ class PostService {
       headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      throw Exception('Errore durante il recupero dei post: $message');
+      throw response;
     }
 
     final decoded = jsonDecode(response.body);
@@ -109,8 +106,7 @@ class PostService {
     final response = await http.get(uri, headers: headers);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      throw Exception('Errore durante il recupero dei post: $message');
+      throw response;
     }
 
     final totalItems = int.tryParse(response.headers['total-items'] ?? '') ?? 0;
@@ -122,7 +118,7 @@ class PostService {
       _ => decoded,
     };
     if (rawList is! List) {
-      throw Exception('Risposta inattesa da /posts: $rawList');
+      throw Exception('Unexpected response from /posts: $rawList');
     }
     final posts = rawList
         .whereType<Map<String, dynamic>>()
@@ -161,8 +157,7 @@ class PostService {
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      throw Exception('Errore durante la creazione del post: $message');
+      throw response;
     }
 
     final decoded = jsonDecode(response.body);
@@ -207,8 +202,7 @@ class PostService {
     var response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      throw Exception('Errore durante il caricamento del media: $message');
+      throw response;
     }
     _clearCache();
   }
@@ -287,8 +281,7 @@ class PostService {
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      throw Exception('Errore durante la votazione: $message');
+      throw response;
     }
     _clearCache();
   }
@@ -310,9 +303,7 @@ class PostService {
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      FeedbackUtils.logError(message);
-      throw Exception('Errore durante la segnalazione');
+      throw response;
     }
     _clearCache();
   }
@@ -325,19 +316,8 @@ class PostService {
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      final message = _errorMessage(response);
-      log(message);
-      throw Exception('Errore durante la cancellazione del post');
+      throw response;
     }
     _clearCache();
-  }
-
-  String _errorMessage(http.Response response) {
-    try {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      return data['message']?.toString() ?? response.body;
-    } catch (_) {
-      return response.body;
-    }
   }
 }

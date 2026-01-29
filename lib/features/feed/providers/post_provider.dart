@@ -386,27 +386,8 @@ class Posts extends _$Posts {
 
   Future<void> votePost(int postId, bool hasVoted) async {
     final authState = ref.read(authProvider).value;
-    if (authState == null || authState.token == null) return;
-
-    final previousState = state;
-
-    if (state.hasValue) {
-      state = AsyncValue.data(
-        state.value!.copyWith(
-          items: state.value!.items.map((post) {
-            if (post.id == postId) {
-              final isCurrentlyVoted = post.hasVoted;
-              return post.copyWith(
-                hasVoted: !isCurrentlyVoted,
-                votesCount: isCurrentlyVoted
-                    ? post.votesCount - 1
-                    : post.votesCount + 1,
-              );
-            }
-            return post;
-          }).toList(),
-        ),
-      );
+    if (authState == null || authState.token == null) {
+      throw Exception('Utente non autenticato');
     }
 
     try {
@@ -415,8 +396,26 @@ class Posts extends _$Posts {
         postId: postId,
         hasVoted: hasVoted,
       );
+      if (state.hasValue) {
+        state = AsyncValue.data(
+          state.value!.copyWith(
+            items: state.value!.items.map((post) {
+              if (post.id == postId) {
+                final isCurrentlyVoted = post.hasVoted;
+                return post.copyWith(
+                  hasVoted: !isCurrentlyVoted,
+                  votesCount: isCurrentlyVoted
+                      ? post.votesCount - 1
+                      : post.votesCount + 1,
+                );
+              }
+              return post;
+            }).toList(),
+          ),
+        );
+      }
     } catch (e) {
-      state = previousState;
+      rethrow;
     }
   }
 }
