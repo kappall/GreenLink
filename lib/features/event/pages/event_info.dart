@@ -17,8 +17,8 @@ import '../../../core/providers/geocoding_provider.dart';
 import '../../../core/utils/feedback_utils.dart';
 
 class EventInfoPage extends ConsumerStatefulWidget {
-  final EventModel event;
-  const EventInfoPage({super.key, required this.event});
+  EventModel event;
+  EventInfoPage({super.key, required this.event});
 
   @override
   ConsumerState<EventInfoPage> createState() => _EventInfoPageState();
@@ -26,7 +26,6 @@ class EventInfoPage extends ConsumerStatefulWidget {
 
 class _EventInfoPageState extends ConsumerState<EventInfoPage> {
   bool _isDeleting = false;
-  bool? _isParticipatingOverride;
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +52,7 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
 
     final isExpired = DateTime.now().isAfter(event.endDate);
     final isActionDisabled = isExpired || isAuthor;
-    final bool isParticipating =
-        _isParticipatingOverride ?? event.isParticipating;
+    final bool isParticipating = event.isParticipating;
     final bool showQrAction = isParticipating && !isActionDisabled;
 
     return Scaffold(
@@ -323,7 +321,17 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
           .read(eventsProvider(null).notifier)
           .participate(eventId: eventId);
       if (!mounted) return;
-      setState(() => _isParticipatingOverride = true);
+      final newEvent = await ref
+          .read(eventsProvider(null).notifier)
+          .fetchEvent(eventId);
+      if (newEvent == null) {
+        FeedbackUtils.logInfo("null");
+        context.pop();
+      } else {
+        setState(() {
+          widget.event = newEvent;
+        });
+      }
       await _showQrCode(context, ticket);
       if (!mounted) return;
       FeedbackUtils.showSuccess(context, "Partecipi all'evento");
@@ -359,7 +367,17 @@ class _EventInfoPageState extends ConsumerState<EventInfoPage> {
           .read(eventsProvider(null).notifier)
           .cancelParticipation(eventId: eventId);
       if (!mounted) return;
-      setState(() => _isParticipatingOverride = false);
+      final newEvent = await ref
+          .read(eventsProvider(null).notifier)
+          .fetchEvent(eventId);
+      if (newEvent == null) {
+        FeedbackUtils.logInfo("null");
+        context.pop();
+      } else {
+        setState(() {
+          widget.event = newEvent;
+        });
+      }
       FeedbackUtils.showSuccess(context, "Hai annullato la partecipazione");
     } catch (e) {
       FeedbackUtils.showError(context, e);

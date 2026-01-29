@@ -33,16 +33,10 @@ class EventService {
     return _requestEvents(uri: uri, token: token);
   }
 
-  Future<EventModel> fetchEventById({
-    required String? token,
-    required String eventId,
-  }) async {
+  Future<EventModel> fetchEventById({required String eventId}) async {
     final uri = Uri.parse('$_baseUrl/event/$eventId');
 
     final headers = {'Accept': 'application/json'};
-    if (token != null && token.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $token';
-    }
 
     final response = await http.get(uri, headers: headers);
 

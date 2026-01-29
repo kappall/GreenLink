@@ -255,6 +255,18 @@ class Events extends _$Events {
       rethrow;
     }
   }
+
+  Future<EventModel?> fetchEvent(int eventId) async {
+    try {
+      final event = await _eventService.fetchEventById(
+        eventId: eventId.toString(),
+      );
+      return event;
+    } catch (e) {
+      FeedbackUtils.logError("failed to fetch event: $e");
+    }
+    return null;
+  }
 }
 
 @Riverpod(keepAlive: true)
