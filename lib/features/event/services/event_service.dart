@@ -12,7 +12,7 @@ class EventService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
   final Map<String, PaginatedResult<EventModel>> _cache = {};
 
-  void _clearCache() {
+  void clearCache() {
     _cache.clear();
   }
 
@@ -226,7 +226,7 @@ class EventService {
       throw response;
     }
 
-    _clearCache();
+    clearCache();
   }
 
   Future<String> participate({
@@ -248,7 +248,7 @@ class EventService {
     if (joinResponse.statusCode >= 200 && joinResponse.statusCode < 300) {
       final ticket = _extractTicket(joinResponse.body);
       if (ticket.isNotEmpty) {
-        _clearCache();
+        clearCache();
         return ticket;
       }
     } else {
@@ -264,7 +264,7 @@ class EventService {
     if (ticket.isEmpty) {
       throw Exception('Missing ticket in response: ${response.body}');
     }
-    _clearCache();
+    clearCache();
     return ticket;
   }
 
@@ -280,7 +280,7 @@ class EventService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw response;
     }
-    _clearCache();
+    clearCache();
   }
 
   Future<void> cancelParticipation({
@@ -297,7 +297,7 @@ class EventService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw response;
     }
-    _clearCache();
+    clearCache();
   }
 
   String _extractTicket(String body) {

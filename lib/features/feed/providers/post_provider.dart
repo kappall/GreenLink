@@ -418,6 +418,11 @@ class Posts extends _$Posts {
       rethrow;
     }
   }
+
+  Future<void> refresh() async {
+    _postService.clearCache();
+    ref.invalidate(postsProvider);
+  }
 }
 
 @Riverpod(keepAlive: true)

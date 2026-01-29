@@ -47,7 +47,7 @@ class _VolunteeringFeedPageState extends ConsumerState<VolunteeringFeedPage> {
 
     return RefreshIndicator(
       onRefresh: () {
-        return ref.refresh(eventsProvider(null).future);
+        return ref.read(eventsProvider(null).notifier).refresh();
       },
       child: CustomScrollView(
         controller: _scrollController,

@@ -267,6 +267,13 @@ class Events extends _$Events {
     }
     return null;
   }
+
+  Future<void> refresh() async {
+    _eventService.clearCache();
+    ref.invalidate(eventsProvider);
+    ref.invalidate(eventsByPartnerProvider);
+    ref.invalidate(eventsByDistanceProvider);
+  }
 }
 
 @Riverpod(keepAlive: true)

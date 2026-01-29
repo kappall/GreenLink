@@ -15,7 +15,7 @@ class PostService {
   static const _baseUrl = 'https://greenlink.tommasodeste.it/api';
   final Map<String, PaginatedResult<PostModel>> _cache = {};
 
-  void _clearCache() {
+  void clearCache() {
     _cache.clear();
   }
 
@@ -168,7 +168,7 @@ class PostService {
         await uploadMedia(token: token, postId: postId, file: file);
       }
     }
-    _clearCache();
+    clearCache();
     return postId;
   }
 
@@ -204,7 +204,7 @@ class PostService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw response;
     }
-    _clearCache();
+    clearCache();
   }
 
   Future<http.MultipartFile> _buildMultipartFile({
@@ -283,7 +283,7 @@ class PostService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw response;
     }
-    _clearCache();
+    clearCache();
   }
 
   Future<void> reportContent({
@@ -305,7 +305,7 @@ class PostService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw response;
     }
-    _clearCache();
+    clearCache();
   }
 
   Future<void> deletePost({required String token, required int postId}) async {
@@ -318,6 +318,6 @@ class PostService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw response;
     }
-    _clearCache();
+    clearCache();
   }
 }
