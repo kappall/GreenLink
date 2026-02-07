@@ -4,46 +4,46 @@ GreenLink is a cross-platform mobile application built with [Flutter](https://fl
 
 ## Features
 
-### 🔔 Community Feed
+### Community Feed
 - Browse and create posts about environmental notices and emergency alerts
 - Filter and sort posts by date, proximity, and category
 - Like and comment on posts
 - Full-text search with pagination
 
-### 🌿 Volunteering Events
+### Volunteering Events
 - Discover local volunteering opportunities
 - Create and manage events (for partners)
 - QR code scanning for event check-in
 - Filter by date, proximity, or participation status
 
-### 🗺️ Interactive Map
+### Interactive Map
 - OpenStreetMap-based visualization of posts and events
 - Category-based icons and color-coded markers
 - Real-time user location tracking
 - Tap markers for quick details with navigation to full views
 
-### 👤 User Profiles
+### User Profiles
 - View user activity: posts, events, and comments
 - Edit profile information
 - Role-based badges (user, partner, admin)
 
-### 🔐 Authentication
+### Authentication
 - Email/password registration and login
 - Anonymous browsing mode
 - Partner activation via token
 - Location-based onboarding
 
-### ⚙️ Admin Dashboard
+### Admin Dashboard
 - User management and reporting
 - Partner creation
 - Content moderation
 
-### 📍 Location Services
+### Location Services
 - Real-time geolocation
 - Geocoding and reverse geocoding
 - Configurable location preferences
 
-### 📄 Legal
+### Legal
 - In-app privacy policy and terms of service
 
 ## Tech Stack
@@ -64,9 +64,9 @@ GreenLink is a cross-platform mobile application built with [Flutter](https://fl
 
 ### Prerequisites
 
-- **Flutter SDK** (≥ 3.9.2) — follow the [official installation guide](https://docs.flutter.dev/get-started/install)
-- **Android Studio** — for the Android SDK, emulator, and build tools
-- **Xcode** (macOS only) — for iOS development
+- **Flutter SDK** (≥ 3.9.2) - follow the [official installation guide](https://docs.flutter.dev/get-started/install)
+- **Android Studio** - for the Android SDK, emulator, and build tools
+- **Xcode** (macOS only) - for iOS development
 - **Git**
 
 Verify your setup by running:
@@ -80,7 +80,7 @@ flutter doctor
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/kappall/GreenLink
    cd GreenLink
    ```
 
